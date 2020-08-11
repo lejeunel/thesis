@@ -1,0 +1,37 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Introduction
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Author:   Jan Grossrieder
+%           Ophthalmic Technology Laboratory
+%           ARTORG Center Bern
+%           jan.grossrieder@students.unibe.ch
+%
+% Date:     07/18/2017
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Introduction}
+Machine Learning is an application of Artificial Intelligence (AI) that allows algorithms to learn from examples, data, and experiences \cite{Kohavi1998}. The success of any machine learning approach is highly dependent on the quantity of available data \cite{Wissner2016}.
+Moreover, it has been suggested that the key limiting factor in bringing AI to human-level is the availability of datasets and not the development of algorithms \cite{Wissner2016}.
+Our world is literary overwhelmed by data, but a lot of it still remains to be annotated. Simplifying the labeling process is therefore of great benefit.
+
+Concerning medical images, the task of labeling often requires expert knowledge, which is difficult to obtain. Moreover, the task itself is very tedious and time-consuming. In an attempt to circumvent these limitations, an ongoing project at the University of Bern replaces the traditional mouse-based annotation approach with an eye-gaze tracker \cite{Lejeune2017}.
+The expert is asked to stare at an object of interest in a video/volumetric sequence. An eye-gaze tracker, placed in front of the expert, records the coordinates of his/her gaze. The gaze locations are then used as priors in a larger framework to generate segmentations on the whole sequence.
+In this frame, a robust foreground model is trained in a Positive-Unlabeled (PU) learning fashion.
+The robustness of the latter framework is therefore highly dependent on the feature representation.
+
+From an intuitive point of view, a robust feature representation should encode explanatory factors in data \cite{Bengio2013}. In early years, a lot of effort had been invested in engineering features ``by hand'', i.e. by selecting a limited number of predefined models.
+More recent approaches use machine learning techniques to train flexible models from the data. This problematic is studied in the field of \textit{representation learning}, a.k.a \textit{feature learning}. Here, a model learns to extract discriminant features from a set of samples \cite{Goodfellow2015}.
+
+This thesis proposes several feature extraction methods applied to medical video and volumetric data as a contribution to the aforementioned gaze-based annotation framework.
+In particular, we aim to find features that discriminate the foreground (object of interest) to the background.
+We apply our methods on four modalities of medical image data: an endoscopic video showing a tweezer, CT recordings of an inner ear with the cochlea being of interest, slit-lamp recordings of the retina showing the optical disc, and MRI recordings of a brain showing a tumor.
+
+Our framework can be divided into a \textit{feature extraction} part and an \textit{evaluation} part. The \textit{feature extraction} part learns features from a given image sequence in an unsupervised (autoencoder setting) or semi-supervised manner and describes this data at a superpixel level. We learn features by training a Convolutional Neural Network (CNN) based on a U-Net \cite{Ronneberger2015} structure. For semi-supervised models, we incorporate the gaze location as an object prior. We also compare those methods to several baseline approaches: Bag of Visual Words (\textit{BoVW}), Sparse-coded Spatial Pyramid (\textit{ScSP}), and a pre-trained \textit{VGG-16} network. 
+
+Our images are first segmented in an unsupervised manner by means of superpixels. A single feature vector is then extracted on each superpixel. Next, we train a Random Forest binary classifier using those features. The training is performed in a supervised manner using provided pixel-wise binary ground truth segmentations. As performance metrics, we use Precision-Recall curves and \textit{max F1-Score}.
+
+This thesis is structured as follows: Chapter two provides an overview of related work and technical background on feature learning as well as gaze-based segmentation. The general concept of CNN is described, followed by the specific structure of the U-Net architecture. The Random Forest algorithm is then introduced. Chapter three presents the datasets and the proposed methods, including an overview of the framework. The results are presented in chapter four. We discuss the findings in chapter five. Chapter six gives an outlook and provides suggestions for future improvements.
+
+\endinput

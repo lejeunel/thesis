@@ -1,0 +1,5 @@
+, ScP mean,ScP std, ScP exp, VGG mean,VGG std, VGG exp, U-Net,U-Net std, U-Net exp, U-Net gaze,U-Net gaze std, U-Net gaze exp
+Tweezer,0.9,6.04,4,0.965,3.87,4,0.983,4.84,4,0.983,4.22,4
+Brain,0.805,1.67,3,0.864,2.61,3,0.956,4.86,3,0.958,3.92,3
+Slitlamp,0.973,1.41,3,0.951,2.57,3,0.982,6.78,3,0.982,5.38,3
+Cochlea,0.853,7.88,3,0.759,5.6,3,0.963,4.05,3,0.962,3.9,3

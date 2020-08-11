@@ -1,0 +1,23 @@
+\begin{table}
+\centering
+\caption{Area Under the Curve (AUC) and performances for each approach on each dataset. Highlight maximum values in bold.}
+\label{tab:results}
+\begin{tabular}{llrrrl}
+\toprule
+         &    &  Vilarino et al. \cite{vilarino07} &  Probability Est. &     EL &           EEL \\
+Type & Metric &                                    &                   &        &               \\
+\midrule
+\multirow{2}{*}{Brain} & AUC &                              0.687 &             0.963 &  0.974 &  $\bm{0.976}$ \\
+         & F1 &                              0.551 &             0.428 &  0.482 &  $\bm{0.592}$ \\
+\cline{1-6}
+\multirow{2}{*}{Cochlea} & AUC &                              0.687 &             0.963 &  0.974 &  $\bm{0.976}$ \\
+         & F1 &                              0.223 &             0.239 &  0.431 &  $\bm{0.631}$ \\
+\cline{1-6}
+\multirow{2}{*}{Tweezer} & AUC &                              0.346 &             0.949 &  0.959 &  $\bm{0.985}$ \\
+         & F1 &                              0.239 &             0.711 &  0.725 &  $\bm{0.851}$ \\
+\cline{1-6}
+\multirow{2}{*}{Slitlamp} & AUC &                              0.687 &             0.963 &  0.974 &  $\bm{0.976}$ \\
+         & F1 &                              0.506 &             0.367 &  0.494 &  $\bm{0.665}$ \\
+\bottomrule
+\end{tabular}
+\end{table}

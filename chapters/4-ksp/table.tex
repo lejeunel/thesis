@@ -1,0 +1,132 @@
+
+\newcommand\mybold[2]{%
+    \IfEqCase{#2}{
+      {True}{\textbf{#1}}
+      {TRUE}{\textbf{#1}}
+      {False}{#1}
+      {FALSE}{#1}
+      }
+}
+
+\newcommand\printType[2]{\ifthenelse{\equal{#1}{KSP}}{\multirow{3}{*}{#2}}{}}
+
+\newcommand{\convmethod}[1]{%
+    \IfEqCase{#1}{%
+        {vilar}{\PSVMnb}%
+        {gaze2}{\GSnb}%
+        {mic17}{\EELnb}%
+        {wtp}{\DLnb}%
+        {KSP}{\KSPnb}%
+        {KSPopt}{\KSPOPTnb}%
+    }[\PackageError{convmethod}{Undefined option to convmethod: #1}{}]%
+}%
+
+% #1: csvfile.csv, #2: Type
+\newcommand\dataall[2]{\csvreader[no head,
+  respect backslash=true,
+  respect rightbrace=true,
+  respect leftbrace=true,
+  late after line=\ifthenelse{\equal{\smethods}{vilar}}{\\\cdashline{2-10}}{\\},
+  late after last line=\\\hline,
+  before first line=,
+  column count=24,
+  ]
+  {#1}{
+    1=\smethods,
+    2=\fa,
+    3=\pra,
+    4=\rca,
+    5=\bolda,
+    6=\fb,
+    7=\prb,
+    8=\rcb,
+    9=\boldb,
+    10=\fc,
+    11=\prc,
+    12=\rcc,
+    13=\boldc,
+    14=\fd,
+    15=\prd,
+    16=\rcd,
+    17=\boldd,
+    18=\boldall,
+    19=\fmean,
+    20=\fstd,
+    21=\prmean,
+    22=\prstd,
+    23=\rcmean,
+    24=\rcstd}
+  {\printType{\smethods}{#2} & \convmethod{\smethods} & $\mybold{\fa}{\bolda}$ & $\mybold{\fb}{\boldb}$ & $\mybold{\fc}{\boldb}$ & $\mybold{\fd}{\boldd}$ & ~~ & $\mybold{\fmean}{\boldall} \pm \fstd$ & $\prmean \pm \prstd$& $\rcmean \pm \rcstd$}
+    }
+
+\newcommand{\convloss}[1]{%
+    \IfEqCase{#1}{%
+        {L2}{\text{U-Net}}
+        {overfeat}{\text{OverFeat}}
+        {L2prior}{\text{Image-object}}
+    }[\PackageError{convloss}{Undefined option to convloss: #1}{}]%
+}%
+\newcommand\printTypeLoss[2]{\ifthenelse{\equal{#2}{L2prior}}{\multirow{3}{*}{#1}}{}}
+\newcommand\losscomp{
+  \csvreader[no head,
+    tabular=cccccccc,
+    column count=17,
+  late after line=\ifthenelse{\equal{\themethod}{L2prior}}{\\\cdashline{1-8}}{\\},
+    late after last line=\\\hline,
+    table head=
+      \toprule \multirow{2}{*}{Type} & \multirow{2}{*}{Features} & \multicolumn{4}{c}{F1} & ~~ & F1 \\
+       &  & 1 & 2 & 3 & 4 & ~~ & mean $\pm$ std \\ \toprule,
+    filter expr={
+          test{\ifnumgreater{\thecsvinputline}{1}}}
+    ]
+  {chapters/4-ksp/tables/ksp_losses.csv}{1=\thetype,
+    2=\themethod,
+    3=\bolda,
+    4=\meana,
+    5=\stda,
+    6=\boldb,
+    7=\meanb,
+    8=\stdb,
+    9=\boldc,
+    10=\meanc,
+    11=\stdc,
+    12=\boldd,
+    13=\meand,
+    14=\stdd,
+    15=\boldall,
+    16=\meanall,
+    17=\stdall}
+    {\printTypeLoss{\thetype}{\themethod} & \convloss{\themethod} & $\mybold{\meana}{\bolda} \pm \stda$ & $\mybold{\meanb}{\boldb} \pm \stdb$ & $\mybold{\meanc}{\boldc} \pm \stdc$ & $\mybold{\meand}{\boldd} \pm \stdd$& ~~ & $\mybold{\meanall}{\boldall} \pm \stdall$}
+    }
+
+% #1: csvfile.csv, #2: Type
+    \newcommand\dataallfeatextr[1]{
+  \csvreader[no head,
+    tabular=cccccc,
+    column count=16,
+    table head=
+              \toprule Types & ScP & VGG & U-Net & U-Net / prior\\\toprule,
+    late after last line=\\\hline,
+    filter expr={
+          test{\ifnumgreater{\thecsvinputline}{1}}}
+    ]
+  {#1}{1=\smethods,
+    2=\mscp,
+    3=\sscp,
+    4=\escp,
+    5=\mvgg,
+    6=\svgg,
+    7=\evgg,
+    8=\munet,
+    9=\sunet,
+    10=\eunet,
+    11=\munetg,
+    12=\sunetg,
+    13=\eunetg}
+    {\smethods & \mscp $\pm \sscp \cdot 10^{-\escp}$ & \mvgg $\pm \svgg \cdot 10^{-\evgg}$ & \munet $\pm \sunet \cdot 10^{-\eunet}$ &  \munetg $\pm \sunetg \cdot 10^{-\eunetg}$}
+    }
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../../main"
+%%% End:

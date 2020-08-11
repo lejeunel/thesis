@@ -1,0 +1,13 @@
+Type,Loss,0_dobold,0_mean,0_std,1_dobold,1_mean,1_std,2_dobold,2_mean,2_std,3_dobold,3_mean,3_std,all_dobold,all_mean,all_std
+Tweezer,L2prior,True,0.81,0.05,False,0.85,0.02,True,0.82,0.05,False,0.75,0.04,True,0.81,0.04
+Tweezer,L2,False,0.8,0.06,True,0.86,0.02,False,0.81,0.05,True,0.78,0.03,False,0.81,0.04
+Tweezer,overfeat,False,0.67,0.03,False,0.75,0.02,False,0.69,0.06,False,0.6,0.05,False,0.68,0.04
+Brain,L2prior,True,0.8,0.01,False,0.67,0.03,False,0.78,0.04,True,0.64,0.02,False,0.72,0.02
+Brain,L2,False,0.8,0.01,False,0.67,0.02,True,0.84,0.0,False,0.64,0.02,True,0.74,0.01
+Brain,overfeat,False,0.77,0.01,True,0.74,0.01,False,0.82,0.01,False,0.61,0.02,False,0.74,0.01
+Slitlamp,L2prior,False,0.61,0.07,False,0.73,0.02,True,0.71,0.07,True,0.83,0.04,True,0.72,0.05
+Slitlamp,L2,True,0.72,0.07,False,0.74,0.05,False,0.61,0.02,False,0.6,0.03,False,0.67,0.04
+Slitlamp,overfeat,False,0.51,0.02,True,0.76,0.02,False,0.71,0.03,False,0.75,0.03,False,0.68,0.02
+Cochlea,L2prior,True,0.6,0.05,True,0.59,0.03,True,0.64,0.06,False,0.63,0.04,True,0.62,0.05
+Cochlea,L2,False,0.59,0.03,False,0.55,0.03,False,0.63,0.05,True,0.64,0.02,False,0.6,0.03
+Cochlea,overfeat,False,0.52,0.03,False,0.5,0.08,False,0.54,0.05,False,0.58,0.03,False,0.54,0.05
