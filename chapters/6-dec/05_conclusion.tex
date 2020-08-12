@@ -1,0 +1,17 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+We presented a contribution to a framework that allows pixel-wise segmentation of medical sequences based on minimal point-wise supervision.
+As the problem is inherently hard, we build up on a previous work that leverages spatio-temporal appearance similarities between superpixels.
+Both the clustering and the features are learned jointly by leveraging both their appearance similarity and their objectness probability.
+We evaluate on a number of different medical datasets, with several inherent difficulties.
+The results show that the addition of the clustering task can in some cases help the sparse point segmentation task.
+However, we noticed that through the clustering process, the reconstruction and clustering objectives come into conflict, i.e the entrance/transition model gets better as the foreground model gets worse, thereby having a detrimental effect on performance.
+The observed variance between the different sequences of the same type can be explained by the fact that in some cases, where one of the four sequences is noisier than the others, the k means clustering encounters limitations, that are reflected both to the mean and the variance. 
+As future work, we aim at more clearly decoupling the two tasks, so that the optimization of the one does not damage the other.
+We also plan on including spatio-temporal constraints in the clustering process.
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "00_main"
+%%% End:
