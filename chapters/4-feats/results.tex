@@ -1,20 +1,8 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Related Work and Background
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% Author:   Jan Grossrieder
-%           Ophthalmic Technology Laboratory
-%           ARTORG Center Bern
-%           jan.grossrieder@students.unibe.ch
-%
-% Date:     07/18/2017
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\chapter{Results}
+\section{Results}
+\label{sec:feats_results}
 This chapter starts by giving visual results of our superpixel segmentation. We then elaborate on the experimental setup. The results from training and evaluation procedures are described. Details on method-specific parameters and configuration are also given.
 
-\section{Superpixel Segmentation}
+\subsection{Superpixel Segmentation}
 Fig. \ref{fig:sp_example} shows examples of the superpixel segmentation. The yellow line shows the ground truth contour of the object of interest and the red line the contour made by the superpixels. We notice that in the surgical video recording the segmentation often misses the contour of the tweezer. In the CT recording of the inner ear, a small region is not captured by the superpixel segmentation. 
 
 \begin{figure}[htbp]
@@ -50,11 +38,11 @@ We also performed experiments with the non-adaptive superpixel segmentation meth
 This method showed to follow better the contours with the cost of having highly irregular shaped segments (as also shown by \cite{csillik16}).
 We concluded that for our task, regularly shaped segments are more important and therefore used the ASLIC method.
 
-\section{Neural Network Training}
+\subsection{Neural Network Training}
 In this section, we first describe the training configurations followed by the parameterization of the data augmentation. We then analyze the training loss (learning curves) on few examples.
 Visual examples of activation maps are given to illustrate what kind of filters the network is learning.
 
-\subsection{Training Configurations} \label{ch:training_conf}
+\subsubsection{Training Configurations} \label{ch:training_conf}
 All of our U-Net based models are trained using an Adam optimizer \cite{kingma15} (learning rate $= 0.0001$, $\beta_1 = 0.9$, $\beta_2 = 0.999$, $\epsilon = 10^{-8}$, no decay), and Glorot \cite{glorot10} to initialize the weights.
 The stopping criterion for training is reached after $20$ epochs. We will argue about this value in chapter \ref{ch:perf_vs_training}.
 
@@ -78,7 +66,7 @@ The maximum size of the mini-batch depends on the GPU memory, the model architec
 \end{table}
 
 \clearpage
-\subsection{Data Augmentation} \label{results_data_gen}
+\subsubsection{Data Augmentation} \label{results_data_gen}
 Since we were limited in data size, we had to use an augmentation method (chapter \ref{ch:data_gen}). A data generator samples from the raw image sequence, randomly chooses a value within the given transform range, and applies this transform to the sampled image. Additionally, random Gaussian noise is added to all channels of the image. The amount of Gaussian noise to be added is defined by a standard deviation $\sigma$, which is relative to the $8$bit image depth ($0$ - $255$). Another parameter describes how many samples are generated for each epoch.
 
 The data generator's parameters are defined in Tab. \ref{tab:data_gen_param}. In Fig. \ref{fig:data_gen}, we show examples obtained from a frame out of the dataset \textit{Slit-Lamp Retina A}.
@@ -113,7 +101,7 @@ The data generator's parameters are defined in Tab. \ref{tab:data_gen_param}. In
 \end{figure}
 
 \clearpage
-\subsection{Learning Curve} \label{ch:learning_curve}
+\subsubsection{Learning Curve} \label{ch:learning_curve}
 In our setting, we train the CNN model on the dataset we later extract the features from. Thus, there is no need to split the dataset into training and validation. The performance would even become worse since the model would be trained on fewer data. For our datasets, where all frames within the set are very similar to each other, we do not expect to find any signs of overfitting given the learning curve.
 
 However, since we will later describe an experiment that shows the feature performance versus the training time of the model (chapter \ref{ch:perf_vs_training}), we still investigate the training curve. To do so, we took the \textit{CT Inner Ear A} dataset and randomly split it into $80\%$ training set and $20\%$ validation set. Subsequently, we trained two models, namely a \textit{U-Net Rec} with MSE-loss and a \textit{U-Net Gaze Prob} with BCE-loss, for $500$ epochs. After each trained epoch, we calculated training and validation loss. Fig. \ref{fig:learn_curve} shows the training and validation loss for the given models. As we expected, there is no sign of overfitting. We also performed this experiment on other datasets and they all showed similar behaviour.
@@ -138,7 +126,7 @@ However, since we will later describe an experiment that shows the feature perfo
 The time per epoch largely depends on the input size of the model. If using the data generator with the above-mentioned settings and train the model on the stated hardware, it takes at most $4.5$ minutes per epoch (dataset \textit{Surgical Video Sequence}) and at least $35$ seconds per epoch (dataset \textit{CT Inner Ear A}).
 
 \clearpage
-\subsection{Activation Maps} \label{ch:act_maps}
+\subsubsection{Activation Maps} \label{ch:act_maps}
 To visualize the effect of filters (kernels) in a CNN, one often visualizes their activation during a forward pass.
 The examples that follow correspond to the layer where our features are extracted, i.e. the last ReLU of the deepest layer (chapter \ref{feat_extract}). We randomly picked an image, performed a forward pass on a trained \textit{U-Net Rec} model, and visualized $11$ out of the $512$ activation maps. Fig. \ref{fig:activatiom_maps} shows two examples on dataset \textit{MRI Brain A} (Fig. \ref{fig:subfig:activatiom_map_ds09}) and \textit{Slit-Lamp Retina B} (Fig. \ref{fig:subfig:activatiom_map_ds13}). The upper left image shows the input image, and the other plots the activation maps, respectively.
 
@@ -163,17 +151,17 @@ We observe for both examples activation maps that have excitations at the object
 \end{figure}
 
 \clearpage
-\section{Feature Extracting Methods}
+\subsection{Feature Extracting Methods}
 We provide results of the evaluation of our feature extraction methods. The evaluation procedure's configurations are first described. Second, the numerical values of the parameters of our methods are given. Third, we show the influence of using data augmentation. Fourth, we give experimental results on the feature performance vs. training-time. Fifth, the influence of the selected features of Random Forest is observed. Sixth, we present an overall ranking of the feature extraction methods in terms of \textit{max F1-Score}. Lastly, we investigate the influence of zero-padding.
 
-\subsection{Configurations of Evaluation Procedure} \label{ch:eval_configs}
+\subsubsection{Configurations of Evaluation Procedure} \label{ch:eval_configs}
 In chapter \ref{optimization} we stated that weight initialization of neural networks can be crucial for performance. Depending on the initialization, the gradient-based optimization will end in different minima and thus, might not be very constant. One could seed the random number generators, such that it always produces the same output. Anyhow, since we compare between different methods, seeding the random number generators would not allow a fair comparison.
 
 U-Net based methods are evaluated in ten repetitions, i.e. each model is trained ten times on each dataset, resulting in ten different feature sets per dataset and method. We evaluate each feature matrix individually by the Random Forest classifier. Its settings are described in chapter \ref{random_forest}. For evaluation, the Random Forest is not seeded.
 
 Concerning the baseline methods (including \textit{VGG-16}), the overall performance is largely unaffected by the random initialization. Thus, for those methods, we produced only one feature matrix per method and dataset. However, the Random Forest, in turn, is applied ten times on each feature matrix.
 
-\subsection{Parameterization of Feature Extraction Methods}
+\subsubsection{Parameterization of Feature Extraction Methods}
 We now give the numerical values of the parameters of our models. The parameters of the baseline methods are given first, followed by the U-Net based method's parameters. For detailed information on the methods, refer to chapter \ref{ch:methods}.
 
 \subsubsection{Baseline Methods}

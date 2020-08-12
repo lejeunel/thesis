@@ -103,17 +103,16 @@ headsepline, % Uncomment to get a line under the header
 	%showframe, % Uncomment to show how the type block is set on the page
 }
 
-% \hyphenation{Mou-gia-ka-kou}
-
 %----------------------------------------------------------------------------------------
 %	THESIS INFORMATION
 %----------------------------------------------------------------------------------------
 
 \thesistitle{Annotation of Medical Videos and Volumes using Sparse Point-wise Supervision}
-\supervisor{Prof. Dr. \textsc{Sznitman} Raphael} % Your supervisor's name, this is used in the title page, print it elsewhere with \supname
-\coadvisor{Prof. Dr. \textsc{Favaro} Paolo} % Your examiner's name, this is not currently used anywhere in the template, print it elsewhere with \examname
+\supervisor{Prof. Dr. \textsc{Sznitman} Raphael} % Your supervisor's name
+\coadvisor{Prof. Dr. \textsc{Favaro} Paolo} % Your examiner's name
+\mentor{Prof. Dr. \textsc{Reyes} Mauricio} % Your mentor's name
 \degree{Doctor of Philosophy in XXX} % Your degree name, this is used in the title page and abstract, print it elsewhere with \degreename
-\author{\textsc{Surname} FirstName} % Your name, this is used in the title page and abstract, print it elsewhere with \authorname
+\author{\textsc{Lejeune} Laurent} % Your name, this is used in the title page and abstract, print it elsewhere with \authorname
 
 \matriculation{00-000-000} % Your matriculation number, this is not currently used anywhere in the template, print it elsewhere with \matriculationnum
 
@@ -162,10 +161,9 @@ headsepline, % Uncomment to get a line under the header
  
 \vfill
 
-\large{Supervisor \\ \supname \\ Supervisor Institute/Department of YYY}\vspace{0.5cm}
-
-\large{Co-advisor \\ \examname \\  Co-advisor Institute/Department of YYY}\vspace{0.5cm}
-\large{Mentor \\ \examname \\  Co-advisor Institute/Department of YYY}\vspace{0.5cm}
+\large{\supname \\ Supervisor Institute/Department of YYY \\}\vspace{0.5cm}
+\large{\examname \\  Co-advisor Institute/Department of YYY \\}\vspace{0.5cm}
+\large{\mentname \\  Mentor Institute/Department of YYY}\vspace{0.5cm}
 
 % % this is needed for the publication at the university of bern library
 % \footnotesize{Original document saved on the web server of the University Library of Bern\\}
@@ -295,9 +293,10 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam bibendum, mi non la
 % Uncomment the lines as you write the chapters
 
 \include{chapters/1-intro/intro}
-\include{chapters/2-eel/eel}
-\include{chapters/3-feats/main}
-\include{chapters/4-ksp/main}
+\include{chapters/2-datasets/datasets}
+\include{chapters/3-eel/eel}
+\include{chapters/4-feats/main}
+\include{chapters/5-ksp/main}
 
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY

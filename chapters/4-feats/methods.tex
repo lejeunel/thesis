@@ -1,44 +1,13 @@
-\chapter{Feature Extraction}
-\label{ch:methods}
-This chapter first describes the dataset modalities and properties. Second, we give an overview of our pipeline from training to evaluation. Third, we introduce the proposed methods for feature learning as well as the evaluation scheme. Concerning the feature representation learning, we first introduce our baseline methods, followed by the U-Net based methods.
-
-Tab. \ref{tab:dataset_stat} summarizes the 13 datasets. We used four different MRI brain sequences (A-D). To augment the number of images for one dataset, the last three datasets (B-D) are combined into one larger dataset \textit{MRI Brain (B-D)}. In a similar manner, dataset \textit{Slit-Lamp Retina (A-D)} is constructed from concatenating four independent datasets together. The two independent datasets of the inner ear CT could not be concatenated due to different image resolutions. To each dataset, we also have corresponding xy-coordinates of the gaze location.
-
-\begin{table}[ht]
-   \centering
-   \caption[Dataset statistics]{Summary and statistics of used datasets. Note the variety in size, resolution and color space.}
-   \begin{tabular}{l|c|c|c|c|c}
-      \toprule
-      \textbf{Name} & \textbf{Size $N$} & \textbf{Height $H$ [px]} & \textbf{Width $W$ [px]} & \textbf{\#Channels $C$} \\
-      \midrule
-      Surgical Video Sequence & 1125 & 576 & 720 & 3 - RGB \\
-      \midrule
-      MRI Brain A & 129 & 540 & 782 & 1 - Gray \\
-      MRI Brain B & 69 & 512 & 680 & 1 - Gray \\
-      MRI Brain C & 75 & 512 & 680 & 1 - Gray \\
-      MRI Brain D & 75 & 512 & 680 & 1 - Gray \\
-      MRI Brain (B-D) & 219 & 512 & 680 & 1 - Gray \\
-      \midrule
-      CT Inner Ear A & 96 & 191 & 252 & 1 - Gray \\
-      CT Inner Ear B & 99 & 290 & 300 & 1 - Gray \\
-      \midrule
-      Slit-Lamp Retina A & 194 & 512 & 680 & 3 - RGB \\
-      Slit-Lamp Retina B & 121 & 512 & 680 & 3 - RGB \\
-      Slit-Lamp Retina C & 75 & 512 & 680 & 3 - RGB \\
-      Slit-Lamp Retina D & 130 & 512 & 680 & 3 - RGB \\
-      Slit-Lamp Retina (A-D) & 520 & 512 & 680 & 3 - RGB \\
-      \bottomrule
-   \end{tabular}
-   \label{tab:dataset_stat}
-\end{table}
+\section{Methods}
+\label{sec:feat_method}
 
 \section{Framework} \label{framework}
-Fig. \ref{fig:Framework} illustrates our feature learning and evaluation framework. The individual blocks, such as superpixel segmentation, feature learning methods, and evaluation method, are elaborated in subsequent chapters. 
+Fig. \ref{fig:Framework} illustrates our feature learning and evaluation framework. The individual blocks, such as superpixel segmentation, feature learning methods, and evaluation method, are elaborated in subsequent sections.
 
 \begin{figure}[!htpb]
   \centering
   \includegraphics[width=13cm]{framework/framework}
-  \caption[Framework description]{Framework description and how the individual parts are connected. Out of image data, superpixel segmentation and possible gaze locations, the feature learning algorithm construct a feature matrix $\boldsymbol{X}$, describing each superpixel by a feature. A Random Forest binary classifier is then trained and validated to make predictions of every superpixel. The labels are denoted by $\boldsymbol{y}$, describing if a superpixel belongs to foreground or background. At the bottom-right, we measure the performance of the classifier.}
+  \caption[Framework description]{Given a superpixel segmentation and 2D locations, the feature learning algorithm construct a feature matrix $\boldsymbol{X}$, describing each superpixel by a feature. A Random Forest binary classifier is then trained and validated to make predictions of every superpixel. The labels are denoted by $\boldsymbol{y}$, describing if a superpixel belongs to foreground or background. At the bottom-right, we measure the performance of the classifier.}
   \label{fig:Framework}
 \end{figure}
 
@@ -51,8 +20,13 @@ Some feature learning methods use the gaze location as an object prior, given as
 \section{Superpixel Segmentation} \label{superpixel_segm}
 As described above, the performance evaluation is performed on a superpixel level. Having a feature vector for each superpixel instead of each pixel reduces the computational requirements. 
 
-We used the superpixel segmentation algorithm ASLIC developed by Achanta et al. \cite{achanta12}.
-SLIC stands for \textit{simple linear iterative clustering} and ASLIC for \textit{adaptive} SLIC. It relies on k-means clustering performed in color and spatial space. A trade-off between color similarity and spatial proximity is found necessary. In the SLIC approach, the problem is solved by using a compactness parameter. For images with both, flat and very textured regions, using the same compactness parameter lead to smooth regular-sized superpixel in the flat regions and highly irregular sized superpixel in textured regions. Thus, Achanta et al. invented the ASLIC approach, which adaptively chooses the compactness parameter for each superpixel differently. Fig. \ref{fig:ExSuperpixel} shows an example of using ASLIC on dataset \textit{Slit-Lamp Retina A}.
+We used the superpixel segmentation algorithm ASLIC proposed in \cite{achanta12}.
+The original simple linear iterative clustering (SLIC) relies on k-means clustering performed in color the Lab color space and further uses spatial coordinates of pixels.
+A trade-off between color similarity and spatial proximity is necessary.
+In the SLIC approach, the problem is solved by using a compactness parameter.
+For images with both, flat and very textured regions, using the same compactness parameter lead to smooth regular-sized superpixel in the flat regions and highly irregular sized superpixel in textured regions.
+Thus, \cite{a} came up with the ASLIC approach, which adaptively chooses the compactness parameter for each superpixel differently.
+Fig. \ref{fig:ExSuperpixel} shows an example of using ASLIC on dataset \textit{Slit-Lamp Retina A}.
 
 \begin{figure}[!htbp]
   \centering
@@ -68,7 +42,11 @@ Having at disposal ground truth data at pixel-level, we set the values of the ou
 If one superpixel is covered by the ground truth pixel-wise segmentation by more than $50\%$ of its area, this specific superpixel is assigned to the foreground. Otherwise, it is assigned to the background.
 
 \section{Feature Learning: Baselines} \label{ch:baselines}
-To evaluate the performance of a method, a standard approach is to compare it to baseline methods. We used three different methods as baselines. The first method is called \textit{Bag of Visual Words (BoVW)}. A variant of the \textit{BoVW} approach is presented in a second baseline approach, so called \textit{Sparse Coded Spatial Pyramid (ScSP)}. This method is currently used in the superordinate project and therefore of high importance. The last baseline method follows the idea of transfer learning and uses a pre-trained VGG-16 network.
+To evaluate the performance of a method, a standard approach is to compare it to baseline methods.
+We used three different methods as baselines.
+The first method is called \textit{Bag of Visual Words (BoVW)}.
+A variant of the \textit{BoVW} approach, called \textit{Sparse Coded Spatial Pyramid (ScSP)} improves on the latter by bagging words at different spatial resolutions.
+Last, we use the features of a Deep Convolutional Network (VGG-16) pre-trained for image classification.
 
 \subsection{Bag of Visual Words} \label{bow}
 \begingroup
@@ -148,35 +126,38 @@ Lazebnik et al. \cite{lazebnik09} describe the spatial pyramid as a "collection 
 Using a pyramid representation implies that the image patch needs to be square. Intuitively, one wants to enclose within the patch some visual context around the superpixel region. We refer to this parameter as patch size.
 In practice, we train our codebook in a similar fashion to \textit{BoVW}, i.e. convert images to grayscale and randomly sample keypoints on every image of the sequence. Each keypoint then gives a SIFT feature vector. Once trained, we extract squared patches of dimension centered on each superpixel's centroid location. We used the implementation of \cite{imdescrip}.
 
-\subsection{VGG-16 Pretrained} \label{vgg}
+\subsection{Pre-trained VGG-16} \label{vgg}
 \begingroup
 \setlength\intextsep{0pt}
 \begin{wrapfigure}[4]{l}[0pt]{1.4cm}
 \includegraphics[height=1.5cm]{icons/vgg.png}
 \end{wrapfigure}
 
-VGGNet is a CNN for large-scale image recognition proposed by Simonyan and Zisserman \cite{simonyan15}.
-Their work was submitted to the ImageNet \cite{ILSVRC15} Challenge 2014 (ILSVRC-2014) where they secured the first and second places in the localization and classification task, respectively.
-Transferring pre-trained VGGNets to other tasks has been successfully used by Long et al.
-\cite{long15} in semantic segmentation and Ng et al. \cite{ng15} in emotion recognition. Those successes motivated us to evaluate the performance of using a pre-trained VGGNet. However, we did not follow any fine tuning steps.
+VGG is a CNN for large-scale image recognition proposed by \cite{simonyan15}.
+The latter work addressed the ImageNet \cite{ILSVRC15} Challenge 2014 (ILSVRC-2014) where it got the first and second places in the localization and classification task, respectively.
+Leveraging pre-trained deep networks to address a different task, an approach called transfer learning, has shown its relevance in the frame of semantic segmentation \cite{long15}, emotion recognition \cite{ng15}, and classification \cite{huynh16}.
 
 \endgroup
 
-Simonyan and Zisserman \cite{simonyan15} proposed various network models.
-We used a model with 16 weight layers and $3 \times 3$ convolution strides, described as configuration D \cite[Tab. 1]{simonyan15}.
-This model was trained on the ILSVRC-2014 dataset and weights are available online \cite{simonyan14a}.
-We took advantage of an already existing implementation by F. Chollet in Keras \cite{Keras}.
+Here, we use the VGG16 model of \cite{simonyan16}, also known as configuration D \cite[Tab. 1]{simonyan15}.
+The model is composed of 16 convolutional layers, each with kernels of size $3 \times 3$.
+It is trained for the classification challenge (ImageNet Large Scale Visual Recognition Challenge \cite{ILSVRC15}.
 Similar to the \textit{ScSP} approach, we extracted patches at superpixel centroids and fed it to the network.
 Since the input dimension of the network is fixed ($244 \times 244 \times 3$), our input data needed to be scaled to that size.
-Resizing is done using bicubic interpolation method of Python's SciPy \cite{scipy} package.
 The features are then extracted from the penultimate fully-connected layer, resulting in a feature dimension of $D=4096$.
 
 From a theoretical point of view, let us mention that most machine learning methods make the assumption that training and unseen data lie in the same feature space and have a similar distribution.
-However, in many real-world applications, this assumption may not hold, as stated by Pan et al. \cite{pan2010}.
-In a setup where the training data largely differs (in the latter sense) from the data used for prediction, we talk about "Transfer Learning". We assume that a network pre-trained on a very large-scale dataset with high generalization will produce good features for our task.
+However, in many real-world applications, this assumption may not hold \cite{pan2010}.
+In a setup where the data distribution of the original training set largely differs from the one we consider, we talk about "Transfer Learning".
+We assume that a network pre-trained on a very large-scale dataset with high generalization will produce good features for our task.
 
 \section{Feature Learning: U-Net Based} \label{ch:unet_based}
-We now describe our U-Net based feature extraction methods. We first explain the architecture of the "core" model, i.e. one that will be modified to account for different outputs and loss functions. We dedicate the second section to data augmentation. The third section describes how the features can be extracted from the CNN model to obtain feature vectors. Our various modified U-Nets will then be described in detail. Finally, an overview summarizes all U-Net based methods.
+We now describe our U-Net based feature extraction methods.
+We first explain the architecture of the "core" model, i.e. one that will be modified to account for different outputs and loss functions.
+We dedicate the second section to data augmentation.
+The third section describes how the features can be extracted from the CNN model to obtain feature vectors.
+Our various modified U-Nets will then be described in detail.
+Finally, an overview summarizes all U-Net based methods.
 
 \subsection{Core Model} \label{model}
 Our CNN is a slight modification of the original U-Net structure described in chapter \ref{u_net}. We did not use the U-Net for image segmentation, as initially done by Ronneberger et. al. Instead, we trained the network in an unsupervised manner, like an autoencoder, on our data and extracted features at the lowest level. Some of our methods operate in a weakly-supervised fashion, where information related to the gaze location is used as a prior.
