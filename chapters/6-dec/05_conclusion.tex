@@ -1,15 +1,21 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-We presented a contribution to a framework that allows pixel-wise segmentation of medical sequences based on minimal point-wise supervision.
-As the problem is inherently hard, we build up on a previous work that leverages spatio-temporal appearance similarities between superpixels.
-Both the clustering and the features are learned jointly by leveraging both their appearance similarity and their objectness probability.
+We presented a framework that allows pixel-wise segmentation of medical sequences based on minimal point-wise supervision.
+Using a self-supervised clustering approach, features of superpixels were learned so as to minimize a purity measure.
 We evaluate on a number of different medical datasets, with several inherent difficulties.
 The results show that the addition of the clustering task can in some cases help the sparse point segmentation task.
 However, we noticed that through the clustering process, the reconstruction and clustering objectives come into conflict, i.e the entrance/transition model gets better as the foreground model gets worse, thereby having a detrimental effect on performance.
-The observed variance between the different sequences of the same type can be explained by the fact that in some cases, where one of the four sequences is noisier than the others, the k means clustering encounters limitations, that are reflected both to the mean and the variance. 
-As future work, we aim at more clearly decoupling the two tasks, so that the optimization of the one does not damage the other.
-We also plan on including spatio-temporal constraints in the clustering process.
+The observed variance between the different sequences of the same type can be explained by the fact that in some cases, where one of the four sequences is noisier than the others, the k means clustering encounters limitations, that are reflected both to the mean and the variance.
+
+We conclude by emphasizing on the flaws and learned lessons of the proposed approach:
+First, \gls{dec} is not suited to our application since it does not explicitely leverages spatial/temporal relations between samples in the learning process.
+We made several attempts at optimizing pairwise constraints along with the clustering purity criteria, but found that the learning process became unstable.
+Second, the foreground prediction is not an explicit part of the learning algorithm, but is rather an ad-hoc component that is meant to benefit from better features.
+We consider this a strategic flaw since \gls{cnn}s are known to perform well on segmentation/prediction tasks.
+In particular, a \gls{cnn} configured for a segmentation task would optimize for both features and classifier function.
+On a more positive note, this work was an opportunity to explore a rich field of machine learning: Self-supervised learning.
+In the next chapter, we therefore conserve the idea of self-supervision and devise a positive-unlabeled learning method coupled with a strategy to augment the set of positive superpixels.
 
 %%% Local Variables:
 %%% mode: latex

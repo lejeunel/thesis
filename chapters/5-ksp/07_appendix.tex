@@ -1,4 +1,4 @@
-\appendix
+\begin{subappendices}
 \section{Edge-disjoint K-shortest paths}
 \label{sec:ksp}
 
@@ -35,29 +35,28 @@ Hence, our algorithm runs Dijkstra's single source shortest path $K$ times. We t
 \end{figure}
 
 
-\SetArgSty{textnormal}
 \begin{algorithm}[t]
-\SetKwInOut{Input}{Input}
-\SetKwInOut{Output}{Output}
-\DontPrintSemicolon
-\Input{$G$: Directed Acyclic Graph constructed as in Sec.~\ref{sec:solving}}
-\Output{$P$: Set of K-shortest paths}
-$p_0 \gets$ \texttt{bellman\_ford\_shortest\_paths}$(G)$\;
-$P_0 \gets\{p_0\} $\;
-\For{$l\gets0$ \KwTo $l_{max}$ }{
- \If{$l \neq 0$}{
-   \If{$\text{cost}(P_l) \geq \text{cost}(P_{l-1})$}{
-     \Return $P_{l-1}$
-     }
- }
-   $G_r \gets$ \texttt{reverse}$(G,P_l)$\tcp*{Reverse edges directions and algebraic signs}
-   $G_r^+ \gets$ \texttt{edge\_costs\_transform}$(G_r)$\tcp*{As in Eq.~\eqref{eq:cost_transform}}
-   $\tilde{p}_l \gets$ \texttt{dijkstra\_shortest\_paths}$(G_r^+)$\tcp*{Returns interlacing path}
-   $P_{l+1} \gets$ \texttt{augment}$(P_l, \tilde{p}_l)$\tcp*{As on Fig.~\ref{fig:augment}}
-
-   }
 \caption{K-shortest paths algorithm.\label{alg:ksp}}
+\begin{algorithmic}[1]
+\Require{$G$: Directed Acyclic Graph constructed as in Sec.~\ref{sec:solving}}
+\Ensure{$P$: Set of K-shortest paths}
+\State $p_0 \gets$ \texttt{bellman\_ford\_shortest\_paths}$(G)$
+\State $P_0 \gets\{p_0\} $
+\For{$l\gets 0$ to $l_{max}$ }
+ \If{$l \neq 0$}
+   \If{\texttt{cost}$(P_l) \geq$ \texttt{cost}$(P_{l-1})$}
+     \Return $P_{l-1}$
+ \EndIf
+ \EndIf
+   \State $G_r \gets$ \texttt{reverse}$(G,P_l)$\Comment{Reverse edges directions and algebraic signs}
+   \State $G_r^+ \gets$ \texttt{edge\_costs\_transform}$(G_r)$\Comment{As in Eq.~\eqref{eq:cost_transform}}
+   \State $\tilde{p}_l \gets$ \texttt{dijkstra\_shortest\_paths}$(G_r^+)$\Comment{Returns interlacing path}
+   \State $P_{l+1} \gets$ \texttt{augment}$(P_l, \tilde{p}_l)$\Comment{As on Fig.~\ref{fig:augment}}
+\EndFor
+
+\end{algorithmic}
 \end{algorithm}
+\end{subappendices}
 
 %%% Local Variables:
 %%% mode: latex

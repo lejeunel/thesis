@@ -3,11 +3,19 @@
 The following section details the implementation of our approach, as well as the parameter values used. We then outline the image datasets that we evaluate and the baselines methods used to compare performances.
 
 \subsection{Implementation and Computational cost}
-Our \KSP ~method is implemented in Python/C++\footnote{We make our implementation, along with the tested datasets and corresponding manual ground truth segmentations available at \label{fn:website}\href{www.gazelabel.com}{www.gazelabel.com}}. Using a Linux machine equipped with a Quad-core 3.2 GHz Intel CPU, the construction of both the forward and backward graphs take 15 minutes each. Superpixel segmentation, including the extraction of dense optical flow, requires 10 minutes. Each iteration in Alg.~\ref{alg:iter_ksp} takes 5 minutes, including the training of the classifier and computing the entrance-exit models. The number of KSP iterations varies between 1 and 5 depending on the sequence and the provided 2D locations. A GeForce GTX 1080 Ti GPU and a Keras based implementation of our network was used for our IOS features, taking 3 hours for 20 epochs (at 500 iterations per epoch).
-In total, our method therefore takes roughly 4 hours for a sequence of 120 frames.
+Our \KSP ~method is implemented in Python/C++\footnote{We make our implementation, along with the tested datasets and corresponding manual ground truth segmentations available at \label{fn:website}\href{www.gazelabel.com}{www.gazelabel.com}}.
+The C++ part (see Alg. \ref{alg:ksp}) uses the C++ Boost Graph library \cite{sick02} which includes the Dijkstra and Bellman-Ford algorithm.
+Using a Linux machine equipped with a Quad-core 3.2 GHz Intel CPU, the construction of both the forward and backward graphs take 15 minutes each.
+Superpixel segmentation, including the extraction of dense optical flow, requires 10 minutes.
+Each iteration in Alg.~\ref{alg:iter_ksp} takes 5 minutes, including the training of the classifier and computing the entrance-exit models.
+The number of KSP iterations varies between 1 and 5 depending on the sequence and the provided 2D locations.
+A GeForce GTX 1080 Ti GPU and a PyTorch \cite{pytorch} based implementation of our network was used for our IOS features, taking ~1 hour per sequence.
+
+In total, our method therefore takes roughly 2 hours for a sequence of 120 frames.
 
 \subsection{Selection of Parameters}
-Table~\ref{tab:parameters} specifies the values of the parameters used in the experiments that follow. Note that these are fixed once and for all, over all experiments and for all datasets. These values were selected empirically so to perform well over all tested sequences.
+Table~\ref{tab:parameters} specifies the values of the parameters used in the experiments that follow.
+Note that these are fixed once and for all, over all experiments and for all datasets. These values were selected empirically so to perform well over all tested sequences.
 
 \begin{table}[htbp]
 \centering

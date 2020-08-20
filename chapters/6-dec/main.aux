@@ -1,45 +1,44 @@
 \relax 
 \providecommand\hyper@newdestlabel[2]{}
-\@writefile{toc}{\contentsline {chapter}{\numberline {5}A Deep Clustering Method for Sparse Point Annotation of Medical Sequences}{63}{chapter.253}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {6}A Deep Clustering approach}{77}{appendix.210}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\@writefile{loa}{\addvspace {10\p@ }}
-\@writefile{toc}{\contentsline {section}{\numberline {5.1}Introduction}{63}{section.254}\protected@file@percent }
-\newlabel{sec:intro}{{5.1}{63}{Introduction}{section.254}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5.1}{\ignorespaces Max-Flow graph (forward case). At each time frame $t$, a ``pseudo'' source node $\mathcal  {E}_t$ is connected via an edge with flow $f_{t}^{\mathcal  {E},n}$ (red) to tracklet $\mathcal  {T}_t^n$. Each tracklet incurs a flow $f_t^n$ (blue) to visit superpixel $s_t^n$. Tracklets in frame $t$ are connected to tracklets in the next frame and allow for flows $f_{t}^{m,n}$ (green). The flow $f_{t}^{n,\mathcal  {X}}$ can leave any tracklet in the network (orange).\relax }}{64}{figure.caption.257}\protected@file@percent }
-\newlabel{fig:ksp_network}{{5.1}{64}{Max-Flow graph (forward case). At each time frame $t$, a ``pseudo'' source node $\mathcal {E}_t$ is connected via an edge with flow $f_{t}^{\mathcal {E},n}$ (red) to tracklet $\mathcal {T}_t^n$. Each tracklet incurs a flow $f_t^n$ (blue) to visit superpixel $s_t^n$. Tracklets in frame $t$ are connected to tracklets in the next frame and allow for flows $f_{t}^{m,n}$ (green). The flow $f_{t}^{n,\mathcal {X}}$ can leave any tracklet in the network (orange).\relax }{figure.caption.257}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.2}Method}{64}{section.255}\protected@file@percent }
-\newlabel{sec:method}{{5.2}{64}{Method}{section.255}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2.1}Base Framework}{64}{subsection.256}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2.2}A Deep Embedded Clustering Approach}{65}{subsection.258}\protected@file@percent }
-\newlabel{sec:dec}{{5.2.2}{65}{A Deep Embedded Clustering Approach}{subsection.258}{}}
-\@writefile{toc}{\contentsline {subsubsection}{Feature encoding: }{65}{section*.260}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Self-supervised clustering: }{65}{section*.261}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {5.2}{\ignorespaces The top row is a convolutional neural network configured for autoencoding. Features are pooled on regions of interest (Superpixels) and projected to a low dimensional space via a fully connected layer (FC). The soft assignments $q$ are then optimized to their hardened target assignments $p$.\relax }}{65}{figure.caption.259}\protected@file@percent }
-\newlabel{fig:network}{{5.2}{65}{The top row is a convolutional neural network configured for autoencoding. Features are pooled on regions of interest (Superpixels) and projected to a low dimensional space via a fully connected layer (FC). The soft assignments $q$ are then optimized to their hardened target assignments $p$.\relax }{figure.caption.259}{}}
-\newlabel{eq:soft_assign}{{5.1}{66}{Self-supervised clustering:}{equation.262}{}}
-\newlabel{eq:tgt_assign}{{5.2}{66}{Self-supervised clustering:}{equation.263}{}}
-\@writefile{toc}{\contentsline {subsubsection}{Optimization: }{66}{section*.264}\protected@file@percent }
-\newlabel{eq:loss_recons}{{5.3}{66}{Optimization:}{equation.265}{}}
-\newlabel{eq:loss_sim}{{5.4}{66}{Optimization:}{equation.266}{}}
-\newlabel{eq:loss}{{5.5}{66}{Optimization:}{equation.267}{}}
-\@writefile{toc}{\contentsline {subsubsection}{Implementation and training: }{66}{section*.268}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Clustering-based pairwise probability model: }{66}{section*.269}\protected@file@percent }
-\newlabel{eq:bc}{{5.6}{67}{Clustering-based pairwise probability model:}{equation.270}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5.3}Experiments}{67}{section.271}\protected@file@percent }
-\newlabel{sec:experiments}{{5.3}{67}{Experiments}{section.271}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.1}Datasets and baselines}{67}{subsection.272}\protected@file@percent }
-\newlabel{sec:data}{{5.3.1}{67}{Datasets and baselines}{subsection.272}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.2}Experiments}{67}{subsection.273}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{Accuracy of segmentations}{67}{section*.274}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5.4}Conclusion}{67}{section.277}\protected@file@percent }
-\newlabel{sec:conclusion}{{5.4}{67}{Conclusion}{section.277}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {5.1}{\ignorespaces  Quantitative results on all datasets. We report the F1 scores and standard deviations. \relax }}{68}{table.caption.275}\protected@file@percent }
-\newlabel{tab:results}{{5.1}{68}{Quantitative results on all datasets. We report the F1 scores and standard deviations. \relax }{table.caption.275}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5.3}{\ignorespaces Qualitative results showing from left to right: (1) Original frame with ground truth contour in red and 2D location in green. The entrance region is the outer circle (2) Thresholded foreground probabilities using plain autoencoder's features. (3) Clusters from K-means. (4) Clusters after DEC. (5) Thresholded foreground probabilities with optimal features. (6) Entrance probabilities given user input of column 1. (7) Final segmentation\relax }}{68}{figure.caption.276}\protected@file@percent }
-\newlabel{fig:qualitative}{{5.3}{68}{Qualitative results showing from left to right: (1) Original frame with ground truth contour in red and 2D location in green. The entrance region is the outer circle (2) Thresholded foreground probabilities using plain autoencoder's features. (3) Clusters from K-means. (4) Clusters after DEC. (5) Thresholded foreground probabilities with optimal features. (6) Entrance probabilities given user input of column 1. (7) Final segmentation\relax }{figure.caption.276}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6.1}Introduction}{77}{section.211}\protected@file@percent }
+\newlabel{sec:intro}{{6.1}{77}{Introduction}{section.211}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6.2}Method}{78}{section.212}\protected@file@percent }
+\newlabel{sec:method}{{6.2}{78}{Method}{section.212}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2.1}Base Framework}{78}{subsection.213}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6.2.1}{\ignorespaces Max-Flow graph (forward case). At each time frame $t$, a ``pseudo'' source node $\mathcal  {E}_t$ is connected via an edge with flow $f_{t}^{\mathcal  {E},n}$ (red) to tracklet $\mathcal  {T}_t^n$. Each tracklet incurs a flow $f_t^n$ (blue) to visit superpixel $s_t^n$. Tracklets in frame $t$ are connected to tracklets in the next frame and allow for flows $f_{t}^{m,n}$ (green). The flow $f_{t}^{n,\mathcal  {X}}$ can leave any tracklet in the network (orange).\relax }}{79}{figure.caption.214}\protected@file@percent }
+\newlabel{fig:ksp_network}{{6.2.1}{79}{Max-Flow graph (forward case). At each time frame $t$, a ``pseudo'' source node $\mathcal {E}_t$ is connected via an edge with flow $f_{t}^{\mathcal {E},n}$ (red) to tracklet $\mathcal {T}_t^n$. Each tracklet incurs a flow $f_t^n$ (blue) to visit superpixel $s_t^n$. Tracklets in frame $t$ are connected to tracklets in the next frame and allow for flows $f_{t}^{m,n}$ (green). The flow $f_{t}^{n,\mathcal {X}}$ can leave any tracklet in the network (orange).\relax }{figure.caption.214}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2.2}A Deep Embedded Clustering Approach}{80}{subsection.215}\protected@file@percent }
+\newlabel{sec:dec}{{6.2.2}{80}{A Deep Embedded Clustering Approach}{subsection.215}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Feature encoding: }{80}{section*.217}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Self-supervised clustering: }{80}{section*.218}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6.2.2}{\ignorespaces The top row is a convolutional neural network configured for autoencoding. Features are pooled on regions of interest (Superpixels) and projected to a low dimensional space via a fully connected layer (FC). The soft assignments $q$ are then optimized to their hardened target assignments $p$.\relax }}{80}{figure.caption.216}\protected@file@percent }
+\newlabel{fig:network}{{6.2.2}{80}{The top row is a convolutional neural network configured for autoencoding. Features are pooled on regions of interest (Superpixels) and projected to a low dimensional space via a fully connected layer (FC). The soft assignments $q$ are then optimized to their hardened target assignments $p$.\relax }{figure.caption.216}{}}
+\newlabel{eq:soft_assign}{{6.1}{81}{Self-supervised clustering:}{equation.219}{}}
+\newlabel{eq:tgt_assign}{{6.2}{81}{Self-supervised clustering:}{equation.220}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Optimization: }{81}{section*.221}\protected@file@percent }
+\newlabel{eq:loss_recons}{{6.3}{81}{Optimization:}{equation.222}{}}
+\newlabel{eq:loss_sim}{{6.4}{81}{Optimization:}{equation.223}{}}
+\newlabel{eq:loss}{{6.5}{81}{Optimization:}{equation.224}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Implementation and training: }{81}{section*.225}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Clustering-based pairwise probability model: }{82}{section*.226}\protected@file@percent }
+\newlabel{eq:bc}{{6.6}{82}{Clustering-based pairwise probability model:}{equation.227}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6.3}Experiments}{82}{section.228}\protected@file@percent }
+\newlabel{sec:experiments}{{6.3}{82}{Experiments}{section.228}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3.1}Datasets and baselines}{82}{subsection.229}\protected@file@percent }
+\newlabel{sec:data}{{6.3.1}{82}{Datasets and baselines}{subsection.229}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3.2}Experiments}{83}{subsection.230}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Accuracy of segmentations}{83}{section*.231}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6.4}Conclusion}{83}{section.234}\protected@file@percent }
+\newlabel{sec:conclusion}{{6.4}{83}{Conclusion}{section.234}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {6.3.1}{\ignorespaces  Quantitative results on all datasets. We report the F1 scores and standard deviations. \relax }}{84}{table.caption.232}\protected@file@percent }
+\newlabel{tab:results}{{6.3.1}{84}{Quantitative results on all datasets. We report the F1 scores and standard deviations. \relax }{table.caption.232}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6.3.1}{\ignorespaces Qualitative results showing from left to right: (1) Original frame with ground truth contour in red and 2D location in green. The entrance region is the outer circle (2) Thresholded foreground probabilities using plain autoencoder's features. (3) Clusters from K-means. (4) Clusters after DEC. (5) Thresholded foreground probabilities with optimal features. (6) Entrance probabilities given user input of column 1. (7) Final segmentation\relax }}{84}{figure.caption.233}\protected@file@percent }
+\newlabel{fig:qualitative}{{6.3.1}{84}{Qualitative results showing from left to right: (1) Original frame with ground truth contour in red and 2D location in green. The entrance region is the outer circle (2) Thresholded foreground probabilities using plain autoencoder's features. (3) Clusters from K-means. (4) Clusters after DEC. (5) Thresholded foreground probabilities with optimal features. (6) Entrance probabilities given user input of column 1. (7) Final segmentation\relax }{figure.caption.233}{}}
 \@setckpt{chapters/6-dec/main}{
-\setcounter{page}{69}
+\setcounter{page}{86}
 \setcounter{equation}{6}
 \setcounter{enumi}{4}
 \setcounter{enumii}{0}
@@ -48,16 +47,16 @@
 \setcounter{footnote}{0}
 \setcounter{mpfootnote}{0}
 \setcounter{part}{0}
-\setcounter{chapter}{5}
+\setcounter{chapter}{6}
 \setcounter{section}{4}
 \setcounter{subsection}{0}
 \setcounter{subsubsection}{0}
 \setcounter{paragraph}{0}
 \setcounter{subparagraph}{0}
-\setcounter{figure}{3}
-\setcounter{table}{1}
-\setcounter{LT@tables}{1}
-\setcounter{LT@chunks}{1}
+\setcounter{figure}{0}
+\setcounter{table}{0}
+\setcounter{LT@tables}{0}
+\setcounter{LT@chunks}{0}
 \setcounter{caption@flags}{0}
 \setcounter{continuedfloat}{0}
 \setcounter{tabx@nest}{0}
@@ -69,7 +68,7 @@
 \setcounter{citetotal}{0}
 \setcounter{multicitecount}{0}
 \setcounter{multicitetotal}{0}
-\setcounter{instcount}{50}
+\setcounter{instcount}{152}
 \setcounter{maxnames}{3}
 \setcounter{minnames}{3}
 \setcounter{maxitems}{3}
@@ -174,21 +173,30 @@
 \setcounter{bbx:relatedcount}{0}
 \setcounter{bbx:relatedtotal}{0}
 \setcounter{cbx@tempcnta}{0}
-\setcounter{cbx@tempcntb}{7}
+\setcounter{cbx@tempcntb}{8}
 \setcounter{subfigure}{0}
 \setcounter{subtable}{0}
-\setcounter{parentequation}{25}
+\setcounter{parentequation}{12}
 \setcounter{nlinenum}{0}
 \setcounter{Item}{4}
 \setcounter{Hfootnote}{3}
 \setcounter{bookmark@seq@number}{0}
-\setcounter{AlgoLine}{13}
-\setcounter{algocfline}{5}
-\setcounter{algocfproc}{5}
-\setcounter{algocf}{5}
+\setcounter{float@type}{8}
+\setcounter{algorithm}{5}
+\setcounter{ALG@line}{12}
+\setcounter{ALG@rem}{0}
+\setcounter{ALG@nested}{0}
+\setcounter{ALG@Lnr}{2}
+\setcounter{ALG@blocknr}{10}
+\setcounter{ALG@storecount}{0}
+\setcounter{ALG@tmpcounter}{0}
 \setcounter{csvinputline}{14}
 \setcounter{csvrow}{12}
 \setcounter{csvcol}{17}
-\setcounter{float@type}{4}
+\setcounter{@pps}{1}
+\setcounter{@ppsavesec}{0}
+\setcounter{@ppsaveapp}{0}
+\setcounter{su@anzahl}{0}
 \setcounter{section@level}{1}
+\setcounter{algsubstate}{3}
 }

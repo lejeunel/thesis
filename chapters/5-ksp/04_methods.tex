@@ -262,26 +262,27 @@ with tuples $(n,t)$ and $(m,n,t)$ corresponding to edges occupied by path $p_l^*
 \end{figure}
 
 \begin{algorithm}[t]
-\SetKwInOut{Input}{Input}
-\SetKwInOut{Output}{Output}
-\DontPrintSemicolon
-\Input{$\mathcal{S}_p$: Initial set of positive superpixels, $\mathcal{S}_u$: Initial set of unlabeled superpixels, $\mathcal{S}$: set of superpixels (with associated variables $\bm{a}$, $\bm{u}$, and $\bm{r}$), $\mathcal{G}$: 2D locations}
-\Output{$\mathcal{P}$: Set of K-shortest paths}
-$g \gets$ \texttt{make\_graph}$(\mathcal{G},\mathcal{S}_p,\mathcal{S}_u,\mathcal{S})$\tcp*{As in sections \ref{sec:foreground_model} and \ref{sec:costs}}
-$\mathcal{P} \gets \emptyset$ \tcp*{Initialize output set to null}
-$find\_paths \gets$ True\tcp*{Flag variable (disabled at convergence)}
-\While{$find\_paths$}{
-  $\mathcal{P^*} \gets$ \texttt{run\_k\_shortest\_paths}$(g)$\tcp*{As in ~\ref{sec:ksp}}
- \eIf(\tcp*[f]{$\phi(.)$ gives the quantity of superpixels}){$\phi(\mathcal{P}) = \phi(\mathcal{P^*})$}{
-   $find\_paths \gets false$\;
- }{
-   $g \gets$ \texttt{update\_tracklet\_costs}$(g,\mathcal{P^*})$\tcp*{Update $\mathcal{S}_p$ and do as in Sec.~\ref{sec:foreground_model}}
-   $g \gets$ \texttt{update\_entrance\_transition\_costs}$(g,\mathcal{P^*})$\tcp*{As in sections \ref{sec:costs}}
-   $g \gets$ \texttt{temporal\_merge}$(g,\mathcal{P^*})$\tcp*{As in Sec.~\ref{sec:iterative_ksp}}
-   }
-   $\mathcal{P} \gets \mathcal{P^*}$\;
-   }
 \caption{\KSP ~Algorithm (single direction).\label{alg:iter_ksp}}
+ \begin{algorithmic}[1]
+\Require{$\mathcal{S}_p$: Initial set of positive superpixels, $\mathcal{S}_u$: Initial set of unlabeled superpixels, $\mathcal{S}$: set of superpixels (with associated variables $\bm{a}$, $\bm{u}$, and $\bm{r}$), $\mathcal{G}$: 2D locations}
+\Ensure{$\mathcal{P}$: Set of K-shortest paths}
+\State $g \gets$ \texttt{make\_graph}$(\mathcal{G},\mathcal{S}_p,\mathcal{S}_u,\mathcal{S})$\Comment{As in sections \ref{sec:foreground_model} and \ref{sec:costs}}
+\State $\mathcal{P} \gets \emptyset$ \Comment{Initialize output set to null}
+\State $find\_paths \gets$ True\Comment{Flag variable (disabled at convergence)}
+\While{$find\_paths$}
+  \State $\mathcal{P^*} \gets$ \texttt{run\_k\_shortest\_paths}$(g)$\Comment{As in ~\ref{sec:ksp}}
+
+ \If $\phi(\mathcal{P}) = \phi(\mathcal{P^*})$ \Comment{$\phi(.)$ gives the quantity of superpixels})
+   $find\_paths \gets false$
+\Else
+   \State $g \gets$ \texttt{update\_tracklet\_costs}$(g,\mathcal{P^*})$\Comment{Update $\mathcal{S}_p$ and do as in Sec.~\ref{sec:foreground_model}}
+   \State $g \gets$ \texttt{update\_entrance\_transition\_costs}$(g,\mathcal{P^*})$\Comment{As in sections \ref{sec:costs}}
+   \State $g \gets$ \texttt{temporal\_merge}$(g,\mathcal{P^*})$\Comment{As in Sec.~\ref{sec:iterative_ksp}}
+   \State $\mathcal{P} \gets \mathcal{P^*}$
+   \EndIf
+  \EndWhile
+
+ \end{algorithmic}
 \end{algorithm}
 
 

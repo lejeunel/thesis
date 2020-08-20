@@ -1,52 +1,41 @@
-\section{Results}
+\section{Experiments}
 \label{sec:feats_results}
 This chapter starts by giving visual results of our superpixel segmentation. We then elaborate on the experimental setup. The results from training and evaluation procedures are described. Details on method-specific parameters and configuration are also given.
 
 \subsection{Superpixel Segmentation}
-Fig. \ref{fig:sp_example} shows examples of the superpixel segmentation. The yellow line shows the ground truth contour of the object of interest and the red line the contour made by the superpixels. We notice that in the surgical video recording the segmentation often misses the contour of the tweezer. In the CT recording of the inner ear, a small region is not captured by the superpixel segmentation. 
+\label{sec:superpix}
+Fig. \ref{fig:sp_example} shows examples of the superpixel segmentation.
 
 \begin{figure}[htbp]
   \centering
-  \subfloat[Surgical Video]
-  {
-    \label{fig:subfig:sp_example_01}
-    \includegraphics[width=4.1cm]{superpixel_results/ds_01}
-  }
-  \hspace{2cm}
-  \subfloat[Slit-Lamp Retina A]
-  {
-    \label{fig:subfig:sp_example_12}
-    \includegraphics[width=4.1cm]{superpixel_results/ds_12}
-  }
-  \\
-  \subfloat[MRI Brain A]
-  {
-    \label{fig:subfig:sp_example_09}
-    \includegraphics[width=4.1cm]{superpixel_results/ds_09}
-  }
-  \hspace{2cm}
-  \subfloat[CT Inner Ear A]
-  {
-    \label{fig:subfig:sp_example_11}
-    \includegraphics[width=4.1cm]{superpixel_results/ds_11}
-  }
-  \caption[Superpixel segmentation example]{Illustration of errors in superpixel segmentation. The object of interest is marked in yellow. Superpixels are shown in dark green and all superpixels which are assigned to positive labels are contoured in red. In (a) the segmentation misses the object contour. In (b) and (c), the segmentation follows the contours more accurately. In (d), a small region is missed.}
+  \includegraphics[width=11cm]{prev_sps}
+  \caption[Superpixel segmentation example]{Example of superpixel segmentation on each type of sequence. Generated with \cite{achanta12}, with $200$ segments.
+  Superpixel contours are in white, ground truth annotation is in red, and user-provided 2D location is in green}
   \label{fig:sp_example}
 \end{figure}
 
-We also performed experiments with the non-adaptive superpixel segmentation method SLIC.
-This method showed to follow better the contours with the cost of having highly irregular shaped segments (as also shown by \cite{csillik16}).
-We concluded that for our task, regularly shaped segments are more important and therefore used the ASLIC method.
+Table \ref{tab:sp_errors} shows for each sequence type the maximum F1 score one would obtain while working with SLIC superpixels in a segmentation setup.
+
+Intuitively, this measure increases as the number of superpixels increase.
+We use here $N=1200$ superpixels, and note that increasing this value further does not improve the F1-score.
+
+\input{chapters/4-feats/tables/sp_errors.tex}
 
 \subsection{Neural Network Training}
-In this section, we first describe the training configurations followed by the parameterization of the data augmentation. We then analyze the training loss (learning curves) on few examples.
+In this section, we first describe the training configurations followed by the parameterization of the data augmentation.
+We then analyze the training loss (learning curves) on few examples.
 Visual examples of activation maps are given to illustrate what kind of filters the network is learning.
 
 \subsubsection{Training Configurations} \label{ch:training_conf}
-All of our U-Net based models are trained using an Adam optimizer \cite{kingma15} (learning rate $= 0.0001$, $\beta_1 = 0.9$, $\beta_2 = 0.999$, $\epsilon = 10^{-8}$, no decay), and Glorot \cite{glorot10} to initialize the weights.
-The stopping criterion for training is reached after $20$ epochs. We will argue about this value in chapter \ref{ch:perf_vs_training}.
+All of our U-Net based models are trained using the Adam optimizer \cite{kingma15} (learning rate $= 0.0001$, $\beta_1 = 0.9$, $\beta_2 = 0.999$, $\epsilon = 10^{-8}$, no decay).
+Weights are initialized with the Glorot method \cite{glorot10}.
+The stopping criterion for training is reached after $20$ epochs.
 
-The maximum size of the mini-batch depends on the GPU memory, the model architecture, and since the latter has different input sizes, also the resolution of the input data. We trained our models on a \textit{GeForce GTX 1080 Ti}, with 11GB memory. The model architectures are all similar in size except for the \textit{U-Net Gaze Prob LSTM}, which contains another recurrent part. The datasets also have similar resolution except for the \textit{CT Inner Ear A + B}. Tab. \ref{tab:batch_size} shows the used mini-batch size.
+The maximum size of the mini-batch depends on the GPU memory, the model architecture, and since the latter has different input sizes, also the resolution of the input data.
+We trained our models on a \textit{GeForce GTX 1080 Ti}, with 11GB memory.
+The model architectures are all similar in size except for the \textit{U-Net Gaze Prob LSTM}, which contains another recurrent part.
+The datasets also have similar resolution except for the \textit{CT Inner Ear A + B}.
+Tab. \ref{tab:batch_size} shows the used mini-batch size.
 \vspace{30pt}
 
 \begin{table}[htbp]
@@ -67,10 +56,9 @@ The maximum size of the mini-batch depends on the GPU memory, the model architec
 
 \clearpage
 \subsubsection{Data Augmentation} \label{results_data_gen}
-Since we were limited in data size, we had to use an augmentation method (chapter \ref{ch:data_gen}). A data generator samples from the raw image sequence, randomly chooses a value within the given transform range, and applies this transform to the sampled image. Additionally, random Gaussian noise is added to all channels of the image. The amount of Gaussian noise to be added is defined by a standard deviation $\sigma$, which is relative to the $8$bit image depth ($0$ - $255$). Another parameter describes how many samples are generated for each epoch.
 
-The data generator's parameters are defined in Tab. \ref{tab:data_gen_param}. In Fig. \ref{fig:data_gen}, we show examples obtained from a frame out of the dataset \textit{Slit-Lamp Retina A}.
-\vspace{20pt}
+The data augmentation parameters are given in Tab. \ref{tab:data_gen_param}.
+Example frames are shown in \ref{fig:data_gen}.
 
 \begin{table}[!htbp]
    \centering
@@ -100,30 +88,39 @@ The data generator's parameters are defined in Tab. \ref{tab:data_gen_param}. In
   \label{fig:data_gen}
 \end{figure}
 
-\clearpage
-\subsubsection{Learning Curve} \label{ch:learning_curve}
-In our setting, we train the CNN model on the dataset we later extract the features from. Thus, there is no need to split the dataset into training and validation. The performance would even become worse since the model would be trained on fewer data. For our datasets, where all frames within the set are very similar to each other, we do not expect to find any signs of overfitting given the learning curve.
+% ch\clearpage
+% \subsubsection{Learning Curve} \label{ch:learning_curve}
+% In our setting, we train the CNN model on the dataset we later extract the features from.
+% Thus, there is no need to split the dataset into training and validation.
+% The performance would even become worse since the model would be trained on fewer data.
+% For our datasets, where all frames within the set are very similar to each other, we do not expect to find any signs of overfitting given the learning curve.
 
-However, since we will later describe an experiment that shows the feature performance versus the training time of the model (chapter \ref{ch:perf_vs_training}), we still investigate the training curve. To do so, we took the \textit{CT Inner Ear A} dataset and randomly split it into $80\%$ training set and $20\%$ validation set. Subsequently, we trained two models, namely a \textit{U-Net Rec} with MSE-loss and a \textit{U-Net Gaze Prob} with BCE-loss, for $500$ epochs. After each trained epoch, we calculated training and validation loss. Fig. \ref{fig:learn_curve} shows the training and validation loss for the given models. As we expected, there is no sign of overfitting. We also performed this experiment on other datasets and they all showed similar behaviour.
-\vspace{20pt}
+% However, since we will later describe an experiment that shows the feature performance versus the training time of the model (chapter \ref{ch:perf_vs_training}), we still investigate the training curve.
+% To do so, we took the \textit{CT Inner Ear A} dataset and randomly split it into $80\%$ training set and $20\%$ validation set.
+% Subsequently, we trained two models, namely a \textit{U-Net Rec} with MSE-loss and a \textit{U-Net Gaze Prob} with BCE-loss, for $500$ epochs.
+% After each trained epoch, we calculated training and validation loss.
+% Fig. \ref{fig:learn_curve} shows the training and validation loss for the given models.
+% As we expected, there is no sign of overfitting.
+% We also performed this experiment on other datasets and they all showed similar behaviour.
+% \vspace{20pt}
 
-\begin{figure}[!htbp]
-  \centering
-  \subfloat[Learning curve of model \textit{U-Net Rec} on dataset \textit{CT Inner Ear A}]
-  {
-    \includegraphics[width=11cm]{learning_curve/learning_curve_ds11_rec}
-  }
-  \\
-  \subfloat[Learning curve of model \textit{U-Net Gaze Prob} on dataset \textit{CT Inner Ear A}]
-  {
-    \includegraphics[width=11cm]{learning_curve/learning_curve_ds11_prob}
-  }
-  \caption[Model learning curves]{Learning curves of training (a) \textit{U-Net Rec} and (b) \textit{U-Net Gaze Prob} model on dataset \textit{CT Inner Ear A}. We split the dataset into $80\%$ training and $20\%$ test and calculated the given loss after each trained epoch. As expected, there are no signs of overfitting.}
-  \label{fig:learn_curve}  
-\end{figure}
-\vspace{20pt}
+% \begin{figure}[!htbp]
+%   \centering
+%   \subfloat[Learning curve of model \textit{U-Net Rec} on dataset \textit{CT Inner Ear A}]
+%   {
+%     \includegraphics[width=11cm]{learning_curve/learning_curve_ds11_rec}
+%   }
+%   \\
+%   \subfloat[Learning curve of model \textit{U-Net Gaze Prob} on dataset \textit{CT Inner Ear A}]
+%   {
+%     \includegraphics[width=11cm]{learning_curve/learning_curve_ds11_prob}
+%   }
+%   \caption[Model learning curves]{Learning curves of training (a) \textit{U-Net Rec} and (b) \textit{U-Net Gaze Prob} model on dataset \textit{CT Inner Ear A}. We split the dataset into $80\%$ training and $20\%$ test and calculated the given loss after each trained epoch. As expected, there are no signs of overfitting.}
+%   \label{fig:learn_curve}
+% \end{figure}
+% \vspace{20pt}
 
-The time per epoch largely depends on the input size of the model. If using the data generator with the above-mentioned settings and train the model on the stated hardware, it takes at most $4.5$ minutes per epoch (dataset \textit{Surgical Video Sequence}) and at least $35$ seconds per epoch (dataset \textit{CT Inner Ear A}).
+% The time per epoch largely depends on the input size of the model. If using the data generator with the above-mentioned settings and train the model on the stated hardware, it takes at most $4.5$ minutes per epoch (dataset \textit{Surgical Video Sequence}) and at least $35$ seconds per epoch (dataset \textit{CT Inner Ear A}).
 
 \clearpage
 \subsubsection{Activation Maps} \label{ch:act_maps}
@@ -272,8 +269,13 @@ To explore the importance of data augmentation, we trained a \textit{U-Net Rec} 
 \end{table}
 
 \clearpage
-\subsection{Performance w.r.t Training Time} \label{ch:perf_vs_training}
-We now evaluate the performance of our features with respect to training time. We trained a \textit{U-Net Rec} model over $100$ epochs and evaluated features every $10$ epochs. Similar to all of our evaluations, we did the training and evaluation with ten repetitions to reduce variance. Fig. \ref{fig:perf_vs_training} shows the mean \textit{max F1-Score} for one dataset per image modality. We notice that past $20$ epochs the performance stagnates or even decreases in the case of the \textit{CT Inner Ear A} dataset. The next section provides more insight on that particular behaviour.
+\subsection{Performance w.r.t Training Time} \label{sec:perf_vs_training}
+We now evaluate the performance of our features with respect to training time.
+We trained a \textit{U-Net AE} model for $100$ epochs and run our evaluation pipeline every $10$ epochs.
+Similar to all of our evaluations, we did the training and evaluation with ten repetitions to reduce variance.
+Fig. \ref{fig:perf_vs_training} shows the mean \textit{max F1-Score} for one dataset per image modality.
+We notice that past $20$ epochs the performance stagnates or even decreases for \textit{Cochlea A} dataset.
+The next section provides more insight on that particular behaviour.
 \vspace{30pt}
 
 \begin{figure}[!htbp]
@@ -281,16 +283,16 @@ We now evaluate the performance of our features with respect to training time. W
   {
     \includegraphics[width=\textwidth]{f1_score_vs_training_time/f1_vs_training_rec}
   }
-  \caption[Feature quality vs training time of U-Net Rec model]{Mean \textit{max F1-Score} over ten repetitions w.r.t training time. The graph shows the results of \textit{U-Net Rec} model for one dataset per image modality.}
+  \caption[Feature quality vs training time of U-Net Rec model]{Mean \textit{max F1-Score} over ten repetitions w.r.t training time using features from \textit{U-Net AE} for one dataset per image modality.}
   \label{fig:perf_vs_training}
 \end{figure}
 
 \clearpage
-\subsection{Influence on Random Forest Feature Selection} \label{ch:ch_infl_feat_selection}
-Fig. \ref{fig:perf_vs_training_maxfeat} shows a comparison of performances for dataset \textit{CT Inner Ear A} where we isolate the parameter $m$, the number of sampled features of the Random Forest (refer to chapter \ref{random_forest}). We observe that setting $m=\sqrt{p}$, as advised by \cite[Ch. 15]{Hastie2009}, gives higher \textit{max F1-Scores} compared to $m=p$.
+\subsection{Influence on Random Forest Feature Selection} \label{sec:infl_feat_selection}
+Fig. \ref{fig:perf_vs_training_maxfeat} shows a comparison of performances for dataset \textit{Cochlea A} w.r.t parameter $m$, the number of sampled features of the Random Forest (see Sec. \ref{random_forest}).
+We observe that setting $m=\sqrt{p}$, as advised by \cite[Ch. 15]{hastie09}, gives higher \textit{max F1-Scores} compared to $m=p$.
 Both curves show a decreasing tendency.
 \vspace{10pt}
-%\myworries{Also, the latter case overfits past $60$ epochs in contrast with $m=\sqrt{p}$ where overfitting happens earlier and is more progressive.}
 
 \begin{figure}[!htbp]
   \centering
@@ -305,7 +307,12 @@ Based on this observations, we choose to train our U-Net based models for $20$ e
 \vspace{20pt}
 
 \subsection{Method Comparison}
-Tab. \ref{tab:final_results} summarizes the feature performance for each dataset and method in terms of \textit{max F1-Scores} averaged over ten repetitions. The standard deviation is given underneath each score. All best scores per dataset are marked in red font. For each dataset and method, we performed a two-sided Welch's t-test \cite{Welch1947} to test if the score reached by the individual method is significantly different to the score reached by the best method for that dataset. We used Welch's t-test since we have independent samples and unequal variances. All values marked in bold font are not significantly different to the best score for a significance level of $0.05$. The last row declares how many times the individual method did not significantly perform worse than the best method. We name this score \textit{Top-Sig-Score}.
+Tab. \ref{tab:final_results} summarizes the feature performance for each dataset and method in terms of \textit{max F1-Scores} averaged over ten repetitions.
+All best scores per dataset are marked in red font.
+For each dataset and method, we performed a two-sided Welch's t-test \cite{welch1947} to determine whether the score reached by the individual method is significantly different to the score reached by the best method for that dataset.
+All values marked in bold font are not significantly different to the best score for a significance level of $0.05$.
+The last row shows how many times the given method did not significantly perform worse than the best method.
+We name this score \textit{Top-Sig-Score}.
 
 \begin{table}[!htbp]
    \centering
@@ -315,12 +322,12 @@ Tab. \ref{tab:final_results} summarizes the feature performance for each dataset
        & \rotatebox[origin=cB]{90}{\parbox[t]{4cm}{BoVW \hspace*{\fill}}} 
        & \rotatebox[origin=cB]{90}{\parbox[t]{4cm}{ScSP \hspace*{\fill}}} 
        & \rotatebox[origin=cB]{90}{\parbox[t]{4cm}{VGG \hspace*{\fill}}} 
-       & \rotatebox[origin=cB]{90}{\parbox[t]{4cm}{U-Net Rec \hspace*{\fill}}} 
-       & \rotatebox[origin=cB]{90}{\parbox[t]{4cm}{U-Net Gaze Rec \hspace*{\fill}}} 
-       & \rotatebox[origin=cB]{90}{\parbox[t]{4cm}{U-Net Gaze Prob \hspace*{\fill}}} 
-       & \rotatebox[origin=cB]{90}{\parbox[t]{4cm}{U-Net Gaze Prob Freeze \hspace*{\fill}}} 
-       & \rotatebox[origin=cB]{90}{\parbox[t]{4cm}{U-Net Gaze Prob Concat \hspace*{\fill}}}
-       & \rotatebox[origin=cB]{90}{\parbox[t]{4cm}{U-Net Gaze Prob LSTM \hspace*{\fill}}}  \\
+       & \rotatebox[origin=cB]{90}{\parbox[t]{4cm}{U-Net AE \hspace*{\fill}}}
+       & \rotatebox[origin=cB]{90}{\parbox[t]{4cm}{U-Net Prior AE \hspace*{\fill}}}
+       & \rotatebox[origin=cB]{90}{\parbox[t]{4cm}{U-Net Pred Loc \hspace*{\fill}}}
+       & \rotatebox[origin=cB]{90}{\parbox[t]{4cm}{U-Net Pred Loc Frozen \hspace*{\fill}}}
+       & \rotatebox[origin=cB]{90}{\parbox[t]{4cm}{U-Net Motion Pred \hspace*{\fill}}}
+       & \rotatebox[origin=cB]{90}{\parbox[t]{4cm}{U-Net Motion Pred LSTM \hspace*{\fill}}}  \\
        & \raisebox{-\totalheight}{\includegraphics[width=0.8cm]{icons/bovw}} 
        & \raisebox{-\totalheight}{\includegraphics[width=0.8cm]{icons/scsp}} 
        & \raisebox{-\totalheight}{\includegraphics[width=0.8cm]{icons/vgg}} 
@@ -362,7 +369,11 @@ Tab. \ref{tab:final_results} summarizes the feature performance for each dataset
    \label{tab:final_results}
 \end{table}
 
-Surprisingly, one baseline method (\textit{ScSP}) reached two times the \textit{Top-Sig-Score}. Both times in a slit-lamp sequence. Fig. \ref{fig:curves_ds14} gives detailed results on the \textit{Slit-Lamp Retina C} dataset. Fig. \ref{subfig:pr_curve_ds14} shows the PR-Curve as an average over all ten repetitions. Fig. \ref{subfig:reprod_ds14} illustrates the distribution of the \textit{max F1-scores} over ten repetitions as a box-plot.
+Surprisingly, one baseline method (\textit{ScSP}) reached two times the \textit{Top-Sig-Score}.
+Both times in a slit-lamp sequence.
+Fig. \ref{fig:curves_ds14} gives detailed results on the \textit{Slit-Lamp Retina C} dataset.
+Fig. \ref{subfig:pr_curve_ds14} shows the PR-Curve as an average over all ten repetitions.
+Fig. \ref{subfig:reprod_ds14} illustrates the distribution of the \textit{max F1-scores} over ten repetitions as a box-plot.
 
 Similarly to Fig. \ref{fig:curves_ds14}, we show in Fig. \ref{fig:curves_ds16} detailed results of dataset \textit{MRI Brain B} to illustrate the improvement obtained by U-Net based methods on that image modality.
 
@@ -429,15 +440,15 @@ In Tab. \ref{tab:zero_vs_sym_padd} we show the mean \textit{max F1-Scores} over 
        & \rotatebox[origin=cB]{90}{\parbox[t]{2.6cm}{U-Net Gaze Rec \\ \textit{\textbf{Symmetric-Pad}\hspace*{\fill}}}}
        & \rotatebox[origin=cB]{90}{\parbox[t]{2.6cm}{\textbf{Improvement\hspace*{\fill}}}} \\
       \midrule
-      \textbf{Surgical Video} & 0.9832 & 0.9823  & \textbf{-0.091\%} \\\midrule
-      \textbf{MRI Brain A} & 0.9810 & 0.9830 &  \textbf{+0.203\%} \\\midrule
+      \textbf{Tweezer} & 0.9832 & 0.9823  & \textbf{-0.091\%} \\\midrule
+      \textbf{Brain A} & 0.9810 & 0.9830 &  \textbf{+0.203\%} \\\midrule
 %      {\scriptsize MRI Brain B} & \scriptsize 0.9292 & \scriptsize 0.9278 & \scriptsize -0.0014 \\\midrule
 %      {\scriptsize MRI Brain C} & \scriptsize 0.9742 & \scriptsize 0.9760 & \scriptsize +0.0018 \\\midrule
 %      {\scriptsize MRI Brain D} & \scriptsize 0.9463 & \scriptsize 0.9470 & \scriptsize +0.0006 \\\midrule
 %      {\scriptsize MRI Brain (B-D)} & \scriptsize 0.9463 & \scriptsize 0.9431 & \scriptsize -0.0032 \\\midrule\midrule
-      \textbf{CT Inner Ear A} & 0.9621 & 0.9535 & \textbf{-0.893\%} \\\midrule
+      \textbf{Cochlea A} & 0.9621 & 0.9535 & \textbf{-0.893\%} \\\midrule
 %      {\scriptsize CT Inner Ear B} & \scriptsize 0.9623 & \scriptsize 0.9566 & \scriptsize -0.0057 \\\midrule\midrule
-      \textbf{Slit-Lamp A} & 0.9863 & 0.9860 & \textbf{-0.03\%} \\
+      \textbf{Slitlamp A} & 0.9863 & 0.9860 & \textbf{-0.03\%} \\
 %      {\scriptsize Slit-Lamp B} & \scriptsize 0.9747 & \scriptsize 0.9796 & \scriptsize +0.0049 \\\midrule
 %      {\scriptsize Slit-Lamp C} & \scriptsize 0.9826 & \scriptsize 0.9846 & \scriptsize +0.002 \\\midrule
 %      {\scriptsize Slit-Lamp D} & \scriptsize 0.9852 & \scriptsize 0.9886 & \scriptsize +0.0034 \\\midrule

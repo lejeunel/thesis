@@ -26,7 +26,7 @@
 10pt, % The default document font size, options: 10pt, 11pt, 12pt
 %oneside, % Two side (alternating margins) for binding by default, uncomment to switch to one side
 english, % ngerman for German
-singlespacing, % Single line spacing, alternatives: onehalfspacing or doublespacing
+doublespacing, % Single line spacing, alternatives: onehalfspacing or doublespacing
 %draft, % Uncomment to enable draft mode (no pictures, no links, overfull hboxes indicated)
 %nolistspacing, % If the document is onehalfspacing or doublespacing, uncomment this to set spacing in lists to single
 %liststotoc, % Uncomment to add the list of figures/tables/etc to the table of contents
@@ -73,14 +73,23 @@ headsepline, % Uncomment to get a line under the header
 \usepackage{fullpage}
 \usepackage{amssymb}
 \usepackage{tabularx}
-\usepackage[linesnumbered,ruled]{algorithm2e}
+
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
 \usepackage{csvsimple, booktabs, siunitx, xstring}
 \usepackage{import}
 \usepackage[skip=10pt]{caption}
 \usepackage{array, multirow}
 \usepackage{arydshln}
 \usepackage{float}
+\usepackage{appendix}
 
+\usepackage[automake]{glossaries-extra}
+\makeglossaries
+\input{abbreviations.tex}
 
 %----------------------------------------------------------------------------------------
 %	TOC SETTINGS
@@ -108,32 +117,40 @@ headsepline, % Uncomment to get a line under the header
 %----------------------------------------------------------------------------------------
 
 \thesistitle{Annotation of Medical Videos and Volumes using Sparse Point-wise Supervision}
-\supervisor{Prof. Dr. \textsc{Sznitman} Raphael} % Your supervisor's name
-\coadvisor{Prof. Dr. \textsc{Favaro} Paolo} % Your examiner's name
-\mentor{Prof. Dr. \textsc{Reyes} Mauricio} % Your mentor's name
-\degree{Doctor of Philosophy in XXX} % Your degree name, this is used in the title page and abstract, print it elsewhere with \degreename
-\author{\textsc{Lejeune} Laurent} % Your name, this is used in the title page and abstract, print it elsewhere with \authorname
+\supervisor{Prof. Dr. \textsc{Sznitman} Raphael}
+\coadvisor{Prof. Dr. \textsc{Favaro} Paolo}
+\mentor{Prof. Dr. \textsc{Reyes} Mauricio}
+\degree{Doctor of Philosophy in XXX}
+\author{\textsc{Lejeune} Laurent}
 
-\matriculation{00-000-000} % Your matriculation number, this is not currently used anywhere in the template, print it elsewhere with \matriculationnum
+\matriculation{04-807-897}
 
-\subject{SUBJECT} % Your subject area, this is not currently used anywhere in the template, print it elsewhere with \\subjectname
-\keywords{keyword1, keyword2} % Keywords for your thesis, this is not currently used anywhere in the template, print it elsewhere with \keywordnames
-\university{University of Bern} % Your university's name and URL, this is used in the title page and abstract, print it elsewhere with \univname
-\department{Faculty of XXX} % Your department's name and URL, this is used in the title page and abstract, print it elsewhere with \deptname
-\group{Group Name} % Your research group's name and URL, this is used in the title page, print it elsewhere with \groupname
-\faculty{Graduate School for Cellular and Biomedical Sciences} % Your faculty's name and URL, this is used in the title page and abstract, print it elsewhere with \facname
+\subject{SUBJECT}
+\keywords{keyword1, keyword2}
+\university{University of Bern}
+\department{Faculty of XXX}
+\group{Group Name}
+\faculty{Graduate School for Cellular and Biomedical Sciences}
 
 \newcommand*{\resetfigpath}[1]{
-    \graphicspath{{chapters/#1/pics/}}
+  \graphicspath{{chapters/#1/pics/}}
 }
 
 \graphicspath{{pics/}}
+
+\AtBeginEnvironment{subappendices}{%
+\chapter*{Appendix}
+\addcontentsline{toc}{chapter}{Appendices}
+\counterwithin{figure}{section}
+\counterwithin{table}{section}
+}
 
 \begin{document}
 
 \frontmatter % Use roman page numbering style (i, ii, iii, iv...) for the pre-content pages
 
 \pagestyle{plain} % Default to the plain heading style until the thesis style is called for the body content
+
 
 %----------------------------------------------------------------------------------------
 %	TITLE PAGE 1
@@ -153,17 +170,15 @@ headsepline, % Uncomment to get a line under the header
 
 {\Large \bfseries \authorname \par}\vspace{0.5cm}
 
-\large{from }{\Large \bfseries Place of Origin \& Canton \par}\vspace{0.5cm}
+\large{from }{\Large \bfseries Belgium \par}\vspace{0.5cm}
 
-\large{from }{\Large \bfseries Country of Origin \par}\vspace{0.5cm}
-
-\large{for the degree of XXX}\vspace{0.5cm}
+% \large{for the degree of XXX}\vspace{0.5cm}
  
 \vfill
 
-\large{\supname \\ Supervisor Institute/Department of YYY \\}\vspace{0.5cm}
-\large{\examname \\  Co-advisor Institute/Department of YYY \\}\vspace{0.5cm}
-\large{\mentname \\  Mentor Institute/Department of YYY}\vspace{0.5cm}
+\large{\supname \\ Supervisor ARTORG/Artificial Intelligence in Medical Imaging \\}\vspace{0.5cm}
+\large{\examname \\  Co-advisor Computer Vision Group \\}\vspace{0.5cm}
+\large{\mentname \\  Mentor ARTORG/Medical Image Analysis}\vspace{0.5cm}
 
 % % this is needed for the publication at the university of bern library
 % \footnotesize{Original document saved on the web server of the University Library of Bern\\}
@@ -255,7 +270,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam bibendum, mi non la
 
 \begin{acknowledgements}
 \addchaptertocentry{\acknowledgementname} % Add the acknowledgements to the table of contents
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam bibendum, mi non lacinia aliquet, orci nisi commodo ex, ac malesuada nunc libero eget metus. Proin vel enim risus. Nullam lobortis posuere sodales. Quisque ac placerat sapien. Praesent in pulvinar dolor. Pellentesque faucibus quam at dui consectetur scelerisque. Donec laoreet pharetra neque, id cursus metus venenatis eu. Quisque tempor molestie velit, ac euismod ligula ullamcorper a. Aliquam lacus ligula, ultrices id vehicula et, hendrerit non turpis. Phasellus molestie erat quis sem iaculis, sed posuere metus tempus. Nullam suscipit lorem et accumsan convallis. Cras eleifend mauris ultrices nunc hendrerit condimentum. 
+This work was supported in part by the Swiss National Science Foundation Grant 200021 162347 and the University of Bern.
 \end{acknowledgements}
 
 %----------------------------------------------------------------------------------------
@@ -271,9 +286,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam bibendum, mi non la
 %----------------------------------------------------------------------------------------
 %	ABBREVIATIONS
 %----------------------------------------------------------------------------------------
-
-\begin{abbreviations}{ll} % Include a list of abbreviations (a table of two columns)
-\end{abbreviations}
+\printglossary[title={List of Abbreviations}]
 
 %----------------------------------------------------------------------------------------
 %	DEDICATION
@@ -289,20 +302,19 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam bibendum, mi non la
 
 \pagestyle{thesis} % Return the page headers back to the "thesis" style
 
-% Include the chapters of the thesis as separate files from the Chapters folder
-% Uncomment the lines as you write the chapters
-
 \include{chapters/1-intro/intro}
 \include{chapters/2-datasets/datasets}
 \include{chapters/3-eel/eel}
 \include{chapters/4-feats/main}
 \include{chapters/5-ksp/main}
+\include{chapters/6-dec/main}
+
 
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
 
-\printbibliography[heading=bibintoc]
+\printbibliography
 
 %----------------------------------------------------------------------------------------
 %	BACK PAGES - Declaration of Originality
