@@ -1,6 +1,6 @@
 \section{Experiments}
 \label{sec:feats_results}
-This chapter starts by giving visual results of our superpixel segmentation. We then elaborate on the experimental setup. The results from training and evaluation procedures are described. Details on method-specific parameters and configuration are also given.
+% We first give visual examples of our superpixel segmentation.
 
 \subsection{Superpixel Segmentation}
 \label{sec:superpix}
@@ -21,109 +21,7 @@ We use here $N=1200$ superpixels, and note that increasing this value further do
 
 \input{chapters/4-feats/tables/sp_errors.tex}
 
-\subsection{Neural Network Training}
-In this section, we first describe the training configurations followed by the parameterization of the data augmentation.
-We then analyze the training loss (learning curves) on few examples.
-Visual examples of activation maps are given to illustrate what kind of filters the network is learning.
-
-\subsubsection{Training Configurations} \label{ch:training_conf}
-All of our U-Net based models are trained using the Adam optimizer \cite{kingma15} (learning rate $= 0.0001$, $\beta_1 = 0.9$, $\beta_2 = 0.999$, $\epsilon = 10^{-8}$, no decay).
-Weights are initialized with the Glorot method \cite{glorot10}.
-The stopping criterion for training is reached after $20$ epochs.
-
-The maximum size of the mini-batch depends on the GPU memory, the model architecture, and since the latter has different input sizes, also the resolution of the input data.
-We trained our models on a \textit{GeForce GTX 1080 Ti}, with 11GB memory.
-The model architectures are all similar in size except for the \textit{U-Net Gaze Prob LSTM}, which contains another recurrent part.
-The datasets also have similar resolution except for the \textit{CT Inner Ear A + B}.
-Tab. \ref{tab:batch_size} shows the used mini-batch size.
-\vspace{30pt}
-
-\begin{table}[htbp]
-   \centering
-   \caption[Mini-batch size]{Mini-batch size used for training U-Net based methods. All methods are trained on a \textit{GeForce GTX 1080 Ti} GPU. Since the CT datasets are smaller in resolution, we could take larger mini-batches. The \textit{U-Net Gaze Prob LSTM} has a larger model and uses, therefore, smaller mini-batches.}
-   \begin{tabular}{|c||c|c|}
-      \hline
-      \diagbox{Dataset}{Method} & \textbf{U-Net Gaze Prob LSTM} & \textbf{All others} \\
-      \hline
-      \hline
-      \Gape[2pt][2pt]{\textbf{\makecell[c]{CT Inner Ear\\ A + B}}} & 4 & 16 \\
-      \hline
-      \Gape[11pt][11pt]{\textbf{All others}} & 1 & 4 \\
-      \hline
-   \end{tabular}
-   \label{tab:batch_size}
-\end{table}
-
-\clearpage
-\subsubsection{Data Augmentation} \label{results_data_gen}
-
-The data augmentation parameters are given in Tab. \ref{tab:data_gen_param}.
-Example frames are shown in \ref{fig:data_gen}.
-
-\begin{table}[!htbp]
-   \centering
-   \caption[Data generator parameters]{Parameters of data generator. Rotation, translation, and shearing are used as transformation. Gaussian noise is also added to augment data variance. It is defined by the standard deviation $\sigma$, which is relative to the range in bit depth $0-255$. $2'000$ images are randomly sampled for each epoch.}
-   \begin{tabular}{l|c}
-      \toprule
-      \textbf{Parameter} & \textbf{Value} \\
-      \midrule
-      Rotation range & $\pm11.25$° \\
-      Horizontal translation range & $20\%$ of image width \\
-      Vertical translation range & $20\%$ of image height \\
-      Shearing range & $\pm22.5$° \\
-      \midrule
-      Gaussian noise $\sigma$ & $13$ \\
-      \midrule
-      Number of samples per epoch & $2'000$ \\
-      \bottomrule
-   \end{tabular}
-   \label{tab:data_gen_param}
-\end{table}
-\vspace{30pt}
-
-\begin{figure}[!htbp]
-  \centering
-  \includegraphics[width=\textwidth]{unet/data_gen}
-  \caption[Examples of data generator]{Examples of data generator on an image of dataset \textit{Slit-Lamp Retina A}. We used rotation, translation, shearing and added Gaussian noise to each of the channels. The values are shown in Tab. \ref{tab:data_gen_param}.}
-  \label{fig:data_gen}
-\end{figure}
-
-% ch\clearpage
-% \subsubsection{Learning Curve} \label{ch:learning_curve}
-% In our setting, we train the CNN model on the dataset we later extract the features from.
-% Thus, there is no need to split the dataset into training and validation.
-% The performance would even become worse since the model would be trained on fewer data.
-% For our datasets, where all frames within the set are very similar to each other, we do not expect to find any signs of overfitting given the learning curve.
-
-% However, since we will later describe an experiment that shows the feature performance versus the training time of the model (chapter \ref{ch:perf_vs_training}), we still investigate the training curve.
-% To do so, we took the \textit{CT Inner Ear A} dataset and randomly split it into $80\%$ training set and $20\%$ validation set.
-% Subsequently, we trained two models, namely a \textit{U-Net Rec} with MSE-loss and a \textit{U-Net Gaze Prob} with BCE-loss, for $500$ epochs.
-% After each trained epoch, we calculated training and validation loss.
-% Fig. \ref{fig:learn_curve} shows the training and validation loss for the given models.
-% As we expected, there is no sign of overfitting.
-% We also performed this experiment on other datasets and they all showed similar behaviour.
-% \vspace{20pt}
-
-% \begin{figure}[!htbp]
-%   \centering
-%   \subfloat[Learning curve of model \textit{U-Net Rec} on dataset \textit{CT Inner Ear A}]
-%   {
-%     \includegraphics[width=11cm]{learning_curve/learning_curve_ds11_rec}
-%   }
-%   \\
-%   \subfloat[Learning curve of model \textit{U-Net Gaze Prob} on dataset \textit{CT Inner Ear A}]
-%   {
-%     \includegraphics[width=11cm]{learning_curve/learning_curve_ds11_prob}
-%   }
-%   \caption[Model learning curves]{Learning curves of training (a) \textit{U-Net Rec} and (b) \textit{U-Net Gaze Prob} model on dataset \textit{CT Inner Ear A}. We split the dataset into $80\%$ training and $20\%$ test and calculated the given loss after each trained epoch. As expected, there are no signs of overfitting.}
-%   \label{fig:learn_curve}
-% \end{figure}
-% \vspace{20pt}
-
-% The time per epoch largely depends on the input size of the model. If using the data generator with the above-mentioned settings and train the model on the stated hardware, it takes at most $4.5$ minutes per epoch (dataset \textit{Surgical Video Sequence}) and at least $35$ seconds per epoch (dataset \textit{CT Inner Ear A}).
-
-\clearpage
-\subsubsection{Activation Maps} \label{ch:act_maps}
+\subsection{Activation Maps} \label{ch:act_maps}
 To visualize the effect of filters (kernels) in a CNN, one often visualizes their activation during a forward pass.
 The examples that follow correspond to the layer where our features are extracted, i.e. the last ReLU of the deepest layer (chapter \ref{feat_extract}). We randomly picked an image, performed a forward pass on a trained \textit{U-Net Rec} model, and visualized $11$ out of the $512$ activation maps. Fig. \ref{fig:activatiom_maps} shows two examples on dataset \textit{MRI Brain A} (Fig. \ref{fig:subfig:activatiom_map_ds09}) and \textit{Slit-Lamp Retina B} (Fig. \ref{fig:subfig:activatiom_map_ds13}). The upper left image shows the input image, and the other plots the activation maps, respectively.
 
@@ -143,111 +41,28 @@ We observe for both examples activation maps that have excitations at the object
     \label{fig:subfig:activatiom_map_ds13}
     \includegraphics[height=6.2cm]{activation_maps/activations_ds13_0109}
   }
-  \caption[Activation maps]{Activation maps of a trained \textit{U-Net Rec} model. The upper left image shows the passed image from (a) \textit{MRI Brain A}, and (b) \textit{Slit-Lamp Retina B} datasets. The other $11$ plots show some randomly chosen activation maps, extracted at the deepest level after the last ReLU.}
+  \caption[Activation maps]{Activation maps of the \textit{U-Net Rec} model for \textit{Brain A} and \textit{Slitlamp B}.
+    The upper left image shows the input image.
+    The other plots show randomly chosen activation maps, extracted at the bottleneck.}
   \label{fig:activatiom_maps}
 \end{figure}
 
 \clearpage
 \subsection{Feature Extracting Methods}
-We provide results of the evaluation of our feature extraction methods. The evaluation procedure's configurations are first described. Second, the numerical values of the parameters of our methods are given. Third, we show the influence of using data augmentation. Fourth, we give experimental results on the feature performance vs. training-time. Fifth, the influence of the selected features of Random Forest is observed. Sixth, we present an overall ranking of the feature extraction methods in terms of \textit{max F1-Score}. Lastly, we investigate the influence of zero-padding.
+We provide results of the evaluation of our feature extraction methods.
+The evaluation procedure's configurations are first described.
+Second, the numerical values of the parameters of our methods are given.
+Third, we show the influence of using data augmentation.
+Fourth, we give experimental results on the feature performance vs. training-time.
+Fifth, the influence of the selected features of Random Forest is observed.
+Sixth, we present an overall ranking of the feature extraction methods in terms of \textit{max F1-Score}.
+Last, we investigate the influence of zero-padding.
 
-\subsubsection{Configurations of Evaluation Procedure} \label{ch:eval_configs}
-In chapter \ref{optimization} we stated that weight initialization of neural networks can be crucial for performance. Depending on the initialization, the gradient-based optimization will end in different minima and thus, might not be very constant. One could seed the random number generators, such that it always produces the same output. Anyhow, since we compare between different methods, seeding the random number generators would not allow a fair comparison.
-
-U-Net based methods are evaluated in ten repetitions, i.e. each model is trained ten times on each dataset, resulting in ten different feature sets per dataset and method. We evaluate each feature matrix individually by the Random Forest classifier. Its settings are described in chapter \ref{random_forest}. For evaluation, the Random Forest is not seeded.
-
-Concerning the baseline methods (including \textit{VGG-16}), the overall performance is largely unaffected by the random initialization. Thus, for those methods, we produced only one feature matrix per method and dataset. However, the Random Forest, in turn, is applied ten times on each feature matrix.
-
-\subsubsection{Parameterization of Feature Extraction Methods}
-We now give the numerical values of the parameters of our models. The parameters of the baseline methods are given first, followed by the U-Net based method's parameters. For detailed information on the methods, refer to chapter \ref{ch:methods}.
-
-\subsubsection{Baseline Methods}
-Tab. \ref{tab:baseline_params} shows the different parameters used for all baseline methods. For comparison purpose, both \textit{ScSP} and \textit{BoVW}, have $512$ classes and a SIFT keypoint size of $16 \times 16$ pixels. The number of keypoints used for vector quantization is defined in terms of number per image for the \textit{BoVW} method, and number over the entire sequence for the \textit{ScSP} method. We experimented with the patch size used for the \textit{ScSP} and \textit{VGG-16} methods. For \textit{ScSP}, taking the width as three times the average width of superpixels ($MSPW$) leads to best results. For the \textit{VGG-16} method, the optimal patch size is found to be two times the $MSPW$. We define:
-
-\begin{equation}
-   MSPW = \frac{1}{S} \sum_{i=1}^S \sqrt{A_i}
-   \label{eq:mspw} 
-\end{equation}
-\vspace{6pt}
-
-Where $S$ is the number of superpixels in the sequence and $A \in \mathbb{Z}$ the area of the individual superpixel measured in pixels. 
-
-\clearpage
-\begin{table}[!htbp]
-   \centering
-   \caption[Baseline parameters]{Illustration of parameters used in the baseline methods. The individual methods are described in chapter \ref{ch:baselines}.}
-   \begin{tabular}{c|m{1.3cm}|c|l}
-      \toprule
-      \textbf{Method} & \textbf{Symbol} & \textbf{\makecell{Feature \\ Dimension $D$}} & \textbf{Parameters}\\
-      \midrule
-      BoVW & \makecell{\includegraphics[width=1cm]{icons/bovw}} & $512$ & 
-        \makecell[l]{Number of classes = $512$ \\ 
-                  SIFT KP size = $16 \times 16$px \\
-                  Number of KP for CB per image = $100$} \\
-      \midrule
-      ScSP & \makecell{\includegraphics[width=1cm]{icons/scsp}} & $10'752$ & 
-        \makecell[l]{Number of classes = $512$ \\ 
-                  SIFT KP size = $16 \times 16$px \\
-                  Number of KP for CB over all sequence = $20'000$ \\
-                  Pyramid levels = $[1,2,4]$ \\
-                  Patch width and height = $3 \cdot MSPW$} \\
-      \midrule
-      VGG-16 & \makecell{\includegraphics[width=1cm]{icons/vgg}} & $4'096$ & 
-        \makecell[l]{Patch width and height = $2 \cdot MSPW$} \\
-      \bottomrule
-      \multicolumn{4}{c}{KP $\coloneqq$ keypoint \hspace{14pt} CB $\coloneqq$ codebook \hspace{14pt} MSPW $\coloneqq$ mean superpixel width} \\
-      \bottomrule
-   \end{tabular}
-   \label{tab:baseline_params}
-\end{table}
-\vspace{20pt}
-
-\subsubsection{U-Net Based Methods}
-Tab. \ref{tab:unet_params} give the values of the parameters of our U-Net based models. For methods that predict a probability map $\boldsymbol{\hat{Z}}$, we set $\sigma$ to $6\%$ of the image width. For methods that involve the probability map $\bm{Z}$ in their loss-functions, we set $\sigma$ to $30\%$ of the image width. Fig. \ref{fig:prob_maps} shows ($\boldsymbol{Z}/\max{\{\boldsymbol{Z}\}}$) with the two $\sigma$ values mentioned above.
-\vspace{30pt}
-
-\begin{table}[!htbp]
-   \centering
-   \caption[U-Net based method parameters]{Illustration of parameters used in the U-Net based methods.}
-   \begin{tabular}{l|m{3.3cm}|l}
-      \toprule
-      \textbf{Method} & \textbf{\makecell{Symbol}} & \textbf{Parameters}\\
-      \midrule
-      U-Net Gaze Rec & \makecell{\includegraphics[width=1cm]{icons/unet_gaze_rec}} & 
-        \makecell[l]{$\sigma = 30\%$ of image width} \\
-      \midrule
-        \makecell[l]{U-Net Gaze Prob \\
-                     U-Net Gaze Prob Freeze \\
-                     U-Net Gaze Prob Concat} & 
-      \makecell{\includegraphics[width=1cm]{icons/unet_gaze_prob} \includegraphics[width=1cm]{icons/unet_gaze_prob_freeze} \includegraphics[width=1cm]{icons/unet_gaze_prob_concat}} & 
-        \makecell[l]{$\sigma = 6\%$ of image width} \\
-      \midrule
-      U-Net Gaze Prob LSTM & \makecell{\includegraphics[width=1cm]{icons/unet_gaze_prob_lstm}} & 
-        \makecell[l]{$\sigma = 6\%$ of image width \\
-                     $\alpha = 0.2$} \\  
-      \bottomrule
-   \end{tabular}
-   \label{tab:unet_params}
-\end{table}
-
-\clearpage
-\begin{figure}[!htbp]
-  \centering
-  \subfloat[$\sigma = 6\%$ of image width]
-  {
-    \includegraphics[width=6cm]{probability_maps/prob_map_06}
-  }
-  \hfill
-  \subfloat[$\sigma = 30\%$ of image width]
-  {
-    \includegraphics[width=6cm]{probability_maps/prob_map_30}
-  }
-  \caption[Illustration of probability maps]{Visualization of probability map ($\boldsymbol{Z}/\max{\{\boldsymbol{Z}\}}$). In (a), we show the probability map for methods that predict $\boldsymbol{\hat{Z}}$. (b) shows the probability map of method \textit{U-Net Gaze Rec}.}
-  \label{fig:prob_maps}  
-\end{figure}
 
 \subsection{Importance of Data Augmentation} \label{ch:nec_data_gen}
-To explore the importance of data augmentation, we trained a \textit{U-Net Rec} model once with standard configuration (use of data generator) and once without using the data generator. As for all experiments, we performed the training and evaluation with ten repetitions, then took the mean \textit{max F1-Score}. We performed this experiment on one dataset per image modality. The results are summarized in Tab. \ref{tab:data_gen_nec}.
+To explore the importance of data augmentation, we trained a \textit{U-Net Rec} model once with standard configuration (use of data generator) and once without using the data generator.
+As for all experiments, we performed the training and evaluation with ten repetitions, then took the mean \textit{max F1-Score}.
+We performed this experiment on one dataset per image modality. The results are summarized in Tab. \ref{tab:data_gen_nec}.
 \vspace{30pt}
 
 \begin{table}[!htbp]
@@ -308,7 +123,7 @@ Based on this observations, we choose to train our U-Net based models for $20$ e
 
 \subsection{Method Comparison}
 Tab. \ref{tab:final_results} summarizes the feature performance for each dataset and method in terms of \textit{max F1-Scores} averaged over ten repetitions.
-All best scores per dataset are marked in red font.
+All best scores per dataset are in red.
 For each dataset and method, we performed a two-sided Welch's t-test \cite{welch1947} to determine whether the score reached by the individual method is significantly different to the score reached by the best method for that dataset.
 All values marked in bold font are not significantly different to the best score for a significance level of $0.05$.
 The last row shows how many times the given method did not significantly perform worse than the best method.
@@ -379,18 +194,18 @@ Similarly to Fig. \ref{fig:curves_ds14}, we show in Fig. \ref{fig:curves_ds16} d
 
 \begin{figure}[!htbp]
   \centering
-  \subfloat[\textit{PR-Curves} of dataset \textit{Slit-Lamp Retina C} with an example image]
+  \subfloat[\textit{PR-Curves} of dataset \textit{Slitlamp C}]
   {
     \label{subfig:pr_curve_ds14}
     \includegraphics[width=12cm]{final_eval/ds14_pr}
   }
   \\[30pt]
-  \subfloat[\textit{Max F1-Scores} of dataset \textit{Slit-Lamp Retina C}]
+  \subfloat[\textit{Max F1-Scores} of dataset \textit{Slitlamp C}]
   {
     \label{subfig:reprod_ds14}
     \includegraphics[width=10cm]{final_eval/ds14_reprod}
   }
-  \caption[Detailed results of dataset \textit{Slit-Lamp Retina C}]{Detailed results of dataset \textit{Slit-Lamp Retina C}. (a) \textit{PR-Curves} averaged on ten repetitions. \textit{Max F1-Scores} are given in the legends. (b) Box-plot of \textit{max F1-Score} on each repetition. The median is drawn in orange.}
+  \caption[Detailed results of dataset \textit{Slitlamp C}]{Detailed results of dataset \textit{Slitlamp C}. (a) \textit{PR-Curves} averaged on ten repetitions (b) Box-plot of \textit{max F1-Score} on each fold (median and standard deviation)}
   \label{fig:curves_ds14}  
 \end{figure}
 
@@ -411,7 +226,11 @@ Similarly to Fig. \ref{fig:curves_ds14}, we show in Fig. \ref{fig:curves_ds16} d
 \end{figure}
 
 \subsection{Zero-Padding vs. Symmetric-Padding} \label{ch:zero_vs_sym_pad}
-To investigate the influence of the border-effect due to zero-padding, we retrained our best model \textit{U-Net Gaze Rec} using symmetric-padding for all convolutional layers. When padding the input with symmetric property, the added pixel rows and columns are a mirror reflection of the input itself. We trained the model on one dataset per image modality. Fig. \ref{fig:activatiom_maps_sym} shows the activation maps of (a) zero-padding and (b) symmetric-padding on \textit{MRI Brain A}. The features are extracted from the last ReLU of the deepest level (see chapter \ref{ch:act_maps}).
+To investigate the influence of the border-effect due to zero-padding, we retrained our best model \textit{U-Net Pred Loc} using symmetric-padding for all convolutional layers.
+When padding the input with symmetric property, the added pixel rows and columns are a mirror reflection of the input itself.
+We trained the model on one dataset per image modality.
+Fig. \ref{fig:activatiom_maps_sym} shows the activation maps in both setups on \textit{Brain A}.
+The activation maps at the output of the bottleneck (see chapter \ref{ch:act_maps}).
 
 \begin{figure}[!htbp]
   \centering
@@ -428,16 +247,18 @@ To investigate the influence of the border-effect due to zero-padding, we retrai
   \label{fig:activatiom_maps_sym}
 \end{figure}
 
-In Tab. \ref{tab:zero_vs_sym_padd} we show the mean \textit{max F1-Scores} over ten repetitions for zero-padding (standard configuration) and symmetric-padding. There is no improvement observed.
+Tab. \ref{tab:zero_vs_sym_padd} shows the mean \textit{max F1-Scores} over ten repetitions using zero-padding and symmetric-padding. We note no substantial improvement.
 
 \begin{table}[!htbp]
    \centering
-   \caption[Zero vs. symmetric padding]{Comparison of zero-padding vs. symmetric-padding of the convolutional layers on a \textit{U-Net Gaze Rec} model. The values show the feature quality in terms of mean \textit{max F1-Scores} for one dataset per image modality over ten repetitions. The last column indicates the improvement due to symmetric-padding.}
+   \caption[Zero-padding vs. symmetric-padding]{Comparison of zero-padding vs. symmetric-padding using \textit{U-Net Prior AE} model.
+     We give the mean \textit{max F1-Scores} for one dataset per image modality over ten repetitions.
+     The last column indicates the improvement due to symmetric-padding.}
    \small
    \begin{tabular}{l|c|c||c|}
       \toprule
-       & \Gape[6pt][6pt]{\rotatebox[origin=cB]{90}{\parbox[t]{2.6cm}{U-Net Gaze Rec \\ \textit{\textbf{Zero-Pad}\hspace*{\fill}}}}}
-       & \rotatebox[origin=cB]{90}{\parbox[t]{2.6cm}{U-Net Gaze Rec \\ \textit{\textbf{Symmetric-Pad}\hspace*{\fill}}}}
+       & \Gape[6pt][6pt]{\rotatebox[origin=cB]{90}{\parbox[t]{2.6cm}{U-Net Prior AE \\ \textit{\textbf{Zero-Pad}\hspace*{\fill}}}}}
+       & \rotatebox[origin=cB]{90}{\parbox[t]{2.6cm}{U-Net Prior AE \\ \textit{\textbf{Symmetric-Pad}\hspace*{\fill}}}}
        & \rotatebox[origin=cB]{90}{\parbox[t]{2.6cm}{\textbf{Improvement\hspace*{\fill}}}} \\
       \midrule
       \textbf{Tweezer} & 0.9832 & 0.9823  & \textbf{-0.091\%} \\\midrule

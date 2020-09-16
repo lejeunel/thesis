@@ -95,7 +95,7 @@ This results in a feature matrix of all superpixels in a sequence being $\boldsy
 \includegraphics[height=1.5cm]{icons/scsp.png}
 \end{wrapfigure}
 
-\gls{scsp} builds up on the \textit{bovw} approach with two main modifications.
+\gls{scsp} builds up on the \gls{bovw} approach with two main modifications.
 A spatial pyramid is a collection of orderless feature histograms computed over cells defined by a multi-level recursive image decomposition \cite{lazebnik09}.
 
 First, instead of the standard k-means clustering, it uses sparse codes of SIFT features.
@@ -142,7 +142,7 @@ Leveraging pre-trained deep networks to address a different task, an approach ca
 
 \endgroup
 
-Here, we use the VGG16 model of \cite{simonyan15}, also known as configuration D \cite[Tab. 1]{simonyan15}.
+Here, we use the VGG16 model of \cite[Tab. 1]{simonyan15}.
 The model is composed of 16 convolutional layers, each with kernels of size $3 \times 3$.
 It is trained for the classification challenge (ImageNet Large Scale Visual Recognition Challenge \cite{ILSVRC15}.
 Similar to the \textit{ScSP} approach, we extracted patches at superpixel centroids and fed it to the network.
@@ -152,7 +152,7 @@ The features are then extracted from the penultimate fully-connected layer, resu
 From a theoretical point of view, let us mention that most machine learning methods make the assumption that training and unseen data lie in the same feature space and have a similar distribution.
 However, in many real-world applications, this assumption may not hold \cite{pan2010}.
 In a setup where the data distribution of the original training set largely differs from the one we consider, we talk about "Transfer Learning".
-We assume that a network pre-trained on a very large-scale dataset with high generalization will produce good features for our task.
+We assume that a network pre-trained on a very large-scale dataset with high generalization power will produce features that are discriminative and therefore adequate to the present task.
 
 \section{Feature Learning: U-Net Based} \label{ch:unet_based}
 We now describe our U-Net based feature extraction methods.
@@ -223,7 +223,7 @@ As we now have a descriptor for each pixel upscaled to the same resolution as th
   \centering
   \includegraphics[width=\textwidth]{feat_extract/feature_extraction}
   \caption[Feature extraction model]{Illustration of feature extraction for U-Net based methods.
-    The features are extracted from the deepest level.
+    The features are extracted at the output of the bottleneck.
     Those features are then upsampled on each dimension individually to obtain the input image resolution.
     The feature vector of a given superpixel is taken as the mean of all pixels that it contains.}
   \label{fig:feat_extract}
@@ -236,8 +236,8 @@ As we now have a descriptor for each pixel upscaled to the same resolution as th
 \includegraphics[height=1.5cm]{icons/unet_rec.png}
 \end{wrapfigure}
 
-\textit{U-Net Autoencoder} (or \textit{U-Net AE}) is configured as an autoencoder.
-It takes as input the image data and reconstructs the same data.
+\textit{U-Net Autoencoder} (or \textit{U-Net AE}) is configured as an autoencoder, i.e.
+takes as input the image data and is trained to reconstruct the input.
 Let $\mathcal{I}$ be the image set and $\boldsymbol{I}_k \in [0,1]^{H \times W \times C}$ an image with height $H$, width $W$ and number of channels $C$.
 % We assume that $\boldsymbol{I}_k$ is already downscaled to have $H$ and $W$ dividable by $16$ (see chapter \ref{model}).
 Pixels are described by $\boldsymbol{I}_k(i,j,c) \in [0,1]$ with $i$ and $j$ its indices.
@@ -429,10 +429,9 @@ Tab. \ref{tab:summary_unet_methods} summarizes the above U-Net based methods.
 \end{table}
 
 
-\section{Evaluation}
+\section{Evaluation framework}
 We used a \gls{rf} classifier to compare the performance between the different feature learning methods.
 The next section describes further the evaluation phase.
-
 
 \subsection{Classification} \label{random_forest}
 To compare performance between the elaborated methods, we set up a \gls{rf} classifier (Sec. \ref{sec:rf}).
@@ -481,6 +480,204 @@ F1-Score is a measure that considers both, recall and precision. It's best value
   \caption[Illustration of max F1-Score]{Illustration of \textit{max F1-Score}. The left diagram shows an example of a \textit{Precision Recall curve}. The diagram on the right shows the F1-Score given the \textit{Recall} values. Maximum score is marked by a green point, the \textit{max F1-Score}.}
   \label{fig:f1_score}
 \end{figure}
+
+\subsection{Hyperparameters} \label{ch:eval_configs}
+In the frame of \gls{nn} training, one typically find two main factors that result in a variation of performances accross training runs.
+(1) The weight initialization of layers usually follow a random distribution (uniform or normal).
+(2) The data augmentation step relies on random sampling of parameters for its transformations.
+To circumvent the variability of performance, we choose to train a given model several time and average the results.
+% However, as we compare between different methods, seeding the random number generators would not allow a fair comparison.
+In particular, U-Net based methods are evaluated accross ten training runs, i.e. each model is trained ten times on each dataset, resulting in ten different feature sets per dataset and method.
+We evaluate each feature matrix individually using our Random Forest classifier (Sec. \ref{random_forest}).
+% Its settings are described in chapter \ref{random_forest}.
+% For evaluation, the Random Forest is not seeded.
+
+As the baseline methods (including \textit{VGG-16}) are less affected by random initialization, we generate a single feature matrix per method and dataset.
+However, the Random Forest model is trained ten times on each feature matrix.
+
+\subsubsection{Baseline Methods}
+Tab. \ref{tab:baseline_params} shows the different parameters used for all baseline methods.
+For comparison purpose, both \textit{ScSP} and \textit{BoVW}, have $512$ classes and a SIFT keypoint size of $16 \times 16$ pixels.
+The number of keypoints used for vector quantization is defined in terms of number per image for the \textit{BoVW} method, and number over the entire sequence for the \textit{ScSP} method.
+% We experimented with the patch size used for the \textit{ScSP} and \textit{VGG-16} methods.
+For \textit{ScSP}, we set empirically the width as three times the average width of superpixels ($MSPW$) leads to best results.
+For \textit{VGG-16}, the optimal patch size is set empirically two times the \gls{mspw}:
+
+\begin{equation}
+   MSPW = \frac{1}{S} \sum_{i=1}^S \sqrt{A_i}
+   \label{eq:mspw}
+\end{equation}
+\vspace{6pt}
+
+Where $S$ is the number of superpixels in the sequence and $A_{i}$ the amount of pixels contained in superpixel $i$.
+
+\clearpage
+\begin{table}[!htbp]
+   \centering
+   \caption[Baseline parameters]{Hyper-parameters of baseline methods}
+   \begin{tabular}{c|m{1.3cm}|c|l}
+      \toprule
+      \textbf{Method} & \textbf{Symbol} & \textbf{\makecell{Feature \\ Dimension $D$}} & \textbf{Parameters}\\
+      \midrule
+      BoVW & \makecell{\includegraphics[width=1cm]{icons/bovw}} & $512$ &
+        \makecell[l]{Number of classes = $512$ \\
+                  SIFT KP size = $16 \times 16$px \\
+                  Number of KP for CB per image = $100$} \\
+      \midrule
+      ScSP & \makecell{\includegraphics[width=1cm]{icons/scsp}} & $10'752$ &
+        \makecell[l]{Number of classes = $512$ \\
+                  SIFT KP size = $16 \times 16$px \\
+                  Number of KP for CB over all sequence = $20'000$ \\
+                  Pyramid levels = $[1,2,4]$ \\
+                  Patch width and height = $3 \cdot MSPW$} \\
+      \midrule
+      VGG-16 & \makecell{\includegraphics[width=1cm]{icons/vgg}} & $4'096$ &
+        \makecell[l]{Patch width and height = $2 \cdot MSPW$} \\
+      \bottomrule
+      \multicolumn{4}{c}{KP $\coloneqq$ keypoint \hspace{14pt} CB $\coloneqq$ codebook \hspace{14pt} MSPW $\coloneqq$ mean superpixel width} \\
+      \bottomrule
+   \end{tabular}
+   \label{tab:baseline_params}
+\end{table}
+\vspace{20pt}
+
+\subsubsection{U-Net Based Methods}
+Tab. \ref{tab:unet_params} give the values of the parameters of our U-Net based models. For methods that predict a probability map $\boldsymbol{\hat{Z}}$, we set $\sigma$ to $6\%$ of the image width. For methods that involve the probability map $\bm{Z}$ in their loss-functions, we set $\sigma$ to $30\%$ of the image width. Fig. \ref{fig:prob_maps} shows ($\boldsymbol{Z}/\max{\{\boldsymbol{Z}\}}$) with the two $\sigma$ values mentioned above.
+\vspace{30pt}
+
+\begin{table}[!htbp]
+   \centering
+   \caption[U-Net based method parameters]{Hyper-parameters of U-Net based methods.}
+   \begin{tabular}{l|m{3.3cm}|l}
+      \toprule
+      \textbf{Method} & \textbf{\makecell{Symbol}} & \textbf{Parameters}\\
+      \midrule
+      U-Net Gaze Rec & \makecell{\includegraphics[width=1cm]{icons/unet_gaze_rec}} &
+        \makecell[l]{$\sigma = 30\%$ of image width} \\
+      \midrule
+        \makecell[l]{U-Net AE Prior \\
+                     U-Net Pred Loc Freeze \\
+                     U-Net Motion Pred} &
+      \makecell{\includegraphics[width=1cm]{icons/unet_gaze_prob} \includegraphics[width=1cm]{icons/unet_gaze_prob_freeze} \includegraphics[width=1cm]{icons/unet_gaze_prob_concat}} &
+        \makecell[l]{$\sigma = 6\%$ of image width} \\
+      \midrule
+      U-Net Motion Pred LSTM & \makecell{\includegraphics[width=1cm]{icons/unet_gaze_prob_lstm}} &
+        \makecell[l]{$\sigma = 6\%$ of image width \\
+                     $\alpha = 0.2$} \\
+      \bottomrule
+   \end{tabular}
+   \label{tab:unet_params}
+\end{table}
+
+\clearpage
+\begin{figure}[!htbp]
+  \centering
+  \subfloat[$\sigma = 6\%$ of image width]
+  {
+    \includegraphics[width=6cm]{probability_maps/prob_map_06}
+  }
+  \hfill
+  \subfloat[$\sigma = 30\%$ of image width]
+  {
+    \includegraphics[width=6cm]{probability_maps/prob_map_30}
+  }
+  \caption[Illustration of probability maps]{Prior probability maps of (a) U-Net AE Prior, U-Net Pred Loc Freeze, U-Net Motion Pred (b) \textit{U-Net Gaze Rec}.}
+  \label{fig:prob_maps}
+\end{figure}
+
+All of our U-Net based models are for $20$ epochs using the Adam optimizer \cite{kingma15} (learning rate $= 0.0001$, $\beta_1 = 0.9$, $\beta_2 = 0.999$, $\epsilon = 10^{-8}$, no decay).
+Weights are initialized with the Glorot method \cite{glorot10}.
+
+The batch size depends on the GPU memory, the model architecture, and the input size.
+% We trained our models on a \textit{GeForce GTX 1080 Ti}, with 11GB memory.
+The model architectures are all similar in size except for the \textit{U-Net Motion Pred LSTM}, which contains another recurrent part.
+The datasets also have similar resolution except for \textit{Cochlea A + B}.
+Tab. \ref{tab:batch_size} gives the batch sizes.
+\vspace{30pt}
+
+\begin{table}[htbp]
+   \centering
+   \caption[Mini-batch size]{Mini-batch size used for training U-Net based methods.}
+   \begin{tabular}{|c||c|c|}
+      \hline
+      \diagbox{Dataset}{Method} & \textbf{U-Net Motion Pred LSTM} & \textbf{All others} \\
+      \hline
+      \hline
+      \Gape[2pt][2pt]{\textbf{\makecell[c]{Cochlea\\ A + B}}} & 4 & 16 \\
+      \hline
+      \Gape[11pt][11pt]{\textbf{All others}} & 1 & 4 \\
+      \hline
+   \end{tabular}
+   \label{tab:batch_size}
+\end{table}
+
+\clearpage
+\subsubsection{Data Augmentation} \label{results_data_gen}
+
+The data augmentation parameters are given in Tab. \ref{tab:data_gen_param}.
+Example frames are shown in \ref{fig:data_gen}.
+
+\begin{table}[!htbp]
+   \centering
+   \caption[Data generator parameters]{Parameters of data generator. Rotation, translation, and shearing are used as transformation. Gaussian noise is also added to augment data variance. It is defined by the standard deviation $\sigma$, which is relative to the range in bit depth $0-255$. $2'000$ images are randomly sampled for each epoch.}
+   \begin{tabular}{l|c}
+      \toprule
+      \textbf{Parameter} & \textbf{Value} \\
+      \midrule
+      Rotation range & $\pm11.25$° \\
+      Horizontal translation range & $20\%$ of image width \\
+      Vertical translation range & $20\%$ of image height \\
+      Shearing range & $\pm22.5$° \\
+      \midrule
+      Gaussian noise $\sigma$ & $13$ \\
+      \midrule
+      Number of samples per epoch & $2'000$ \\
+      \bottomrule
+   \end{tabular}
+   \label{tab:data_gen_param}
+\end{table}
+\vspace{30pt}
+
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[width=\textwidth]{unet/data_gen}
+  \caption[Examples of data generator]{Examples of data generator on an image of dataset \textit{Slit-Lamp Retina A}. We used rotation, translation, shearing and added Gaussian noise to each of the channels. The values are shown in Tab. \ref{tab:data_gen_param}.}
+  \label{fig:data_gen}
+\end{figure}
+
+% ch\clearpage
+% \subsubsection{Learning Curve} \label{ch:learning_curve}
+% In our setting, we train the CNN model on the dataset we later extract the features from.
+% Thus, there is no need to split the dataset into training and validation.
+% The performance would even become worse since the model would be trained on fewer data.
+% For our datasets, where all frames within the set are very similar to each other, we do not expect to find any signs of overfitting given the learning curve.
+
+% However, since we will later describe an experiment that shows the feature performance versus the training time of the model (chapter \ref{ch:perf_vs_training}), we still investigate the training curve.
+% To do so, we took the \textit{CT Inner Ear A} dataset and randomly split it into $80\%$ training set and $20\%$ validation set.
+% Subsequently, we trained two models, namely a \textit{U-Net Rec} with MSE-loss and a \textit{U-Net Gaze Prob} with BCE-loss, for $500$ epochs.
+% After each trained epoch, we calculated training and validation loss.
+% Fig. \ref{fig:learn_curve} shows the training and validation loss for the given models.
+% As we expected, there is no sign of overfitting.
+% We also performed this experiment on other datasets and they all showed similar behaviour.
+% \vspace{20pt}
+
+% \begin{figure}[!htbp]
+%   \centering
+%   \subfloat[Learning curve of model \textit{U-Net Rec} on dataset \textit{CT Inner Ear A}]
+%   {
+%     \includegraphics[width=11cm]{learning_curve/learning_curve_ds11_rec}
+%   }
+%   \\
+%   \subfloat[Learning curve of model \textit{U-Net Gaze Prob} on dataset \textit{CT Inner Ear A}]
+%   {
+%     \includegraphics[width=11cm]{learning_curve/learning_curve_ds11_prob}
+%   }
+%   \caption[Model learning curves]{Learning curves of training (a) \textit{U-Net Rec} and (b) \textit{U-Net Gaze Prob} model on dataset \textit{CT Inner Ear A}. We split the dataset into $80\%$ training and $20\%$ test and calculated the given loss after each trained epoch. As expected, there are no signs of overfitting.}
+%   \label{fig:learn_curve}
+% \end{figure}
+% \vspace{20pt}
+
+% The time per epoch largely depends on the input size of the model. If using the data generator with the above-mentioned settings and train the model on the stated hardware, it takes at most $4.5$ minutes per epoch (dataset \textit{Surgical Video Sequence}) and at least $35$ seconds per epoch (dataset \textit{CT Inner Ear A}).
 
 %%% Local Variables:
 %%% mode: latex

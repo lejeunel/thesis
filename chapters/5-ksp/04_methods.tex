@@ -9,7 +9,6 @@ The first is a strategy to characterize the object of interest by using the prov
 The second component considers each specified 2D location as a potential target to track. To segment the object from these locations, we construct a graph over all compact image regions (\ie superpixels) in the image sequence.
 The object segmentation is then inferred with a network flow optimization strategy whereby each of the provided 2D locations correspond to flow sources and we use the object likelihood to establish a series of costs between adjacent edges in our graph. We show that this graph can be optimized exactly and efficiently using a K-shortest path approach. To further improve the segmentation, we update our classifier using the previously found segmentation and repeat the K-shortest path optimization to produce an improved segmentation. This process is iterated until convergence of the final produced segmentation.
 
-\comment{ 
 \begin{figure}[!ht]
   \centering
 \begin{tikzpicture}
@@ -26,7 +25,6 @@ The object segmentation is then inferred with a network flow optimization strate
   (Top) The dataset consists of a video/volumetric sequence and a set of 2D locations. (Middle) Our approach is divided in two main blocks: (Green frame) A feature learning phase where each pixels are assigned a feature vector. After a superpixel segmentation step, we assign to each superpixel a feature vector. (Red frame) A foreground model gives objectness likelihood to each superpixel. A MAP optimization problem then associates tracklets. Several iterations are performed and allow to re-train foreground and transition models. (Bottom) At the output, we obtain for each frame a binary segmentation of our object of interest.}
 \label{fig:pipeline}
 \end{figure}
-}
 
 By combining these two components, we show in our experiments that effective segmentations can be generated from extremely few 2D locations, without further prior assumptions on the image modality or the object of interest. 
 
@@ -150,6 +148,7 @@ Thanks to its inherent structure, our MAP problem can be mapped into a cost-flow
 %\label{sec:int_prog}
 As a first step, the MAP problem of Eq.~\eqref{eq:map2} is transformed into an Integer Program (IP) \cite{schrijver98}. To simplify notations, let $\alpha_t^{m,n} \coloneqq P(Y_t^n=1|a_{t-1}^m)$, $\beta_t^n \coloneqq P(Y_t^n=1|a_t,g_t)$, and $\rho_t^n \coloneqq P(Y_t^n=1|\bm{a},\bm{g})$. We also introduce a sink node $\mathcal{X}$, and set of source nodes $\mathcal{E}_t$ such that each pushes flow onto the corresponding frame $I_t$.
 Additionally, we introduce the variables $f_t^n$, $f_t^{m,n}$, $f_t^{\mathcal{E},n}$, and $f^{n,\mathcal{X}}$ to denote tracklet, transition, entrance and exit flows, respectively. The corresponding IP is thus given by,
+
   \begin{subequations}
   \label{eq:int_prog}
   \begin{align}
