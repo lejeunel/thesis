@@ -1,0 +1,29 @@
+(TeX-add-style-hook
+ "05_experiments"
+ (lambda ()
+   (LaTeX-add-labels
+    "sec:experiments"
+    "fn:website"
+    "tab:parameters"
+    "sec:data"
+    "sec:results"
+    "sec:accuracy"
+    "tab:stats"
+    "fig:ROC-PR"
+    "fig:sp_limits"
+    "fig:all"
+    "fig:brain_paths"
+    "tab:learning"
+    "fig:learning"
+    "fig:sub2"
+    "fig:sub1"
+    "fig:coverage"
+    "fig:multigaze"
+    "eq:loss_features"
+    "tab:multigaze"
+    "fig:neigh_5"
+    "fig:neigh_10"
+    "fig:outliers"
+    "fig:outliers_missing"))
+ :latex)
+

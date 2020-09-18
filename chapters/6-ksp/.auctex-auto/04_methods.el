@@ -1,0 +1,34 @@
+(TeX-add-style-hook
+ "04_methods"
+ (lambda ()
+   (LaTeX-add-labels
+    "sec:overview"
+    "fig:pipeline"
+    "tab:notation"
+    "sec:foreground_model"
+    "sec:features"
+    "eq:loss_features"
+    "eq:app_vector"
+    "fig:unet"
+    "sec:optimization"
+    "sec:MAP"
+    "eq:map"
+    "eq:map2"
+    "sec:solving"
+    "eq:int_prog"
+    "eq:loglikelihood"
+    "eq:cap1_trans"
+    "eq:conserv1"
+    "eq:conserv2"
+    "fig:mcf"
+    "sec:costs"
+    "eq:in_frame_cost"
+    "eq:alpha"
+    "eq:beta"
+    "fig:temporal_merge"
+    "sec:iterative_ksp"
+    "eq:cost_transform"
+    "fig:example_iter_ksp"
+    "alg:iter_ksp"))
+ :latex)
+

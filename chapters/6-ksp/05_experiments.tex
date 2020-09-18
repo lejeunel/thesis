@@ -107,10 +107,10 @@ As illustrated in Fig.~\ref{fig:all}, the results of our methods show improved s
       & F1 & PR & RC \\
        & & 1 & 2 & 3 & 4 & & mean $\pm$ std& mean $\pm$ std& mean $\pm$ std\\ 
       \fatline
-      \dataall{chapters/5-ksp/tables/Tweezer_self.csv}{Tweezer}
-      \dataall{chapters/5-ksp/tables/Brain_self.csv}{Brain}
-      \dataall{chapters/5-ksp/tables/Slitlamp_self.csv}{Slitlamp}
-      \dataall{chapters/5-ksp/tables/Cochlea_self.csv}{Cochlea}
+      \dataall{chapters/6-ksp/tables/Tweezer_self.csv}{Tweezer}
+      \dataall{chapters/6-ksp/tables/Brain_self.csv}{Brain}
+      \dataall{chapters/6-ksp/tables/Slitlamp_self.csv}{Slitlamp}
+      \dataall{chapters/6-ksp/tables/Cochlea_self.csv}{Cochlea}
   \end{tabularx}
 \caption{Comparison of quantitative results on all datasets. We report the F1 score for each method on each tested sequence using 4 different 2D gaze sets. In addition, for each sequence type, we give the mean and standard deviation F1, precision (PR) and recall (RC) scores.}
 \label{tab:stats}
@@ -184,7 +184,7 @@ table foot=\hline,
 filter expr={
       test{\ifnumgreater{\thecsvinputline}{1}}
     }]
-{chapters/5-ksp/tables/learning_all.csv}
+{chapters/6-ksp/tables/learning_all.csv}
   {1=\type,2=\sksp,3=\smouse}
   {\type & \sksp & \smouse }
 \caption{Prediction using manual or produced training annotations. For each type, the mean of the maximum F1 scores for the proposed method (KSP) and the mouse-labeled case are shown.}\label{tab:learning}
