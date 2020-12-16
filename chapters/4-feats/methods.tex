@@ -54,7 +54,7 @@ The algorithm can be split into feature learning and feature encoding phase \cit
 Feature learning phase is illustrated in Fig. \ref{fig:subfig:bow_training}.
 First, we randomly choose a fixed amount of keypoints over all images in a sequence.
 Each keypoint is then described by a SIFT descriptor of dimension 128 \cite{lowe04}.
-Subsequently, k-means vector quantization quantizes the keypoint descriptors into $K$ classes \cite{lloyed1982}.
+Subsequently, k-means vector quantization quantizes the keypoint descriptors into $K$ classes \cite{lloyd1982}.
 Let $\boldsymbol{F} = [\boldsymbol{f}_1,\cdots,\boldsymbol{f}_M]^T \in \mathbb{R}^{M \times 128}$ the SIFT appearance descriptor of the $M$ keypoints.
 Eq. \ref{eq:k_means} describes the k-means objective function, where $\boldsymbol{C} = [\boldsymbol{c}_1,...,\boldsymbol{c}_K]^T \in \mathbb{R}^{K \times 128}$ denotes the codebook.
 
