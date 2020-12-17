@@ -37,9 +37,10 @@ First, the datasets that were used in the elaboration and testing of the propose
 Second, the requirements that ground our annotation protocol is explicitated.
 Third, we present software solutions implemented in the frame of thesis, namely a cross-platform and multi-device annotation software, and a web platform where a front-end allows users to upload annotations, and a back-end that runs our segmentations algorithms.
 
-\textbf{Chapter 4} gives an overview of the broad litterature related to the present thesis.
+\textbf{Chapter 4} gives an overview of the broad litterature related to the present thesis,
 In particular, we first give a state-of-the-art of computer vision methods related to segmentation of images and volumes using sparse annotations.
 Next, we review several categories of \gls{ml} applicable to the same scenario, namely \gls{ssl}, \gls{pu}, and \gls{da}.
+Last, we add some essential theoretical elements that intervene in the proposed solutions.
 
 \textbf{Chapter 5} contains our first segmentation method that relies on the Expected Exponential loss, optimized using a gradient boosting classifier. The probabilities of unlabeled samples are estimated using label propagation.
 
@@ -53,7 +54,7 @@ Through extensive experiments, we demonstrate the superiority of the proposed de
 \textbf{Chapter 7} develops an innovative framework based on multi-object tracking.
 Concretely, we formulate our segmentation problem as a maximum a-posteriori problem, where the random variable to optimize is the objectness of superpixels.
 Using deep features extracted to the best method of the previous chapter, we train an ensemble of decision trees using a sampling method applicable to Positive/Unlabeled setup.
-Next, simple gaussian kernels provide pairwise simlarity measures.
+Next, simple gaussian kernels provide pairwise similarity measures.
 These two models allow to define likelihoods of selecting a superpixel given the user's annotations, and transiting from one frame to the next.
 Using the network flow paradigm, we then build a graph that connects superpixels according to spatio-temporal relations.
 
