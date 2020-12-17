@@ -1,0 +1,82 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%		Thesis Settings
+%		Custom settings
+%
+%		2011
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% %
+% %   Use this file for your own custom packages, command-definitions, etc...
+% %
+% % 
+
+\usepackage[utf8]{inputenc} % Required for inputting international characters
+\usepackage[T1]{fontenc} % Output font encoding for international characters
+\usepackage{amssymb, amsmath}
+\usepackage{pifont}% http://ctan.org/pkg/pifont
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{bm}
+\usepackage{tabularx}
+
+\usepackage{hyperref}
+\newcommand{\footref}[1]{%
+    $^{\ref{#1}}$%
+}
+\usepackage{csvsimple}
+\usepackage{arydshln}
+\usepackage{subcaption} % for subfigures
+\usepackage{xstring}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+\usepackage{appendix}
+\AtBeginEnvironment{subappendices}{%
+\chapter*{Appendix}
+\addcontentsline{toc}{chapter}{Appendices}
+\counterwithin{figure}{section}
+\counterwithin{table}{section}
+}
+
+\usepackage{xfrac}
+\usepackage[section]{placeins}
+%\usepackage{mathpazo} % Use the Palatino font by default
+%\usepackage{libertine}
+%\usepackage{libertinust1math}
+\usepackage[T1]{fontenc}
+\usepackage{siunitx}
+%\usepackage[backend=bibtex,style=ieee]{biblatex} % Use the bibtex backend with the authoryear citation style (which resembles APA)
+
+% \usepackage[block=ragged,natbib=true]{biblatex}
+
+\usepackage{graphicx}
+\usepackage{wrapfig}
+%\usepackage{caption}
+% \usepackage[caption=false]{subfig}
+%\captionsetup[subfigure]{width=0.7\textwidth}
+% \graphicspath{{Figures/}{./}} % Specifies where to look for included images
+
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows,fit,backgrounds, patterns}
+
+\usepackage[super]{nth}
+
+%\usepackage[autostyle=true]{csquotes} % Required to generate language-dependent quotes in the bibliography
+
+\usepackage{layout}
+\usepackage{diagbox}
+
+\usepackage{tikz}
+\usepackage{datapie}
+\usepackage[automake]{glossaries-extra}
+\makeglossaries
+
+\newcommand{\comment}[1]{{\color{red}{\bf comment: #1}}}
+
