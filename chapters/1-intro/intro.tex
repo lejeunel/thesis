@@ -55,23 +55,103 @@ The segmentation method must be functional in a variety of situations, namely pr
 \section{Datasets}
 
 We now introduce the datasets that have been used during the elaboration and testing of the proposed solutions.
-Note that as the range of possibilities is huged, we chose to restrict ourselves to $4$ types of sequences.
-These, however, cover the entirety of the proposed spectrum.
+Note that as the range of possibilities is huged, we chose to restrict ourselves to $4$ types of sequences. These, however, cover the entirety of the proposed spectrum.
 
-We used four different MRI brain sequences (A-D).
-To augment the number of images for one dataset, the last three datasets (B-D) are combined into one larger dataset \textit{MRI Brain (B-D)}.
-In a similar manner, dataset \textit{Slit-Lamp Retina (A-D)} is constructed from concatenating four independent datasets together.
-The two independent datasets of the inner ear CT could not be concatenated due to different image resolutions.
+In particular, we now describe them in detail and give each type a short name that will be used in the remaining of this thesis:
 
-\input{chapters/2-datasets/tables/dset_types.tex}
+\begin{itemize}
+  \item \textbf{Tweezer}: Surgical instruments during an endoscopic procedure, where the instrument is object of interest.
+    The background is relatively homogeneous, while the instrument moves accross the frame both in translation and rotation.
+    The sequences are taken from the MICCAI EndoVision Challenge \cite{EndoChall}.
+    Each sequence is around $120$ frames long, i.e. represent $\sim 5s$ of video acquired at $25$ fps.
+  \item \textbf{Cochlea}: Volumetric \Gls{ct} scans of the inner-ear where the cochlear labyrinth is to be segmented. These are acquired according to different protocols, and therefore show important variations in gray-scale level, orientation, as well as sizes. Furthermore, the object of interest is composed of different parts that split and merge.
+  \item \textbf{Slitlamp}: Microscopic video of the retina where the optic nerve is to be segmented. The videos have been acquired using a slitlamp instrument.
+    The optic nerve is of rather small size. The background often shows important artifacts, in the form of yellow and blue beams, which sometime overlap with the object of interest. The movement of the optic nerve is often very jerky.
+  \item \textbf{Brain}: Transverse \gls{mri} scans of brains where the tumor is object of interest. The sequences are taken randomly from the Brain Tumor Segmentation Challenge (BRATS) public database \cite{BRATSChall}.
+    Scans are acquired using the same \gls{mri} protocol, but with different scanners, thereby showing wide variety of contrast and color.
+    The tumors have varying size, colors, and shapes. Sometimes, the same scan shows several tumors on the same slice.
+
+\end{itemize}
+
+In Fig. \ref{fig:dset_previews}, we show example frames for each type.
 
 \begin{figure}
 \centering
-\includegraphics[width=0.99\textwidth]{previews.pdf}
-\caption{Example of objects of interest in different video and volumetric modalities. The bottom row shows the pixel wise segmentation for each case: From left to right: A surgical instrument during an endoscopic procedure, a 3D MRI scan containing a brain tumor, an optic disc seen from a slit lamp microscope and a cochlea cross-section in a 3D CT scan.}
+\includegraphics[width=0.99\textwidth]{prevs.png}
+\caption{Example of objects of interest in different video and volumetric modalities. Each type contains 4 sequences. We show a single frame per sequence.
+  From top to bottom: Tweezer, Cochlea, Slitlamp, and Brain}
 \label{fig:dset_previews}
 \end{figure}
 
+\section{Annotation Software and Web Platform}
+In the frame of this thesis, a flexible and elegant annotation software was developed that supports as pointing device a traditional mouse, a pen compatible with touch-screens, as well as an interface to connect a eye-gaze tracker through the USB port.
+Also, a web interface was designed and implemented that allows a user to upload a sequence annotated using the above software, and download the generated pixel-wise segmentation when they are ready.
+We now describe both contributions.
+
+\subsection{Sequence annotation tool}
+\label{sec:anna}
+
+The typical annotation workflow is as follows:
+
+\begin{enumerate}
+  \item[-]{Provide as input a volume/video. These can be either DICOM \cite{dicom}, or video files.}
+  \item[-]{Optional: Set the framerate at which the sequence will play (right knob on Fig. \ref{fig:anna}).}
+  \item[-]{Optional: Connect the software to the eye-gaze tracker server. The tracker will then act as a secondary mouse.}
+  \item[-]{Hit the play button. The sequence unfolds.}
+  \item[-]{Give point annotations:}
+    \begin{itemize}
+      \item[-]{When using mouse: Simply click on the desired region.}
+      \item[-]{When using gaze-tracker: Place gaze on region and use right button (Fig. \ref{fig:anna}) to activate the recording of locations.}
+    \end{itemize}
+  \item[-]{Save locations in \gls{csv} file.}
+\end{enumerate}
+
+\begin{figure}[!htpb]
+  \includegraphics[width=0.99\textwidth]{anna0.png}
+  \caption{Screenshot of annotation tool. }
+  \label{fig:anna}
+\end{figure}
+
+The software is intended to be cross-platform and be compatible with a variety of input formats.
+Second, as our early experiments relied on an eye-gaze tracker, our software needed to be compatible with the proprietary backend given by the manufacturer.
+Third, a simple \gls{gui} was needed to display images and allow the user to select his favorite modality of annotation.
+The latter requirements drove our choice towards the Qt5 framework \cite{eng16}, which relies on C++ and provides convenient widgets out of the box.
+Our software supports allows to annotate using a mouse and an eye-gaze tracker \cite{eyetribe}.
+As platform, it supports the Linux, MacOS and Windows operating systems.
+We provide the source code at \href{https://github.com/aimi-lab/Anna}.
+
+\subsection{Web platform}
+The segmentation methods presented in the next chapters require important computational resources, namely a \gls{gpu} to train deep networks.
+We therefore provide a way for users to upload their data along with the corresponding 2D locations to a server that will perform the necessary computations remotely and send back segmentation results when they are available.
+Concretely, we develop a web interface that provides:
+
+\begin{itemize}
+  \item[-]{Links to download the annotation software (Sec. \ref{sec:anna}).}
+  \item[-]{A login mechanism that provides us with a contact e-mail address.}
+  \item[-]{An upload form where the user drops his sequence along with the 2D locations}
+\end{itemize}
+
+Once the data has been uploaded, a task object is created and queued until computational resources are available.
+After completion, the user is warned that he can download his segmentations via a URL.
+
+\begin{figure}[!htpb]
+  \includegraphics[width=0.99\textwidth]{gazelabel.png}
+  \caption{Screenshot of our web platform. Home page.}
+  \label{fig:anna}
+\end{figure}
+
+The frontend, which generates the web pages uses the \href{https://webpack.js.org}{Webpack} bundler.
+The backend is based on the \href{https://www.djangoproject.com/}{Django} framework, which handles different applications, namely the forms (login, data upload), the job queue, and the database.
+
+\begin{figure}[!htpb]
+  \includegraphics[width=0.99\textwidth]{gazelabel_upload.png}
+  \caption{Screenshot of our web platform, where the user can upload a sequence and its corresponding annotations. The task queue panel shows the state of the submitted tasks.}
+  \label{fig:anna_upload}
+\end{figure}
+
+
+
+\section{Related Works}
 
 Past research that address this issue can be roughly divided in two categories,
 where the first leverages computer vision techniques to generate segmentation masks from sparse and/or noisy annotations, while the second focuses on developping Machine Learning techniques to minimize an annotation budget.
@@ -81,7 +161,7 @@ We start by giving an overview of state-of-the-art in computer vision.
 Next, we focus on \gls{ml} methods.
 In particular, we emphasize on domains that target segmentation in a semi-supervised setting.
 
-\section{Computer Vision Methods}
+\subsection{Computer Vision Methods}
 Another line of research focuses on the annotation protocol itself so as to complement the above efforts.
 While the most tedious protocol requires that images be manually segmented at a pixel-level, many computer-vision approaches exist to facilitate this task.
 
@@ -104,7 +184,7 @@ Using the same algorithm, grab-cut \cite{rother04}, further simplifies the scrib
 
 Along the same line, \cite{criminisi08}
 
-\section{On the Wise Use of Annotation Budget}
+\subsection{On the Wise Use of Annotation Budget}
 The problem of scarcity of labeled data can also be posed in the following manner:
 Given a limited annotation budget, i.e. when only a few hours of annotation work can be provided, how can one make the best use of it?
 
@@ -121,7 +201,7 @@ First, the difficulty of the annotation task can prohibit the effective use of c
 Another limitation is the nature of the data, i.e. one usually prefers to pre-classify brain scans and submit to workers the slices where tumors are present.
 Last, one must usually integrate a test-task to ensure the competence of workers, or filter-out annotations provided by ``poorly performing'' workers \cite{park18}.
 
-\section{Transfer Learning, Semi-supervised Learning, and Domain Adaptation}
+\subsection{Transfer Learning, Semi-supervised Learning, and Domain Adaptation}
 \gls{tl} consists in using a \gls{ml} model trained for the task of interest, but using a training set of different nature than the targeted domain, e.g. train a \gls{cnn} to segment natural objects (trees, cars, ...) for the segmentation of surgical tools.
 As pointed out by \cite{oliver18}, an important and implicit assumption in that context is that both datasets share similar data distributions.
 
