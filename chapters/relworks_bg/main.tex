@@ -1,0 +1,24 @@
+\chapter{Related Works and Background}
+\resetfigpath{relworks_bg}
+
+\newcounter{algsubstate}
+\renewcommand{\thealgsubstate}{\alph{algsubstate}}
+\newenvironment{algsubstates}
+  {\setcounter{algsubstate}{0}%
+   \renewcommand{\State}{%
+     \stepcounter{algsubstate}%
+     \Statex {\footnotesize\thealgsubstate:}\space}}
+  {}
+
+This chapter gives an overview of the vast spectrum of past research related to the present thesis, namely computer vision techniques applied to segmentation, and \gls{ml} methods applicable with sparse supervision.
+
+The remaining of this chapter gives some background theory that is relevant to the methods proposed in the remaining of this thesis, namely Random Forest classification and Deep Learning methods.
+
+\input{chapters/relworks_bg/rel_works.tex}
+\input{chapters/relworks_bg/background.tex}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../../main"
+%%% End:

@@ -1,0 +1,69 @@
+\section{Related Works}
+
+Past research that address image and volume segmentation using sparse supervision can be roughly divided in two categories,
+The first category, mainly focuses on computer vision techniques, while the second focuses on developping Machine Learning techniques.
+In practice, both categories often overlap.
+
+We now give an overview of the state-of-the-art in computer vision.
+Next, we focus on \gls{ml} methods.
+
+
+\subsection{Computer Vision Methods}
+Another line of research focuses on the annotation protocol itself so as to complement the above efforts.
+While the most tedious protocol requires that images be manually segmented at a pixel-level, many computer-vision approaches exist to facilitate this task.
+
+Early contributions relied on the Active Contour model \cite{kass88}, which assumes that an initial contour is given and parameterized as the nodes of a spline curve, in this context called an elastic snake.
+The segmentation problem is formulated as finding the deformation of the initial snake that minimizes an energy term.
+In its simplest form, the energy term is composed of a term that determines the fitting of the snake to the edges of the image, while another term controls the smoothness of the snake.
+The energy is then minimized using gradient descent.
+Following works alleviate the problem of robustness brought by noisy edge maps by minimizing the Mumford-Shah functional \cite{chan01}, and parameterize the contour using the level-set method \cite{osher88}.
+
+More recently, annotations in the form of scribbles were considered, where the annotator is asked to draw crude delineations of one or several objects of interest, along with a scribble on the background.
+A first method that handles such kind of annotations relies on the Random-Walk algorithm \cite{grady06}.
+The segmentation problem reduces to assigning to each unlabeled pixel a random-walker. The label of the latter pixel is then determined by the finding the label for which the walker has a maximum probability of reaching first.
+
+Relying on the same annotation requirement, the graph-cut approach \cite{Boykov2006}
+minimizes an Markov Random Field energy objective that considers unary terms (a scalar on each pixel), and a pairwise term that models the similarity of neighboring pixels.
+Concretely, the image or volume is represented as a region adjacency graph where each pixel is assigned a node, and edges connect adjacent pixels.
+Each annotated positive pixels is connected to a source node, while annotated negatives are connected to a sink node.
+The energy minimization is then performed using the min-cut/max-flow algorithm \cite{goldberg88}.
+Using the same algorithm, grab-cut \cite{rother04}, further simplifies the scribble-based annotation protocol by considering bounding-boxes around the object of interest, which provide crude labels on both foreground and background in a single stroke.
+
+Along the same line, \cite{criminisi08}
+
+\subsection{On the Wise Use of Annotation Budget}
+The problem of scarcity of labeled data can also be posed in the following manner:
+Given a limited annotation budget, i.e. when only a few hours of annotation work can be provided, how can one make the best use of it?
+
+\gls{al} \cite{settles09} considers semi-supervised learning scenarios, where abundant unlabeled data are available.
+\gls{al} algorithms select unlabeled samples that are the most informative to the \gls{ml} model, i.e. it assumes that many unlabeled samples represent redundant information to the late-stage \gls{ml} model.
+In \cite{KonSznFua15}, authors devise a strategy to select unlabeled supervoxels of a 3D volume so as to segment volumes of various modalities.
+The approach iteratively trains a classifier and takes its entropy as measure of uncertainty.
+Combining the latter with a geometric prior, which takes into account intuitive rules on spatial coherence, they sample a batch of most uncertain samples.
+The classifier is then re-trained using the newly annotated samples.
+
+Crowd-sourcing, refers to the outsourcing of the annotation task to a high number of annotators \cite{orting19}.
+Its use in the frame of medical imaging poses several limitations.
+First, the difficulty of the annotation task can prohibit the effective use of crowd-sourcing, e.g when the structure of interest is hard to distinguish \cite{orting19}.
+Another limitation is the nature of the data, i.e. one usually prefers to pre-classify brain scans and submit to workers the slices where tumors are present.
+Last, one must usually integrate a test-task to ensure the competence of workers, or filter-out annotations provided by ``poorly performing'' workers \cite{park18}.
+
+\subsection{Transfer Learning, Semi-supervised Learning, and Domain Adaptation}
+\gls{tl} consists in using a \gls{ml} model trained for the task of interest, but using a training set of different nature than the targeted domain, e.g. train a \gls{cnn} to segment natural objects (trees, cars, ...) for the segmentation of surgical tools.
+As pointed out by \cite{oliver18}, an important and implicit assumption in that context is that both datasets share similar data distributions.
+
+\gls{ssl} is a broad category of \gls{ml} algorithm that combines traditional supervised learning tasks, where a fully labeled training dataset is available, along with an abundant unlabeled dataset.
+The latter can, under specific conditions, boost the performance of an \gls{ml} model trained with labeled dataset only, i.e. in a fully-supervised manner.
+The basic idea is that the ML model may acquire knowledge of the data distribution from the unlabeled set.
+Here again, one assumes that both data domains share similar distributions.
+In \cite{ghafoorian17}, authors show experimentally that a \gls{nn} trained to segment tumors on MRI brain scans acquired in a given MRI protocol, perform poorly when transfered to another protocol, as the shape, intensities, and contrast level are inconsistent.
+
+\gls{da} addresses the problem of adapting the model so as to take into account domain shift, i.e. the discrepancies between the training and target domain.
+In \cite{perone19}, authors devise a strategy to segment MRI scans of spinal cords using a model trained with images taken at a specific field-of-view, and transfer to another field-of-view in an unsupervised fashion.
+Their approach leverages data-augmentation to enforce a consistency between the augmented and pristine images of the unlabeled set, while jointly training with the labeled set with traditional cross-entropy loss.
+On the same image modality, \cite{li20} resort to adversarial training. They jointly train a segmentation model and a discriminator wit shared weights. The discriminator is trained to discriminate between the source and target domain.
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../../main"
+%%% End:

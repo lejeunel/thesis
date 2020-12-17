@@ -1,0 +1,139 @@
+\chapter{Datasets, Annotation Protocol and Software Solutions}
+\label{datasets}
+
+\resetfigpath{datasets}
+\section{Datasets}
+
+We now introduce the datasets that have been used during the elaboration and testing of the proposed solutions.
+Note that as the range of possibilities is huge, we choose to restrict ourselves to $4$ types of sequences.
+These, however, cover the entirety of the proposed spectrum.
+
+We now describe them in detail and give each type a short name that will be used in the remaining of this thesis:
+
+\begin{itemize}
+  \item \textbf{Tweezer}: Surgical instruments during an endoscopic procedure, where the instrument is object of interest.
+    The background is relatively homogeneous, while the instrument moves accross the frame both in translation and rotation.
+    The sequences are taken from the MICCAI EndoVision Challenge \cite{EndoChall}.
+    Each sequence is around $120$ frames long, i.e. represent $\sim 5s$ of video acquired at $25$ fps.
+  \item \textbf{Cochlea}: Volumetric \Gls{ct} scans of the inner-ear where the cochlear labyrinth is to be segmented. These are acquired according to different protocols, and therefore show important variations in gray-scale level, orientation, as well as sizes. Furthermore, the object of interest is composed of different parts that split and merge, thereby making this type the most challenging.
+    Each scan contains $\sim 100$ slices.
+  \item \textbf{Slitlamp}: Microscopic video of the retina where the optic nerve is to be segmented. The videos have been acquired using a slitlamp instrument.
+    The optic nerve is of rather small size. The background often shows important artifacts, in the form of yellow and blue beams, which sometime overlap with the object of interest. The movement of the optic nerve is often very jerky.
+    Each video contains $\sim 120$ frames acquired at $25$ fps.
+  \item \textbf{Brain}: Transverse \gls{mri} scans of brains where the tumor is object of interest. The sequences are taken randomly from the Brain Tumor Segmentation Challenge (BRATS) public database \cite{BRATSChall}.
+    Scans are acquired using the same \gls{mri} protocol, but with different scanners, thereby showing wide variety of contrast and color.
+    The tumors have varying size, colors, and shapes. Sometimes, the same scan shows several tumors on the same slice.
+    Each scan contains $\sim 80$ frames.
+\end{itemize}
+
+In Fig. \ref{fig:dset_previews}, we show example frames for each type.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.99\textwidth]{prevs.png}
+\caption{Example of objects of interest in different video and volumetric modalities. Each type contains 4 sequences. We show a single frame per sequence.
+  From top to bottom: Tweezer, Cochlea, Slitlamp, and Brain}
+\label{fig:dset_previews}
+\end{figure}
+
+\section{Proposed annotation protocol and applicability}
+
+In the present thesis, we devise solutions that allow to annotate medical sequences in a fast and intuitive manner, in an attempt to alleviate the bottleneck of scarcity of example data.
+
+In particular, the annotator is presented a video or volumetric sequence that plays on a screen, i.e. the frames unfold in an automatic manner.
+As the sequence unfolds, the annotator is asked to point at the object of interest using a pointing device, such as a mouse, a tablet pen, or an eye-gaze tracker.
+In contrast with the traditional approach, where the object must be manually segmented on each frame individually, the proposed protocol drastically reduces the annotation time.
+In essence, our contribution ambitions an annotation time equal to the duration of the video/volume playback.
+For example, assuming the sequence contains $100$ frames playing at $5fps$, the total annotation time is $20$ seconds.
+In comparison, the traditional pixel-wise annotation task of a sequence of similar size could take anywhere from $10$ min. to $1$ hour.
+
+Concretely, we set the following requirements on the annotation protocol:
+\begin{itemize}
+  \item The annotator does not need to manually change the frame being annotated, e.g. by hitting a forward or backward key. The sequence automatically unfolds according to a specified frame-rate.
+  \item The annotator handles a single pointing device, which he/she uses to indicate the location of the object of interest.
+  \item The annotator must be able to watch and annotate the sequence in a single go, i.e. he/she does not need to review annotations and modify them manually afterwards.
+\end{itemize}
+
+The segmentation method must be functional in a variety of situations, namely produce acceptable accuracy for:
+\begin{itemize}
+  \item Both videos and volumetric sequences.
+  \item Both color and grayscale images.
+  \item Various kind of image modality, e.g. \gls{mri} and \gls{ct}.
+  \item Various levels of noise, perturbations, and lightning artifacts.
+  \item Various nature of object, i.e. size, shape, appearance.
+  \item The object can be made of several parts that are not contiguous, i.e. an \gls{mri} brain scan with several tumors.
+\end{itemize}
+
+\section{Annotation Software and Web Platform}
+In the frame of this thesis, a flexible and elegant annotation software was developed that supports as pointing device a traditional mouse, a pen compatible with touch-screens, as well as an interface to connect a eye-gaze tracker through the USB port.
+Also, a web interface was designed and implemented that allows a user to upload a sequence annotated using the above software, and download the generated pixel-wise segmentation when they are ready.
+We now describe both contributions.
+
+\subsection{Sequence annotation tool}
+\label{sec:anna}
+
+We design our annotation software around the following features.
+First, we want it to be cross-platform.
+Second, we wished to experiment on using an eye-gaze tracker in place of standard pointing devices.
+We therefore implement a module that is compatible with the proprietary backend given by the manufacturer of the tracker \cite{eyetribe}.
+Third, a simple \gls{gui} was needed to display images, select the type of pointing device, as well as tune the frame-rate.
+
+To guarantee cross-platform compatibility, we choose the Qt5 framework \cite{eng16}, which relies on C++ and provides convenient widgets out of the box.
+The source code is made publicly available at \url{https://github.com/aimi-lab/Anna}.
+In Fig. \ref{fig:anna}, we show an example screenshot.
+
+The typical annotation workflow is the following:
+
+\begin{itemize}
+  \item[-]{Provide as input a volume/video. These can be either DICOM \cite{dicom}, or video files.}
+  \item[-]{Optional: Set the framerate at which the sequence will play (right knob on Fig. \ref{fig:anna}).}
+  \item[-]{Optional: Connect the software to the eye-gaze tracker server. The tracker will then act as a secondary mouse.}
+  \item[-]{Hit the play button. The sequence unfolds.}
+  \item[-]{Give point annotations:}
+    \begin{itemize}
+      \item[-]{When using mouse: Simply click on the desired region.}
+      \item[-]{When using gaze-tracker: Place gaze on region and use right button (Fig. \ref{fig:anna}) to activate the recording of locations.}
+    \end{itemize}
+  \item[-]{Save annotations in \gls{csv} format.}
+\end{itemize}
+
+\begin{figure}[!htpb]
+  \includegraphics[width=0.99\textwidth]{anna0.png}
+  \caption{Screenshot of annotation tool. }
+  \label{fig:anna}
+\end{figure}
+
+
+\subsection{Web platform}
+The segmentation methods presented in the next chapters require important computational resources, namely a \gls{gpu} to train deep networks.
+We therefore provide a way for users to upload their data along with the corresponding 2D locations to a server that will perform the necessary computations remotely and send back segmentation results when they are available.
+Concretely, we develop a web interface that provides:
+
+\begin{itemize}
+  \item[-]{Links to download the annotation software (Sec. \ref{sec:anna}).}
+  \item[-]{A login mechanism that provides us with a contact e-mail address.}
+  \item[-]{An upload form where the user drops his sequence along with the 2D locations}
+\end{itemize}
+
+Once the data has been uploaded, a task object is created and queued until computational resources are available.
+After completion, the user is warned that he can download his segmentations via a URL.
+
+\begin{figure}[!htpb]
+  \includegraphics[width=0.99\textwidth]{gazelabel.png}
+  \caption{Screenshot of our web platform. Home page.}
+  \label{fig:homepage}
+\end{figure}
+
+The frontend, which generates the web pages uses the \href{https://webpack.js.org}{Webpack} bundler.
+The backend is based on the \href{https://www.djangoproject.com/}{Django} framework, which handles different applications, namely the forms (login, data upload), the job queue, and the database.
+
+\begin{figure}[!htpb]
+  \includegraphics[width=0.99\textwidth]{gazelabel_upload.png}
+  \caption{Screenshot of our web platform, where the user can upload a sequence and its corresponding annotations. The task queue panel shows the state of the submitted tasks.}
+  \label{fig:upload}
+\end{figure}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../../main"
+%%% End:

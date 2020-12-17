@@ -1,0 +1,69 @@
+\resetfigpath{intro}
+
+\chapter{Introduction}
+\label{intro}
+
+The medical imaging field has recently witnessed the revolution of \gls{ai}, a broad discipline that is a part of computer science whose aim is to conceptualize human ``intellectual'' tasks, and produce computer programs that can replicate them, thereby allowing to relieve human beings from tedious and repetitive tasks.
+From classification to segmentation tasks, \gls{ai} already provides flexible and efficient tools that greatly facilitate the daily practice of clinicians.
+In particular, large quantities of \gls{mri} brain scans are now efficiently and accurately processed by \gls{ai} systems that help clinicians in the diagnosis of pathologies \cite{sun19}.
+Similarly, surgical instruments can be segmented automatically and accurately in real-time to allow laparoscopic interventions of the abdominal cavity by means of robotic technology, thereby decreasing the invasiveness of traditional methods \cite{davinci}.
+
+\Gls{ml}, a term that denote a sub-category of \gls{ai}, is grounded on the ``learning by example'' paradigm.
+Whereas traditional approaches generally consisted in explicitly formalizing and implementing complex tasks as a combination of simpler programmatic instructions,
+\gls{ml} rather considers that a flexible system can learn such instructions automatically through repeated experiences.
+
+Concretely, as a young child can effectively derive the concept of car using a few visual examples, and be able to identify an ``unseen'' car in a complex environment with near-perfect accuracy,
+state-of-the-art \gls{ml} methods leverage the same principle.
+However, no matter how well-engineered they are, they need, in order to replicate this simple task with comparable accuracy, thousands of examples and counter-examples of images \cite{ILSVRC15}.
+
+In this scenario, collecting such quantity of example images and annotating them is tedious and cumbersome.
+In practice, the annotation task is performed by numerous individuals in parallel.
+The annotation of medical data, however, adds the following practical difficulties.
+First, the task can require a specific medical expertise.
+Second, assuming such experts are available and willing to participate to this task, their daily obligations imposes a limited time budget.
+These two factors largely explain why the medical field does not benefit from the latest and greatest \gls{ml} technologies used in more generic applications \cite{orting19}.
+
+
+\section{Organization and Contribution of this Thesis}
+The organization of this thesis is summarized below per chapter:
+
+\textbf{Chapter 2} gives a detailed description of the proposed problematic.
+The datasets that were used in the elaboration and testing of the proposed methods are described.
+The requirements that ground our annotation protocol is then explicitated.
+Next, we describe our software solutions, namely a cross-platform and multi-device annotation software, and a web platform with a front-end that allows users to upload annotations, and a back-end that runs our segmentations algorithms.
+
+\textbf{Chapter 3} gives a detailed description of the proposed problematic.
+First, the datasets that were used in the elaboration and testing of the proposed methods are described.
+Second, the requirements that ground our annotation protocol is explicitated.
+Third, we present software solutions implemented in the frame of thesis, namely a cross-platform and multi-device annotation software, and a web platform where a front-end allows users to upload annotations, and a back-end that runs our segmentations algorithms.
+
+\textbf{Chapter 4} gives an overview of the broad litterature related to the present thesis.
+In particular, we first give a state-of-the-art of computer vision methods related to segmentation of images and volumes using sparse annotations.
+Next, we review several categories of \gls{ml} applicable to the same scenario, namely \gls{ssl}, \gls{pu}, and \gls{da}.
+
+\textbf{Chapter 5} contains our first segmentation method that relies on the Expected Exponential loss, optimized using a gradient boosting classifier. The probabilities of unlabeled samples are estimated using label propagation.
+
+\textbf{Chapter 6} gives a thorough study of feature extraction methods applicable to the present scenario.
+We devise a simple evaluation framework based on a \gls{rf} classifier that operates on superpixels.
+As baselines, we implement traditional feature extraction methods, such as \gls{bovw}.
+Another baseline considers unsupervised deep feature extraction, where we use a \gls{cnn} trained to classify natural images.
+We then implement various methods based on Deep Learning that integrate motion priors, as well as priors derived from the user-provided point annotations.
+Through extensive experiments, we demonstrate the superiority of the proposed deep feature learning method over the baselines.
+
+\textbf{Chapter 7} develops an innovative framework based on multi-object tracking.
+Concretely, we formulate our segmentation problem as a maximum a-posteriori problem, where the random variable to optimize is the objectness of superpixels.
+Using deep features extracted to the best method of the previous chapter, we train an ensemble of decision trees using a sampling method applicable to Positive/Unlabeled setup.
+Next, simple gaussian kernels provide pairwise simlarity measures.
+These two models allow to define likelihoods of selecting a superpixel given the user's annotations, and transiting from one frame to the next.
+Using the network flow paradigm, we then build a graph that connects superpixels according to spatio-temporal relations.
+
+\textbf{Chapter 8}
+
+
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../../main"
+%%% End:

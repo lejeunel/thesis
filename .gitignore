@@ -41,3 +41,6 @@
 *.ist
 *.lof
 *.lot
+*.aux
+*.el
+*.log

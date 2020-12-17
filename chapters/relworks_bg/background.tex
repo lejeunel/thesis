@@ -1,3 +1,35 @@
+\section{Random Forest}
+\label{sec:rf}
+This section describes the \gls{rf} method, which we will use in the evaluation phase of our deep feature study.
+Most of the following content is taken from \cite{hastie09}.
+
+\gls{rf} is an algorithm that builds up from the idea of bootstrap aggregation (bagging).
+Bagging consists in combining a commitee of weak learners (high variance and low bias estimators).
+Combining such learners allows to decrease the variance one would get when using a single learner.
+The \gls{rf} algorithm generates a single decision tree per bootstrap sample.
+In the present experimental setup, our task is to predict the class of a given sample (foreground or background).
+Once the set of trees are fitted, we infer the class probability of a given sample by computing the average vote over all trees.
+The training algorithm is described in Alg. \ref{alg:rf}.
+
+\begin{algorithm}[H]
+  \label{alg:rf}
+ \caption{Training a Random Forest for classification}
+ \begin{algorithmic}[1]
+ \Require{Input samples $\bm{X}$, $B$: Number of trees, $N$: Number of samples per tree, $m$: Number of variables to pick at each split, $n_{min}$: Minimum size of a non-leaf node}
+  \Ensure{$\bm{T} = \{T_{b}^{i}\}_{i=1}^{N_{T}}$: Set of trees}
+    \For{$b \gets 1$ to $B$}
+        \State Draw a bootstrap sample $\bm{Z}^{*}$ of size $N$ from $\bm{X}$
+        \State Grow a tree $T_{b}$ on $\bm{Z}^{*}$ by recursively repeating the following steps for each non-leaf node of the tree, until the minimum node size $n_{min}$ is reached
+        \begin{algsubstates}
+                \State Select $m$ variables at random from the $p$ variables
+                \State Pick the best variable/split-point among the $m$
+                \State Split the node into two children nodes
+            \end{algsubstates}
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+
 \section{Deep Convolutional Neural Network}
 \label{sec:cnn}
 
@@ -52,7 +84,7 @@ The convolutional operator brings the following advantage over the \gls{mlp}: (1
 Fig. \ref{fig:cnn_con} illustrates the idea of sparse connectivity brought by convolutional layers.
 
 \begin{figure}[!htpb]
-  \includegraphics[width=13cm]{theory/fc_vs_conv}
+  \includegraphics[width=13cm]{fc_vs_conv}
   \caption{(Left) A fully-connected (linear) layer with 1D input at the bottom. (Right) Convolutional layer with a kernel of size 3.}
   \label{fig:cnn_con}
 \end{figure}
@@ -64,7 +96,7 @@ This effectively allow to capture, in the case of images, visual features at dif
 In particular, the max-pooling operator computes for each spatial location the maximal filter response over a pre-defined neighborhood (see fig. \ref{fig:max_pool})
 
 \begin{figure}[!htpb]
-  \includegraphics[width=13cm]{theory/max_pooling}
+  \includegraphics[width=13cm]{max_pooling}
   \caption{(Left) Input. (Right) Output of max-pooling layer. Each color represents a set of values included in the sliding window.}
   \label{fig:max_pool}
 \end{figure}
@@ -124,7 +156,7 @@ The algorithm is described in alg. \ref{alg:batchnorm}.
 
 \begin{figure}[!htpb]
   \centering
-  \includegraphics[width=13cm]{theory/cnn}
+  \includegraphics[width=13cm]{cnn}
   \caption{Convolutional Neural Network applied to an image task.
     The network applies a succession of convolution, and pooling (subsampling) operation.
   Activation functions are not represented. Figure taken from \cite{lecun95}}
@@ -147,14 +179,13 @@ For example, using the \gls{mse} criterion, one writes:
 
 \begin{figure}[!htpb]
   \centering
-  \includegraphics[width=7cm]{theory/ae}
+  \includegraphics[width=7cm]{ae}
   \caption{Convolutional Autoencoder.
     The input sample $x$ passes through an encoder.
     The output of the encoder, called $h$, passes through a decoder to give the reconstructed version $x'$.
     In yellow is the bottleneck.}
   \label{fig:ae}
 \end{figure}
-
 
 %%% Local Variables:
 %%% mode: latex
