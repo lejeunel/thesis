@@ -1,4 +1,6 @@
-\section{Random Forest}
+\section{Background Theory}
+
+\subsection{Random Forest}
 \label{sec:rf}
 This section describes the \gls{rf} method, which we will use in the evaluation phase of our deep feature study.
 Most of the following content is taken from \cite{hastie09}.
@@ -30,28 +32,28 @@ The training algorithm is described in Alg. \ref{alg:rf}.
 \end{algorithm}
 
 
-\section{Deep Convolutional Neural Network}
+\subsection{Deep Convolutional Neural Network}
 \label{sec:cnn}
 
 This chapter serves as an introduction to the basic notions that will come up in the remaining of this thesis, namely the notion of \gls{nn} and \gls{cnn}.
 We start by introducing generalities about gls{nn}.
 Most of the content of the present chapter is taken from \cite{goodfellow16}.
 
-\subsection{Neural Network}
+\subsubsection{Neural Network}
 Deep learning essentially refers to a family of machine learning methods that historically derive from the \gls{mlp}, also known as Neural Network.
 An \gls{mlp} aims at approximating a function $f^{*}$ with a function $f(x;\theta)$ parameterized by $\theta$.
 More concretely, an \gls{mlp} converts an input $x$ to an output $y$ using a chain of function $f^{(1)} \circ f^{2} \circ \cdots \circ f^{n}(x)$, which justifies its name ``network''.
 Each function is usually referred to as ``layer'', while the term ``neural'' comes from the fact that it is originally inspired by neuroscience \cite{mcculloch43}.
 
-As in all machine learning setup, one wants to find the set of parameters $\bm{\theta}$ so as to optimize a cost function, for example the \gls{mse}:
+As in all machine learning setup, one wants to find the set of parameters $\bm{\theta}$ so as to optimize a cost (or loss) function, for example the \gls{mse}:
 
 \begin{equation}
-\mathcal{L}(\bm{theta}) = \sum_{x\in \mathcal{X}}(f^{*}(x)-f(x;\bm{\theta}))
+\mathcal{L}(\bm{\theta}) = \sum_{x\in \mathcal{X}}(f^{*}(x)-f(x;\bm{\theta}))
 \end{equation}
 
 One typically use a gradient-descent method to solve the above problem.
 
-In the frame of \gls{mlp}, the functions $f^{m}(x;\bm{\theta_{m}})$ are linear (or fully-connected) layer, i.e. $\bm{theta}_m=(\bm{w)}_{m},b$, followed by an activation function $\sigma(.)$
+In the frame of \gls{mlp}, the functions $f^{m}(x;\bm{\theta_{m}})$ are linear (or fully-connected) layer, i.e. $\bm{\theta}_m=(\bm{w)}_{m},b$, followed by an activation function $\sigma(.)$
 
 \begin{equation}
 f^{m}(x;\bm{\theta_{m}}) = \sigma(\bm{x}^{T}\bm{w} + b)
@@ -66,7 +68,7 @@ It writes:
 \sigma(x) = \max \{0, \bm{x}\}
 \end{equation}
 
-\subsection{Convolutional Network}
+\subsubsection{Convolutional Network}
 Many machine learning applications relie on structured data, i.e. data that respect a grid-like topology.
 Typical examples include time-series and images.
 For this reason, \cite{lecun95} introduced the notion of convolutional network, which adapts the previous MLP to leverage the grid-like topolgy in an effective manner.
@@ -163,7 +165,7 @@ The algorithm is described in alg. \ref{alg:batchnorm}.
   \label{fig:cnn}
 \end{figure}
 
-\subsection{Convolutional Autoencoder}
+\subsubsection{Convolutional Autoencoder}
 The basic idea of \gls{ae}, first introduced in \cite{vincent10}, consists in training a model in an unsupervised manner, so as to generate a compressed representation of the input.
 Such compressed representation, often called feature vector, is typically used in a subsequent machine learning task.
 In particular, an \gls{ae} is composed of two modules: An encoding function $f_{\theta}$, and a decoding function $g_{\phi}$.

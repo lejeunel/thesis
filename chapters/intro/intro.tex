@@ -3,21 +3,57 @@
 \chapter{Introduction}
 \label{intro}
 
-The medical imaging field has recently witnessed the revolution of \gls{ai}, a broad discipline that is a part of computer science whose aim is to conceptualize human ``intellectual'' tasks, and produce computer programs that can replicate them, thereby allowing to relieve human beings from tedious and repetitive tasks.
+The medical imaging field has recently witnessed the revolution of \gls{ai}, a broad discipline that is part of computer science, whose aim is to conceptualize human ``intellectual'' tasks, and produce computer programs that can replicate them, thereby allowing to relieve human beings from tedious and repetitive tasks.
 From classification to segmentation tasks, \gls{ai} already provides flexible and efficient tools that greatly facilitate the daily practice of clinicians.
 In particular, large quantities of \gls{mri} brain scans are now efficiently and accurately processed by \gls{ai} systems that help clinicians in the diagnosis of pathologies \cite{sun19}.
 Similarly, surgical instruments can be segmented automatically and accurately in real-time to allow laparoscopic interventions of the abdominal cavity by means of robotic technology, thereby decreasing the invasiveness of traditional methods \cite{davinci}.
 
+Before diving into the underlying intricacies of these systems, we
+first wish to give the reader some insights on the genesis of \gls{ai}.
+In particular, we describe the two main paradigms that are historically anterior to it, namely the descriptive and predictive analysis paradigms.
+In a second section, we explain why one needs large amounts of annotated data to make \gls{ai} solutions practical, and how the medical imaging field, in particular, is hindered by this requirement.
+Next, we emphasize how the present thesis aims at solving this issue.
+Last, we give an overview of the organization of the present thesis.
+
+\section{Descriptive VS. predictive analysis}
 \Gls{ml}, a term that denote a sub-category of \gls{ai}, is grounded on the ``learning by example'' paradigm.
 Whereas traditional approaches generally consisted in explicitly formalizing and implementing complex tasks as a combination of simpler programmatic instructions,
 \gls{ml} rather considers that a flexible system can learn such instructions automatically through repeated experiences.
+Formally, traditional computer vision techniques belong the descriptive analysis paradigm, whereas \gls{ml} relies on predictive analysis \cite{omahony19}.
 
-Concretely, as a young child can effectively derive the concept of car using a few visual examples, and be able to identify an ``unseen'' car in a complex environment with near-perfect accuracy,
-state-of-the-art \gls{ml} methods leverage the same principle.
-However, no matter how well-engineered they are, they need, in order to replicate this simple task with comparable accuracy, thousands of examples and counter-examples of images \cite{ILSVRC15}.
+The descriptive approach consists in producing a mathematical model that describes the considered phenomenon.
+This requires to collect a representative dataset of the latter phenomenon, identify patterns (or features) that are relevant to the task at hand.
+Next, a system is conceived that applies a set of rules to these features, in such a way as to produce the expected outcome.
+The predictive analysis approach rather considers that the latter component can be obtained by means of a training procedure.
+In particular, predictive analysis considers a model that includes parameterized mathematical operations. The training tasks consists in optimizing these parameters by minimizing an error, taken as a discrepancy measure between the system's output and the expected output.
 
+To better illustrate the differences between the two approaches, let us examine a concrete scenario in which we are interested in elaboring a system that takes as input an image, and must provide at the output an answer to the question ``Does this image contain a car?''.
+As a first step, we compute distinctive visual features, assumed to be relevant cues for the task at hand, e.g. large and homogeneous blobs (assumed to reflect the body of the car), and circular and dark-colored regions (assumed to reflect the wheels).
+Both components are characterized by their size, orientation, and location.
+A naive approach grounded on the descriptive analysis paradigm, would apply a serie of logical operations such as: (1) Are the wheels located below the body? (2) Are the wheels located at both ends of the body? (3) Is the average size of the wheels inferior to the size of the body? etc..
+This toy example demonstrates how such an approach is often at risk of missing important and non-intuitive relations.
+The predictive analysis approach aims at circumventing the latter risk by taking inspiration from the human functioning.
+We humans can effectively derive the concept of car through experience, i.e. by being given a set of images that contain cars, and another set that do not.
+The task of then resolves to inferring a combination of mental operations that would best separate the two sets of images.
+This is often called the ``learning by example'' paradigm.
+
+\section{On the importance of large quantities of annotated data}
+\Gls{ml} methods, as the name implies, are built on the ``learning by example'' paradigm.
+In their most primitive form, \gls{ml} methods considered feature extraction as a preliminary ad-hoc step, while the design and training of the model formed another step.
+Engineers had to choose for the task at hand which features to choose, which was a tedious and cumbersome task.
+More recently, thanks to the technical progress in computing hardware, \gls{dl}, which is a class of models that elaborate on \gls{ann}, brought the possibility to do end-to-end training.
+In essence, \gls{dl} models allow one to optimize both the feature extraction module and the predictor in a joint manner, by regressing an objective criteria, also called loss function.
+This has brought spectacular improvements in performance over traditional methods, making \gls{dl} the de-facto standard in most \gls{ml} fields.
+As will be further developped in a next chapter, \gls{dl} models are composed of a concatenation of layers that each perform simple mathematical operations, such as matrix multiplication or convolutions.
+The power, flexibility, and hence impressive performance boost of \gls{dl} models, namely comes from the fact that stacking layers allows to express complex and abstract features.
+
+As showcase application, let us mention the ImageNet Large Scale Visual Recognition Challenge \cite{ILSVRC15}, which consists in classifying natural images into semantic categories such as ``balloon'', ``dog'', etc..
+The training dataset contains $150'000$ images, classified into $1000$ categories.
+As of today, the state-of-the-art performance uses a \gls{dl} model, in particular a Deep Convolutional Neural Network, which classifies unseen images with an accuracy of $88.6\%$ \cite{tan19}, a performance on par with human capacities.
+The model, however, has over $70$ million parameters.
 In this scenario, collecting such quantity of example images and annotating them is tedious and cumbersome.
 In practice, the annotation task is performed by numerous individuals in parallel.
+
 The annotation of medical data, however, adds the following practical difficulties.
 First, the task can require a specific medical expertise.
 Second, assuming such experts are available and willing to participate to this task, their daily obligations imposes a limited time budget.
@@ -59,9 +95,6 @@ These two models allow to define likelihoods of selecting a superpixel given the
 Using the network flow paradigm, we then build a graph that connects superpixels according to spatio-temporal relations.
 
 \textbf{Chapter 8}
-
-
-
 
 
 %%% Local Variables:
