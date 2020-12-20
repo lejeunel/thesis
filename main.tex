@@ -15,6 +15,9 @@
   \graphicspath{{chapters/#1/pics/}}
 }
 
+\newcommand*{\resetfigpathnopics}[1]{
+  \graphicspath{{chapters/#1/}}
+}
 
 \input{head/settings_epfl_template.tex} % epfl template packages are here
 \input{head/settings_custom.tex}  % place your custom packages, etc... in this file!
@@ -77,6 +80,7 @@
 \input{chapters/feats/main}
 \input{chapters/ksp/main}
 \input{chapters/dec/main}
+\input{chapters/nnpu/main}
 
 % use to end the last part if the thesis is composed of parts
 %\addtocontents{toc}{\vspace{\normalbaselineskip}}

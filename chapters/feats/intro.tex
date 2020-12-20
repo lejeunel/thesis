@@ -1,25 +1,41 @@
 \chapter{Deep Feature Learning}
-This chapter investigates several feature extraction methods as a contribution to the sparse point-wise annotation of the next chapter.
+This chapter investigates several feature extraction methods as a contribution to the sparse point-wise annotation framework developed in the next chapter.
+In particular, we aim at devising an efficient \gls{dl}-based method to characterize image regions, which will later be used to train a foreground model in a \gls{pu} scenario.
 
-\textbf{Author contributions} The software solutions presented in this chapter combine the contributions of Severin Tobler, Jan Grossrieder, Philipp Gerber, Olen Andoni, and myself.
-Severin Tobler, as part of his civil service, contributed to the coding of the annotation software, in particular, the design of the \gls{gui}, coding the video/volume decoding layers, and the documentation.
-Jan Grossrieder, Philipp Gerber, and Olen Andoni all contributed equally to the coding of the web platform.
+\textbf{Author contributions} This work has been performed by Jan Grossrieder in the frame of his Masters thesis.
+His contribution include, design and coding of the evaluation framework, design and coding of the feature extraction methods, writing of the manuscript.
+Raphael Sznitman supervised the thesis and contributed on the methodology and analysis of results.
 
 \textbf{My personal contributions include}:
 \begin{itemize}
-    \item Supervision and testing of both projects
-    \item Coding parts of the annotation software: Decoding of videos and gaze-tracker integration
-    \item Packaging of the annotation software for Linux platforms
-    \item Coding parts of the web-platform: Frontend, backend, packaging
-    \item Documentation of the web-platform
+    \item Close supervision of the thesis
+    \item Coding of baseline extraction methods
+    \item Theoretical contributions on the methodology
+    \item Analysis of results
+    \item Proof-reading and rewriting parts of the manuscript
 \end{itemize}
 
 \section{Introduction}
 
-In section \ref{sec:feat_method}, we introduce our experimental framework for the study of feature learning in the frame of our general problem of sparse point-wise annotation.
-In particular, several baseline methods are introduced along the deep learning approach used in \cite{lejeune18}.
-Extensive experiments are performed and results are given in section \ref{sec:feats_results}.
+In the first section, we introduce our evaluation framework for the study of feature learning in the frame of our general problem of sparse point-wise annotation.
+In particular, we consider a \gls{rf} to classify superpixels in a \gls{pn} setup,
+where labels are computed using the manual groundtruth annotations.
 
+As feature extraction method, we first consider \gls{bovw} and \gls{scsp}.
+The first generates local texture descriptors, which are then assigned a code using the K-means clustering algorithm.
+Each superpixel is then assigned a feature vector, taken as the histogram of codes.
+The second extends the latter by performing a multi-scale spatial pooling of codes.
+A third baseline considers a \gls{cnn} trained on natural images, where we forward-pass patches taken from images.
+Features are then taken at the pen-ultimate layer.
+
+Next, we implement an unsupervised \gls{dl} approach by training a \gls{cnn} configured as an \gls{ae}, and pool features from the bottleneck layer.
+Several other models are devised that incorporate prior knowledge on the object of interest using the user-provided 2D locations.
+More elaborate models leverage frame-to-frame motion using an \gls{lstm} module.
+
+Extensive experiments are performed on each feature extraction method.
+Also, the effects of data-augmentation strategies and zero-padding methods are studied.
+
+In the conclusion section, we summarize our findings and select the best performing feature learning method for the next chapter.
 
 \endinput
 

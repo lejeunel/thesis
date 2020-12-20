@@ -503,6 +503,57 @@ year = {2017},
 pages = {NOPAGES},
 }
 
+@inproceedings{kiryo17,
+  title={Positive-unlabeled learning with non-negative risk estimator},
+  author={Kiryo, Ryuichi and Niu, Gang and Du Plessis, Marthinus C and Sugiyama, Masashi},
+  booktitle={Advances in neural information processing systems},
+  pages={1675--1685},
+  year={2017}
+}
+
+@inproceedings{li03,
+  title={Learning to classify texts using positive and unlabeled data},
+  author={Li, Xiaoli and Liu, Bing},
+  booktitle={IJCAI},
+  volume={3},
+  number={2003},
+  pages={587--592},
+  year={2003}
+}
+
+@inproceedings{liu03,
+  title={Building text classifiers using positive and unlabeled examples},
+  author={Liu, Bing and Dai, Yang and Li, Xiaoli and Lee, Wee Sun and Yu, Philip S},
+  booktitle={Third IEEE International Conference on Data Mining},
+  pages={179--186},
+  year={2003},
+  organization={IEEE}
+}
+
+@inproceedings{li05,
+  title={Learning from positive and unlabeled examples with different data distributions},
+  author={Li, Xiao-Li and Liu, Bing},
+  booktitle={European conference on machine learning},
+  pages={218--229},
+  year={2005},
+  organization={Springer}
+}
+@inproceedings{lee03,
+  title={Learning with positive and unlabeled examples using weighted logistic regression},
+  author={Lee, Wee Sun and Liu, Bing},
+  booktitle={ICML},
+  volume={3},
+  pages={448--455},
+  year={2003}
+}
+
+@inproceedings{elkan08,
+  title={Learning classifiers from only positive and unlabeled data},
+  author={Elkan, Charles and Noto, Keith},
+  booktitle={Proceedings of the 14th ACM SIGKDD international conference on Knowledge discovery and data mining},
+  pages={213--220},
+  year={2008}
+}
 
 @article{koch98,
 author = {Itti, L and Koch, C and Niebur, E},
@@ -710,6 +761,69 @@ booktitle = {Advances in Neural Information Processing Systems 27},
 editor = {Z. Ghahramani and M. Welling and C. Cortes and N. D. Lawrence and K. Q. Weinberger},
 pages = {703--711},
 year = {2014},
+}
+
+@InProceedings{duplessis15,
+title = {Convex Formulation for Learning from Positive and Unlabeled Data},
+author = {Marthinus Du Plessis and Gang Niu and Masashi Sugiyama},
+pages = {1386--1394},
+year = {2015},
+editor = {Francis Bach and David Blei},
+volume = {37},
+series = {Proceedings of Machine Learning Research},
+address = {Lille,
+France},
+month = {07--09 Jul},
+publisher = {PMLR},
+pdf = {http://proceedings.mlr.press/v37/plessis15.pdf},
+url = {http://proceedings.mlr.press/v37/plessis15.html},
+abstract = {We discuss binary classification from only from positive and unlabeled data (PU classification),
+which is conceivable in various real-world machine learning problems. Since unlabeled data consists of both positive and negative data,
+simply separating positive and unlabeled data yields a biased solution. Recently, it was shown that the bias can be canceled by using a particular non-convex loss such as the ramp loss. However, classifier training with a non-convex loss is not straightforward in practice. In this paper, we discuss a convex formulation for PU classification that can still cancel the bias. The key idea is to use different loss functions for positive and unlabeled samples. However, in this setup, the hinge loss is not permissible. As an alternative, we propose the double hinge loss. Theoretically, we prove that the estimators converge to the optimal solutions at the optimal parametric rate. Experimentally, we demonstrate that PU classification with the double hinge loss performs as accurate as the non-convex method, with a much lower computational cost.} }
+
+@inproceedings{bekker18,
+  title={Estimating the class prior in positive and unlabeled data through decision tree induction},
+  author={Bekker, Jessa and Davis, Jesse},
+  booktitle={Proceedings of the 32th AAAI conference on artificial intelligence},
+  pages={2712--2719},
+  year={2018},
+  organization={AAAI Press}
+}
+
+@article{kato18,
+  author    = {Masahiro Kato and
+               Liyuan Xu and
+               Gang Niu and
+               Masashi Sugiyama},
+  title     = {Alternate Estimation of a Classifier and the Class-Prior from Positive
+               and Unlabeled Data},
+  journal   = {CoRR},
+  volume    = {abs/1809.05710},
+  year      = {2018},
+  url       = {http://arxiv.org/abs/1809.05710},
+  archivePrefix = {arXiv},
+  eprint    = {1809.05710},
+  timestamp = {Tue, 01 Sep 2020 17:53:14 +0200},
+  biburl    = {https://dblp.org/rec/journals/corr/abs-1809-05710.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+
+@inproceedings{scott09,
+  title={Novelty detection: Unlabeled data definitely help},
+  author={Scott, Clayton and Blanchard, Gilles},
+  booktitle={Artificial intelligence and statistics},
+  pages={464--471},
+  year={2009}
+}
+
+
+@inproceedings{christoffel16,
+  title={Class-prior estimation for learning from positive and unlabeled data},
+  author={Christoffel, Marthinus and Niu, Gang and Sugiyama, Masashi},
+  booktitle={Asian Conference on Machine Learning},
+  pages={221--236},
+  year={2016}
 }
 
 @inproceedings{duPlessis2015,

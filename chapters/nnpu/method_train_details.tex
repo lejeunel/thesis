@@ -1,0 +1,56 @@
+\subsection{Training details, hyper-parameters, and implementation}
+We now describe for each component of our pipeline the hyper-parameters and training details.
+The code of our foreground prediction model is written in Python using the PyTorch library \cite{paszke19}.
+The tracking module is written in C++.
+The code of all components is made publicly available \footnote{\url{https://github.com/lejeunel/ksptrack}}.
+
+\subsubsection{Foreground prediction model}
+For all our experiments we use a Convolutional Neural Network based on the U-Net architecture \cite{ronneberger15}, as proposed in \cite{ibtehaz20}.
+First, in place of simple convolutional layers, we use ``Inception-like'' blocks \cite{szegedy16} to improve robustness to scale variations.
+Second, the shortcut connections are replaced by a serie of $3\times3$ convolutional layers with residual connections.
+Last, batch normalization layers \cite{ioffe15} are added after each convolutional layer.
+
+For the proposed self-supervised class-prior estimation (Sec. \ref{sec:nnpu} and \ref{sec:pi_estim}), we divide the training into three phases:
+
+\begin{enumerate}
+  \item We perform a pre-training phase so as to make our observations more robust.
+    In particular, we initialize the weights of our CNN so as to
+    make the training focus more on the foreground, as suggested in \cite{lin17}.
+    Concretely, we note that the last layer of our decoder is a sigmoid function $\sigma(x)=\frac{1}{1+e^{-x}}$.
+    We set the bias of the preceding convolutional layer to $-\log{\frac{1-\pi_{init}}{\pi_{init}}}$, with $\pi_{init}=0.01$.
+    All others parameters are initialized using He's method \cite{he15init}.
+    The CNN is then trained for $50$ epochs using constant initial prior $\hat \pi_{0}$ following Alg. \ref{alg:sgdnnpu} with a learning rate set to $10^{-4}$.
+    \item We optimize the model and class-prior estimates for maximum $100$ epochs as in Alg. \ref{alg:prior_estim} with a learning rate set to $10^{-5}$.
+  \item We train using frame-wise priors given by the previous phase for an additional $100$ epochs with a learning rate of $10^{-5}$.
+\end{enumerate}
+
+In all phases, we use the Adam optimizer \cite{kingma14} with weight decay $0.01$.
+As data augmentation, we use a random combination of additive gaussian noise, bilateral blur, and gamma constrast.
+
+\subsubsection{Recursive Bayesian Estimation}
+For the process, transition, and initial covariance matrices, we use diagonal matrices, i.e.
+$Q=\sigma_{Q}\mathbb{I}$, $R=\sigma_{R}\mathbb{I}$, and $S=\sigma_{S}\mathbb{I}$, where $\mathbb{I}$ is the identity matrix.
+As the observations are often very noisy, we set an observation variance much larger than the process variance, i.e. $\sigma_{Q}=10$ and $\sigma_{R}=0.05$.
+$\sigma_{S}$ is set to $0.03$.
+The parameters of the control input are set proportional to $\hat \pi_{0}$, i.e. $u_{0}=0.02 \cdot \hat \pi_{0}$, and $u_{T}=0.4 \cdot \hat \pi_{0}$.
+For the observation model (Eq. \ref{eq:observ}), we set $\gamma=2$.
+The window length of the frame-wise smoothing filter is set proportional to the number of frames: $L=0.05\cdot N$.
+The time-period of our stopping condition is set to $T_{s}=10$, and the threshold on the variance is $\tau=0.007$.
+
+\subsubsection{Tracking and superpixelization}
+\label{sec:org4560526}
+We define for each user-provided 2D location a circle of radius \(R=0.05 \cdot \max\{W,H\}\) centered on the 2D location, where \(W\) and \(H\) are the width and height of frames, respectively.
+In order to reduce the number of edges and alleviate the computational requirement, we also prune ``visiting'' edges when their corresponding foreground probability falls below $0.4$.
+
+So as to make the tracking step tracktable, all sequences are pre-segmented into $\sim 1200$ superpixels using SLIC \cite{achanta12}.
+Given that our segmentations will be evaluated at pixel-level, the latter pre-processing step induces an upper-bound in accuracy, which we wish to evalute.
+To do so, we use the manual ground truth annotation as follows:
+Taking as positive the superpixels that overlap the manual ground truth annotations by more than $0.5$ of their area, and the others as negatives, we obtain the optimal superpixel segmentation of our sequence.
+We then compare the latter segmentation with the pixel-wise manual ground truth annotation and report the F1-score in Tab. \ref{tab:sp_errors}.
+
+\input{chapters/nnpu/tables/sp_errors.tex}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../../main"
+%%% End:

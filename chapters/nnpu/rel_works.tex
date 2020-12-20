@@ -1,0 +1,32 @@
+\section{Related Works}
+\label{sec:rel_works}
+
+The present paper combines theoretical contributions related to semi-supervised learning, of which Positive/Unlabeled learning is a sub-category, as well as self-supervised learning.
+From an application point of view, we contribute to the field of sparse point-wise supervision for segmentation.
+We now give an overview of the state-of-the-art related to the present contributions.
+
+\textbf{Positive/Unlabeled learning} considers that only a subset of the positives are labeled, while the unlabeled set contains both positives and negatives.
+Early methods focused on iteratively sampling reliable negatives from the unlabeled sets using a classifier, and follow with a re-training of the same classifier using the new samples \cite{li03}, \cite{liu03}, \cite{li05}.
+In \cite{lee03}, authors propose a reweighting scheme applied to the unlabeled samples, which allows the use of traditional PN classifier.
+As the latter approach heavily relies on a good choice of weights, \cite{elkan08} rather choose to duplicate unlabeled samples into a positive and negative samples with complementary weights, an approach called unbiased PU learning.
+More recently, a general-purpose unbiased risk estimator for PU learning is presented by \cite{duplessis15} which allows convex optimization.
+As a follow-up to the latter, \cite{kiryo17} noted that modern expressive models such as Deep Neural Networks induce negative empirical risks through overfitting of the positives, which they fix by introducing their non-negative unbiased risk estimator.
+
+\textbf{Class-prior estimation} is tightly related to PU learning in that the state-of-the-art approaches formulate a risk estimator composed of two terms which need to be balanced.
+In \cite{duplessis14}, authors suggest to partially match the class-conditional densities of the positive class to the input samples using the Pearson divergence criteria. In \cite{christoffel16}, the same approach is improved by considering general divergence criteria along with $L_{1}$ distance regularization, which solves the problem of over-estimation.
+In \cite{bekker18}, a tree induction scheme is introduced to estimate the probability of a positive sample to be labeled as a proxy task. \cite{scott09}.
+Similar to the self-supervised estimation of class-priors proposed in the present work, \cite{kato18} combines the non-negative unbiased risk of \cite{kiryo17} with an iterative update of class-priors.
+In particular, they devise an update rule inspired by the Expectation-Maximization algorithm and iterate until convergence.
+
+\textbf{Point-wise supervision} has first been applied in the frame of medical imaging by \cite{vilarino2007}, who leverage a Support-Vector Machine classifier on patches to segmentations of CT-scans.
+\cite{khosravan16} construct saliency maps as the input of a Random-Walker.
+\cite{bearman16} train a CNN using a loss function that includes an object-prior defined by the user-provided points. The method is trained and tested on (still) natural images.
+The Most relevant to the present work are \cite{lejeune17} and \cite{lejeune18}.
+In the former, a classifier is learned to segment various kinds of medical sequences in a PU setting using a loss function that leverages the uncertainties of unlabeled samples.
+As a follow-up, \cite{lejeune18}, formulates the same problem as a multi-path optimization problem. In particular, a simple foreground model formulated in a PU setting provides costs of selecting superpixels, while a gaussian kernel applied in the feature space defines the costs of transiting from one frame to the next.
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "main"
+%%% End:

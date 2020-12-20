@@ -1,46 +1,52 @@
-\section{Methods}
-\label{sec:feat_method}
+\section{Feature extraction and classification} \label{framework}
+The evaluation of the proposed feature learning methods is performed at superpixel level.
+This pre-processing step is justified by the fact that our late-stage segmentation
+framework, as presented in the next chapter, is computationally demanding, and would be untracktable at pixel-level.
+Hence, all presented feature learning methods shall provide a feature vector for each superpixel.
 
-\section{Framework} \label{framework}
-Fig. \ref{fig:Framework} illustrates our feature learning and evaluation framework. The individual blocks, such as superpixel segmentation, feature learning methods, and evaluation method, are elaborated in subsequent sections.
+Let $N$ be the number of images in a data sequence and $S$ the number of superpixels over all sequence.
+We write the feature matrix $\boldsymbol{X} = [\boldsymbol{x}_1,...,\boldsymbol{x}_S]^T \in \mathbb{R}^{S \times D}$, where $S$ is the total number of superpixels contained within the sequence.
+Next, let $\boldsymbol{y} = [y_1,...y_S]^T \in \{0,1\}^S$ be the objectness labels, such that $y_i=1$ when superpixel $i$ is positive, and $y_i=0$ otherwise.
+Concretely, let $M_{j} \in \{0,1\}^{W \cdot H}$ the manual groundtruth mask of frame $j$ with dimension $(W,H)$, we set
+
+\begin{equation}
+y_{i} =
+\begin{cases}
+      1 & \text{if $\quad \frac{\sum_{(k,l) \in y_{i}} M_{j}(k,l)}{\sum_{(k,l) \in y_{i}}1} \geq 0.5$}, \\
+      0 & \text{otherwise}
+   \end{cases}
+\end{equation}
+
+We then train a \gls{rf} classifier using feature matrix $\boldsymbol{X}$ and labels $\boldsymbol{y}$.
+Some feature learning methods will use a user-provided 2D location, if available (see Fig. \ref{fig:Framework}).
+Fig. \ref{fig:Framework} illustrates our feature learning and classification framework.
+The individual blocks, such as superpixel segmentation, feature learning methods, and evaluation method, are developed in subsequent sections.
 
 \begin{figure}[!htpb]
   \centering
-  \includegraphics[width=13cm]{framework/framework}
-  \caption[Framework description]{Given a superpixel segmentation and 2D locations, the feature learning algorithm construct a feature matrix $\boldsymbol{X}$, describing each superpixel by a feature. A Random Forest binary classifier is then trained and validated to make predictions of every superpixel. The labels are denoted by $\boldsymbol{y}$, describing if a superpixel belongs to foreground or background. At the bottom-right, we measure the performance of the classifier.}
+  \includegraphics[width=13cm]{framework/framework.png}
+  \caption[Framework description]{Given a set of images, superpixel segmentations, and 2D locations, a feature learning algorithm provides a feature vector for every superpixel.
+    A binary \gls{rf} classifier is then trained using labels generated from manual pixelwise groundtruth annotations.}
   \label{fig:Framework}
 \end{figure}
 
-Performance evaluation of the different feature learning methods is done on a superpixel level.
-In general, superpixelization allows to overcome practical limitations in many applications of computer vision, which may be forbidden due to memory consumption and/or computation time.
-This, of course, sometimes bring a significant decrease in the maximal performance of a computer vision task.
-We provide quantitative experiments on the latter problem in sec. \ref{sec:superpix}.
+% We use the superpixel segmentation algorithm SLIC proposed in \cite{achanta12}.
+% The original simple linear iterative clustering (SLIC) relies on k-means clustering performed in color the Lab color space and further uses spatial coordinates of pixels.
+% A trade-off between color similarity and spatial proximity is necessary.
+% In the SLIC approach, the problem is solved by using a compactness parameter.
+% For images with both, flat and very textured regions, using the same compactness parameter lead to smooth regular-sized superpixel in the flat regions and highly irregular sized superpixel in textured regions.
+% The ASLIC approach adaptively chooses the compactness parameter for each superpixel differently.
+% Fig. \ref{fig:ExSuperpixel} shows an example of using ASLIC on dataset \textit{Slit-Lamp Retina A}.
 
-Hence, the feature learning methods shall output a feature vector for each of the superpixels. Refer to chapter \ref{superpixel_segm} for more details about the superpixel segmentation.
+% As parameter, the number of superpixels is crucial. In terms of trade-off, setting a large value will capture the contours of objects more accurately, at the cost of having a higher quantity of samples to predict/classify. We verified that taking $200$ superpixels per frame produces reasonably good segmentation on all our sequences.
 
-Let $N$ be the number of images in a data sequence and $S$ the number of superpixels over all sequence. As an example, if we have exactly $200$ superpixels per image, we would have $S=N \cdot 200$ superpixels in that sequence. To every superpixel, we want to assign a feature vector of dimension $D$. We can write the sequence feature matrix as $\boldsymbol{X} = [\boldsymbol{x}_1,...,\boldsymbol{x}_S]^T \in \mathbb{R}^{S \times D}$. Let $\boldsymbol{y} = [y_1,...y_S]^T \in \{0,1\}^S$ be the labels, meaning that $y_i=1$ for superpixels that count to the object of interest and $y_i=0$ for superpixels belonging to the background. Using the feature matrix $\boldsymbol{X}$ and the label vector $\boldsymbol{y}$, a \gls{rf} classifier then calculates performance measures, such as Precision-Recall curve and \textit{max F1-Score}. How the \gls{rf} classifier is applied is described in chapter \ref{random_forest}.
-
-Some feature learning methods will use a user-provided 2D location, if available (see Fig. \ref{fig:Framework}).
-
-We used the superpixel segmentation algorithm ASLIC proposed in \cite{achanta12}.
-The original simple linear iterative clustering (SLIC) relies on k-means clustering performed in color the Lab color space and further uses spatial coordinates of pixels.
-A trade-off between color similarity and spatial proximity is necessary.
-In the SLIC approach, the problem is solved by using a compactness parameter.
-For images with both, flat and very textured regions, using the same compactness parameter lead to smooth regular-sized superpixel in the flat regions and highly irregular sized superpixel in textured regions.
-The ASLIC approach adaptively chooses the compactness parameter for each superpixel differently.
-Fig. \ref{fig:ExSuperpixel} shows an example of using ASLIC on dataset \textit{Slit-Lamp Retina A}.
-
-As parameter, the number of superpixels is crucial. In terms of trade-off, setting a large value will capture the contours of objects more accurately, at the cost of having a higher quantity of samples to predict/classify. We verified that taking $200$ superpixels per frame produces reasonably good segmentation on all our sequences.
-
-Having at disposal ground truth data at pixel-level, we set the values of the output variable $\boldsymbol{y}$ the following way.
-If one superpixel is covered by the ground truth pixel-wise segmentation by more than $50\%$ of its area, this specific superpixel is assigned to the foreground. Otherwise, it is assigned to the background.
+% Having at disposal ground truth data at pixel-level, we set the values of the output variable $\boldsymbol{y}$ the following way.
+% If one superpixel is covered by the ground truth pixel-wise segmentation by more than $50\%$ of its area, this specific superpixel is assigned to the foreground. Otherwise, it is assigned to the background.
 
 \section{Feature Learning: Baselines} \label{ch:baselines}
-To evaluate the performance of a method, a standard approach is to compare it to baseline methods.
-We used three different methods as baselines.
-The first method is named \gls{bovw}.
-A variant of the \gls{bovw}, \gls{scsp} improves on the latter by bagging words at different spatial resolutions.
-Last, we use the features of a Deep Convolutional Network (VGG16) pre-trained for image classification.
+As baseline feature extraction method, we consider \gls{bovw} and \gls{scsp}, both being unsupervised methods relying on handcrafted texture-based features.
+A third baseline considers a \gls{cnn} trained to classify natural images, where we forward-pass patches taken from images.
+We now describe them in details.
 
 \subsection{Bag of Visual Words} \label{bow}
 \begingroup
@@ -52,11 +58,11 @@ Last, we use the features of a Deep Convolutional Network (VGG16) pre-trained fo
 \gls{bovw} is an unsupervised feature encoding method successfully utilized in scene classification \cite{zhang15}.
 The algorithm can be split into feature learning and feature encoding phase \cite{cheriyadat14}.
 Feature learning phase is illustrated in Fig. \ref{fig:subfig:bow_training}.
-First, we randomly choose a fixed amount of keypoints over all images in a sequence.
-Each keypoint is then described by a SIFT descriptor of dimension 128 \cite{lowe04}.
-Subsequently, k-means vector quantization quantizes the keypoint descriptors into $K$ classes \cite{lloyd1982}.
+First, we randomly choose $M$ keypoints over all images in a sequence.
+Each keypoint is then described by a SIFT descriptor of dimension $128$ \cite{lowe04}.
+Next, K-means clustering is performed on these descriptors so as to classify all pixels into $K$ classes \cite{lloyd1982}.
 Let $\boldsymbol{F} = [\boldsymbol{f}_1,\cdots,\boldsymbol{f}_M]^T \in \mathbb{R}^{M \times 128}$ the SIFT appearance descriptor of the $M$ keypoints.
-Eq. \ref{eq:k_means} describes the k-means objective function, where $\boldsymbol{C} = [\boldsymbol{c}_1,...,\boldsymbol{c}_K]^T \in \mathbb{R}^{K \times 128}$ denotes the codebook.
+The K-means algorithm minimizes the following objective:
 
 \begin{equation}
    \min_{\boldsymbol{C}} \sum_{m=1}^M \min_{k=1...K} \|\boldsymbol{f}_m - \boldsymbol{c}_k\|^2
@@ -64,9 +70,12 @@ Eq. \ref{eq:k_means} describes the k-means objective function, where $\boldsymbo
 \end{equation}
 \vspace{6pt}
 
-The encoding phase, shown in Fig. \ref{fig:subfig:bow_coding}, consists in describing each pixel by a SIFT descriptor and assigning it to the cluster whose centroids is the closest in terms of Euclidean distance.
+Where $\boldsymbol{C} = [\boldsymbol{c}_1,...,\boldsymbol{c}_K]^T \in \mathbb{R}^{K \times 128}$ denotes the cluster's centroids.
+In the \gls{bovw} context, the clusters' coordinates form a codebook.
+The encoding phase assigns each pixel to a cluster by assigning it to the cluster whose centroid is the closest in terms of $L_{2}$ distance.
 The assigned clusters of every pixel in one superpixel are described by a histogram of $K$ bins.
 This results in a feature matrix of all superpixels in a sequence being $\boldsymbol{X} = [\boldsymbol{x}_1,\cdots,\boldsymbol{x}_S]^T \in \mathbb{R}^{S \times D}$, where $D = K$.
+Fig. \ref{fig:subfig:bow_coding} illustrates the generation of the codebook and assignment of features to superpixels.
 
 \begin{figure}[htbp]
   \centering
@@ -81,10 +90,10 @@ This results in a feature matrix of all superpixels in a sequence being $\boldsy
     \label{fig:subfig:bow_coding}
     \includegraphics[width=11cm]{bovw/bow_approach_coding}
   }
-  \caption[BoVW illustration]{The \gls{bovw} approach is divided in two steps.
-    (a) shows the feature learning phase, where SIFT descriptors of randomly chosen keypoints are quantized into a codebook.
+  \caption[BoVW illustration]{The \gls{bovw} approach divides in two steps.
+    (a) In the feature learning phase, SIFT descriptors of randomly chosen keypoints are quantized into a codebook.
     (b) In the encoding phase, each pixel is described by a SIFT descriptor and assigned to a class using the codebook.
-    Subsequently, for each superpixel, a histogram of all assigned classes is created, which makes up the final feature descriptor.}
+    To each superpixel, a histogram of all assigned classes is created.}
   \label{fig:BoVW_approch}  
 \end{figure}
 
@@ -95,39 +104,44 @@ This results in a feature matrix of all superpixels in a sequence being $\boldsy
 \includegraphics[height=1.5cm]{icons/scsp.png}
 \end{wrapfigure}
 
-\gls{scsp} builds up on the \gls{bovw} approach with two main modifications.
-A spatial pyramid is a collection of orderless feature histograms computed over cells defined by a multi-level recursive image decomposition \cite{lazebnik09}.
-
-First, instead of the standard k-means clustering, it uses sparse codes of SIFT features.
+\gls{scsp} \cite{lazebnik09} builds up on the \gls{bovw} approach with two main modifications.
+First, instead of the standard k-means clustering, \gls{scsp} uses sparse codes of SIFT features.
 Second, a pyramid representation is used.
 The following describes the added value of \gls{scsp} with \gls{bovw}.
 
-Formally, the objective of sparse coding for vector quantization can be written using matrix computation as shown in Eq. \ref{eq:sparse_codes}.
+Formally, the objective of sparse coding is
 
 \begin{equation}
-  \min_{\boldsymbol{U,C}} \sum_{m=1}^M \|\boldsymbol{f}_m - \boldsymbol{u}_m \boldsymbol{C}\|^2 + \lambda |\boldsymbol{u}_m|
+  \min_{\boldsymbol{U,C}} \sum_{m=1}^M \|\boldsymbol{f}_m - \boldsymbol{u}_m \boldsymbol{C}\|^2 + \lambda ||\boldsymbol{u}_m||_{2}
   \label{eq:sparse_codes} 
 \end{equation}
 \begin{align*}
   \textrm{subject to } \|\boldsymbol{c}_k\| \leq 1, \hspace{6pt} \forall{k} = 1,2,...,K
 \end{align*}
 
-Similar to Eq. \ref{eq:k_means}, $\boldsymbol{f_m}$ represents the SIFT appearance vector of keypoint $m$ and $\boldsymbol{C}$ represents the codebook. $\boldsymbol{U} = [\boldsymbol{u}_1,...,\boldsymbol{u}_M]^T \in \mathbb{R}^{M \times K}$ defines the cluster membership indicator. The L2-norm on $\boldsymbol{c}_k$ is typically applied to avoid trivial solutions. If we drop the regularization term $\lambda |\boldsymbol{u}_m|$ and add a cardinality constraint to $\boldsymbol{u}_m$, meaning that only one element in $\boldsymbol{u}_m$ must be nonzero and positive, the sparse coding formulation in Eq. \ref{eq:sparse_codes} simplifies to k-means objective. Yang et al. \cite{yang09} approved that, compared to standard k-means coding, sparse coding can achieve a much lower reconstruction error due to less restrictive constraints. Sparsity also allows the representation to be specialized and capture salient properties of the image.
+Similar to Eq. \ref{eq:k_means}, $\boldsymbol{f_m}$ represents the SIFT appearance vector of keypoint $m$ and $\boldsymbol{C}$ represents the codebook.
+$\boldsymbol{U} = [\boldsymbol{u}_1,...,\boldsymbol{u}_M]^T \in \mathbb{R}^{M \times K}$ defines the cluster membership indicator.
+The L2-norm on $\boldsymbol{c}_k$ is added to avoid trivial solutions.
+If we drop the regularization term $\lambda |\boldsymbol{u}_m|$ and add a cardinality constraint to $\boldsymbol{u}_m$, meaning that only one element in $\boldsymbol{u}_m$ must be nonzero and positive, the sparse coding formulation in Eq. \ref{eq:sparse_codes} simplifies to k-means objective.
+Yang et al. \cite{yang09} showed that, in comparison to standard k-means clustering, the sparse coding objective often achieves a lower reconstruction error due to less restrictive constraints.
+Sparsity also allows the representation to be specialized and capture salient properties of the image.
 
 Fig. \ref{fig:pyramid_repr} show histograms extracted at different locations on an image.
-The final histogram representation is a concatenation of all histograms from all regions.
-After normalization, the concatenated histograms can again be seen as a histogram representing the full feature vector.
-Hence, for the example shown in Fig. \ref{fig:pyramid_repr} using pyramid levels $\boldsymbol{l} = [1,2,4]$, we have a feature dimension $D = K \cdot (1^2 + 2^2 + 4^2) = K \cdot 21$, where $K$ is the number of classes.
+The final feature vector is then obtained by concatenating histograms of all levels, and normalizing to unit norm.
+For example, using pyramid levels $\boldsymbol{l} = [1,2,4]$, the feature dimension $D = K \cdot (1^2 + 2^2 + 4^2) = K \cdot 21$, where $K$ is the number of classes, as illustrated in \ref{fig:pyramid_repr}.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=6cm]{scp/pyramid_representation}
-  \caption[Spatial pyramid representation]{Illustration of the spatial pyramid representation. Histograms are computed at different levels which are then concatenated into one big vector. After normalization, this vector can again be seen as a histogram vector.}
+  \caption[Spatial pyramid representation]{Illustration of the spatial pyramid coding, where histograms are computed at 3 different levels.}
   \label{fig:pyramid_repr}
 \end{figure}
 
-Using a pyramid representation implies that the image patch needs to be square. Intuitively, one wants to enclose within the patch some visual context around the superpixel region. We refer to this parameter as patch size.
-In practice, we train our codebook in a similar fashion to \textit{BoVW}, i.e. convert images to grayscale and randomly sample keypoints on every image of the sequence. Each keypoint then gives a SIFT feature vector. Once trained, we extract squared patches of dimension centered on each superpixel's centroid location. We used the implementation of \cite{imdescrip}.
+Using a pyramid representation implies that the image patch needs to be square. Intuitively, one wants to enclose within the patch some visual context around the superpixel region.
+We refer to this parameter as patch size.
+In practice, we train our codebook in a similar fashion to \textit{BoVW}, i.e. convert images to grayscale and randomly sample keypoints on every image of the sequence.
+Each keypoint then gives a SIFT feature vector.
+After optimizing the objective of Eq. \ref{eq:sparse_codes}, we extract squared patches centered on the centroids of superpixels.
 
 \subsection{Pre-trained VGG-16} \label{vgg}
 \begingroup
@@ -137,30 +151,24 @@ In practice, we train our codebook in a similar fashion to \textit{BoVW}, i.e. c
 \end{wrapfigure}
 
 VGG is a CNN for large-scale image recognition proposed by \cite{simonyan15}.
-The latter work addressed the ImageNet \cite{ILSVRC15} Challenge 2014 (ILSVRC-2014) where it got the first and second places in the localization and classification task, respectively.
+The latter work tackled the ImageNet \cite{ILSVRC15} Challenge 2014 (ILSVRC-2014) where it got the first and second places in the localization and classification task, respectively.
 Leveraging pre-trained deep networks to address a different task, an approach called transfer learning, has shown its relevance in the frame of semantic segmentation \cite{long15}, emotion recognition \cite{ng15}, and classification \cite{huynh16}.
 
 \endgroup
 
 Here, we use the VGG16 model of \cite[Tab. 1]{simonyan15}.
-The model is composed of 16 convolutional layers, each with kernels of size $3 \times 3$.
-It is trained for the classification challenge (ImageNet Large Scale Visual Recognition Challenge \cite{ILSVRC15}.
-Similar to the \textit{ScSP} approach, we extracted patches at superpixel centroids and fed it to the network.
-Since the input dimension of the network is fixed ($244 \times 244 \times 3$), our input data needed to be scaled to that size.
-The features are then extracted from the penultimate fully-connected layer, resulting in a feature dimension of $D=4096$.
+The model is composed of 16 convolutional layers, each with kernels of size $3 \times 3$, and is trained for the classification task.
+Similar to the \textit{ScSP} approach, we extracted patches at superpixel centroids.
+We resize to ($244 \times 244 \times 3$), forward-pass into the network, and extract features from the penultimate convolutional layer, which gives a feature vector of dimension $D=4096$.
 
-From a theoretical point of view, let us mention that most machine learning methods make the assumption that training and unseen data lie in the same feature space and have a similar distribution.
-However, in many real-world applications, this assumption may not hold \cite{pan2010}.
-In a setup where the data distribution of the original training set largely differs from the one we consider, we talk about "Transfer Learning".
-We assume that a network pre-trained on a very large-scale dataset with high generalization power will produce features that are discriminative and therefore adequate to the present task.
 
 \section{Feature Learning: U-Net Based} \label{ch:unet_based}
-We now describe our U-Net based feature extraction methods.
+We now describe a serie of U-Net based feature extraction methods.
 We first explain the architecture of the "core" model, i.e. one that will be modified to account for different outputs and loss functions.
 We dedicate the second section to data augmentation.
 The third section describes how the features can be extracted from the CNN model to obtain feature vectors.
 Our various modified U-Nets will then be described in detail.
-Finally, an overview summarizes all U-Net based methods.
+Finally, an overview will summarizes all U-Net based methods.
 
 \subsection{Core Model} \label{model}
 Our core model is a slight modification of the original U-Net model \cite{ronneberger15}.
@@ -274,7 +282,8 @@ It is formulated in Eq. \ref{eq:gaussian}.
 \begin{equation}
 \boldsymbol{Z} = 
 \begin{cases}
-  \mathcal{U}(0,WH),& \textit{if } \boldsymbol{g} \textit{ not available}\\         \mathcal{G}(\boldsymbol{g}, \sigma^2\mathbb{I}),         & \textit{if } \boldsymbol{g} \textit{ available}
+  \mathcal{G}(\boldsymbol{g}, \sigma^2\mathbb{I}),         & \text{if $\bm{g}$ is availabe }\\
+  \mathcal{U}(0,WH),& \text{otherwise}\\
 \end{cases}
 \label{eq:gaussian}
 \end{equation}
@@ -407,22 +416,22 @@ Tab. \ref{tab:summary_unet_methods} summarizes the above U-Net based methods.
 
 \begin{table}[!htbp]
    \centering
-   \caption[U-Net based method overview]{Overview of U-Net based methods with $C$ being the number of channels in the images and $c\_i$, $c\_o$ the network's input and output channel dimension, respectively.}
+   \caption[U-Net based method overview]{Overview of U-Net based methods with $C$ the number of channels of images.}
    \begin{tabular}{l|m{1.3cm}|c|c|c|c}
       \toprule
-      \textbf{Method} & \textbf{Symbol} & \textbf{Inputs} & \textbf{Labels} & \textbf{c\_i} & \textbf{c\_o} \\
+      \textbf{Method} & \textbf{Symbol} & \textbf{Inputs} & \textbf{Outputs} & \textbf{In. chans} & \textbf{Out. chans} \\
       \midrule
       U-Net Autoencoder & \includegraphics[width=1cm]{icons/unet_rec.png} & Image & Image & $C$ & $C$ \\
       \midrule
-      U-Net Prior Autoencoder & \includegraphics[width=1cm]{icons/unet_gaze_rec.png} & Image & Image \& Gaze & $C$ & $C$ \\
+      U-Net Prior Autoencoder & \includegraphics[width=1cm]{icons/unet_gaze_rec.png} & Image & \specialcell{Image \& \\Location-prior} & $C$ & $C$ \\
       \midrule
-      U-Net Predict Location & \includegraphics[width=1cm]{icons/unet_gaze_prob.png} & Image & Gaze & $C$ & $1$ \\
+      U-Net Predict Location & \includegraphics[width=1cm]{icons/unet_gaze_prob.png} & Image & Location-prior & $C$ & $1$ \\
       \midrule
-      U-Net Predict Location Frozen & \includegraphics[width=1cm]{icons/unet_gaze_prob_freeze.png} & Image & Gaze & $C$ & $1$ \\
+      U-Net Predict Location Frozen & \includegraphics[width=1cm]{icons/unet_gaze_prob_freeze.png} & Image & Location-prior & $C$ & $1$ \\
       \midrule
-      U-Net Motion Predict & \includegraphics[width=1cm]{icons/unet_gaze_prob_concat.png} & Image \& Gaze & Gaze & $C+1$ & $1$ \\
+      U-Net Motion Predict & \includegraphics[width=1cm]{icons/unet_gaze_prob_concat.png} & \specialcell{Image \& \\Location-prior} & Location-prior & $C+1$ & $1$ \\
        \midrule
-      U-Net Motion Predict LSTM & \includegraphics[width=1cm]{icons/unet_gaze_prob_lstm.png} & Image Sequence & Gaze & $3 \times C$ & $3 \times 1$ \\
+      U-Net Motion Predict LSTM & \includegraphics[width=1cm]{icons/unet_gaze_prob_lstm.png} & \specialcell{Batch of \\ Consecutive images} & Location-prior & $3 \times C$ & $3 \times 1$ \\
       \bottomrule
    \end{tabular}
    \label{tab:summary_unet_methods}
@@ -434,15 +443,12 @@ We used a \gls{rf} classifier to compare the performance between the different f
 The next section describes further the evaluation phase.
 
 \subsection{Classification} \label{random_forest}
-To compare performance between the elaborated methods, we set up a \gls{rf} classifier (Sec. \ref{sec:rf}).
-Our pipeline is shown on Fig. \ref{fig:random_forest}.
-It takes as input a feature matrix $\bm{X} \in \mathbb{R}^{S \times D}$ and labels $\bm{y} \in \{0,1\}^{S}$ of one image data sequence.
-$S$ is the number of superpixels in one sequence and $D$ the feature dimension.
-We use 5-fold cross-validation to train the classifier and validate \cite[p. 241]{hastie09}.
+We compare our methods in a \gls{pn} classification setup using a \gls{rf} binary classifier.
+We evaluating using 5-fold cross-validation \cite[p. 241]{hastie09}.
 Prior to every construction of fold, the samples and their corresponding labels are shuffled.
-Each validation set is then evaluated using two metrics: \gls{pr} curve and \textit{max F1-Score}.
+Each validation set is then evaluated using two metrics: \gls{pr} curve and F1-score.
 The final performance measure is then given by the average performance over all folds.
-% Since we usually have very few positive labels, we made in sort that each validation set has approximately the same number of samples.
+Our pipeline is shown on Fig. \ref{fig:random_forest}.
 
 \begin{figure}[htbp]
   \centering

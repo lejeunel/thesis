@@ -1,0 +1,13 @@
+\begin{abstract}
+  We propose a method to segment medical sequences of various modalities
+  with minimal annotations: a single click per frame that indicate where the object is located, and an upper-bound on the object's size.
+  Our approach relies on a Positive/Unlabeled objective applicable to Deep Convolutional Neural Networks.
+  As the latter requires accurate class-priors to be effective, we further propose a self-supervised method to infer the latter from data using a recursive Bayesian filtering approach.
+  Next, we use the foreground predictions in a multi-path optimization problem where spatio-temporal relations of over-segmented regions are explicitly leveraged.
+  We demonstrate that our approach is resilient to inaccuracies in the upper-bound of priors and show substantial improvements to state-of-the-art.
+\end{abstract}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "main"
+%%% End:

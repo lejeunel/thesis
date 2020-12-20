@@ -1,0 +1,24 @@
+\begin{table*}[t]
+\centering
+\caption{
+    Quantitative results on all datasets. We report the F1 scores and standard deviations.
+    }
+\label{tab:results}
+\begin{tabular}{llp{1.8cm}p{1.8cm}p{1.8cm}p{1.8cm}p{1.8cm}}
+\toprule
+Types &                 Brain &               Cochlea &              Slitlamp &              Tweezer \\
+Methods       &                       &                       &                       &                      \\
+\midrule
+Truth         &       $0.92 \pm 0.02$ &       $0.92 \pm 0.01$ &       $0.92 \pm 0.02$ &      $0.95 \pm 0.01$ \\
+\hline
+
+KSPTrack/nnPU &                  0.74 &                  0.66 &                  0.73 &  $\bm{0.9} \pm 0.02$ \\
+nnPU          &                   0.7 &                  0.45 &  $\bm{0.82} \pm 0.02$ &                 0.76 \\
+\hdashline
+KSPTrack      &  $\bm{0.74} \pm 0.08$ &  $\bm{0.66} \pm 0.02$ &                  0.77 &                 0.77 \\
+EEL           &                  0.52 &                  0.12 &                  0.59 &                  0.6 \\
+Gaze2Segment  &                  0.07 &                  0.07 &                  0.02 &                 0.18 \\
+DL-prior      &                  0.56 &                   0.3 &                  0.51 &                 0.72 \\
+\bottomrule
+\end{tabular}
+\end{table*}

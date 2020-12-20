@@ -1,0 +1,103 @@
+
+\subsection{Non-negative Positive-Unlabeled learning}
+\label{sec:nnpu}
+
+In Positive/Negative learning (PN) applied to image foreground prediction task,
+one usually defines a model \(f_{\theta}: I \mapsto [0;1]^{W \cdot H}\), where \(\theta\) is a set of parameters, \(I\) is the input image space, and $(W,H)$ are its width and height.
+
+Let \(\bm{\mathcal{I}} = \{\mathcal{I}^i\}_{i=1}^{N}\) a set of $N$ input images.
+For practical reasons, the present work considers that annotations are provided at a superpixel-level.
+Note however that the following development remains valid when annotations are provided at pixel-level.
+Each image $\mathcal{I}^i$ is therefore composed of annotated superpixels, $\mathcal{X}^i=\mathcal{X}_p^i \cup \mathcal{X}_n^i$, where $\mathcal{X}_p^i$ and $\mathcal{X}_n^i$ denote the positive and negative superpixels, respectively.
+To simply notations we write $f_{\theta}(x) = f_{\theta}(\mathcal{I})\big|_x$ as the
+response of $f_{\theta}$ on image $\mathcal{I}$ averaged on the region defined by superpixel $x$.
+
+Given a known class prior for every image $\bm{\pi} = \{\pi^i\}_{i=1}^{N}$, one aims to optimize $\theta$ by minimizing an objective of the form:
+\begin{multline}
+  \label{eq:pn}
+R_{pn}=\sum_{i=1}^{N} \left[ \frac{\pi^i}{|\mathcal{X}_p^i|}\sum_{x \in \mathcal{X}_p^i}\ell(f_{\theta}(x),+1) + \\
+\frac{1-\pi^i}{|\mathcal{X}_n|}\sum_{x \in \mathcal{X}_n^i}\ell(f_{\theta}(x),-1) \right]
+\end{multline}
+
+A popular objective is the logistic loss, for which \(\ell(z,+1)=\log(1+ e^{-z})\), \(\ell(z, -1)=\log(1+e^{z})\) are the positive and negative entropy loss terms, respectively.
+When using both the logistic loss and class-priors, the objective of Eq. \ref{eq:pn} is called Balanced Cross-Entropy loss (BBCE).
+
+In a PU setup, the objective of Eq. \ref{eq:pn} is inadequate as we do not have $\bm{\mathcal{X}}_{n}$.
+Instead, we have a set of unlabeled superpixels $\bm{\mathcal{X}}_{u}$ which can contain both positives and negatives.
+As suggested in \cite{duplessis15}, the negative risk, i.e. the second term of Eq. \ref{eq:pn} can be derived as follows.
+Let \(p(x|Y=1)\), \(p(x|Y=-1)\), and $p(x)$ the probability distributions of positive, negative, and unlabeled samples, respectively.
+Without loss of generality, we take $\pi_{i}=\pi, \forall i$.
+The distribution of unlabeled samples can be written:
+\begin{equation}
+  \label{eq:probas}
+   p(x) = \pi p(x|Y=1) + (1-\pi) p(x|Y=-1)
+\end{equation}
+
+We then express the estimated negative risk as:
+\begin{multline}
+  \label{eq:estim_neg_risk}
+   (1-\pi) \mathbb{E}_{X \sim p(x|Y=-1)}\left[\ell(f_\theta(X,-1)) \right] = \\
+    \mathbb{E}_{X \sim p(x)}\left[\ell(f_\theta(X,-1)) \right]
+    - \pi \mathbb{E}_{X \sim p(x|Y=+1)}\left[\ell(f_\theta(X,-1)) \right]
+\end{multline}
+
+The two bottom terms of Eq. \ref{eq:estim_neg_risk} can be approximated using the available data to give the empirical risk.
+Injecting the latter into Eq. \ref{eq:pn}, one gets the empirical PU risk estimator:
+\begin{multline}
+  \label{eq:nnpu}
+R_{pu}=\sum_{i=1}^{N}\Biggl[ \frac{\pi^{i}}{|\mathcal{X}^{i}_{p}|}\sum_{x \in \mathcal{X}^{i}_p}\ell(f_{\theta}(x),+1) + \\
+\Biggl( \frac{1}{|\mathcal{X}^{i}_{u}|}\sum_{x \in \mathcal{X}^{i}_u}\ell(f_{\theta}(x),-1) -
+\frac{\pi^{i}}{|\mathcal{X}^{i}_{p}|}\sum_{x \in \mathcal{X}^{i}_p}\ell(f_{\theta}(x),-1) \Biggr) \Biggr]
+\end{multline}
+
+In practice, we aim at minimizing the objective of Eq. \ref{eq:nnpu} using a Convolutional Neural Network by applying stochastic gradient descent on mini-batches of images.
+However, such expressive models tend to overfit to the training data, which tends to make the negative risk, i.e. the bottom term of Eq. \ref{eq:nnpu} go negative.
+To circumvent that, \cite{kiryo17} suggest two solutions.
+(1) Clip the negative risk to be non-negative, or (2) perform gradient ascent when the negative risk the mini-batch is negative.
+Preliminary experiments showed that the second option works best.
+
+In particular, the negative risk writes
+\begin{multline}
+  \label{eq:neg_risk}
+R_{i}^{-}=\sum_{i}\Biggl(
+ \frac{1}{|\mathcal{X}^{i}_{u}|}\sum_{x \in \mathcal{X}^{i}_u}\ell(f_{\theta}(x),-1) - \\
+\frac{\pi^{i}}{|\mathcal{X}^{i}_{p}|}\sum_{x \in \mathcal{X}^{i}_p}\ell(f_{\theta}(x),-1) \Biggr)
+\end{multline}
+
+When \(R_{i}^{-} < 0\), we do gradient ascent by setting the gradient to \(-\nabla_\theta R_{i}^{-}\).
+When \(R_{i}^{-} \geq 0\), the gradient is set to \(\nabla_\theta R_{pu}\).
+Our procedure is described in Alg. \ref{alg:sgdnnpu}.
+
+\algnewcommand\algorithmicforeach{\textbf{for each}}
+\algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
+\begin{algorithm}[H]
+\caption{Non-negative PU learning}
+\label{alg:sgdnnpu}
+\begin{algorithmic}[1]
+\Require{$f_\theta$: Prediction model \newline
+  $\bm{\mathcal{I}}$: Set of images \newline
+  $\bm{\mathcal{X}_p}, \bm{\mathcal{X}_u}$: Positive and unlabeled superpixels \newline
+  $\bm{\pi}$: Set of class priors \newline
+  $T$: Number of epochs \newline}
+
+\For{\texttt{epoch} $\gets 1$ to $T$}
+\State Shuffle dataset into $N_{b}$ batches
+    \For{$i \gets 1$ to $N_{b}$}
+      \State Sample next batch to get $\mathcal{I}^i$, $\mathcal{X}_p^i$, $\mathcal{X}_u^i$, $\bm{\pi}^i$
+      \State Forward pass $\mathcal{I}^i$ in $f_\theta$
+      \State Compute risks as in Eq. \ref{eq:nnpu} and \ref{eq:neg_risk}
+      \If{$R_{i}^{-} < 0$}
+          \State Do gradient ascent along $\nabla_\theta R_{i}^{-}$
+      \Else
+          \State Do gradient descent along $\nabla_\theta R_{pu}$
+      \EndIf
+  \EndFor
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../../main"
+%%% End:
