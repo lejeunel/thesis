@@ -1,7 +1,80 @@
 \resetfigpath{eel}
+\glsresetall
 
 \chapter{Expected exponential loss for gaze-based video and volume}
 \label{eel} % For referencing the chapter elsewhere, use \ref{Chapter1}
+
+\textbf{Author contributions} This chapter combines the contributions of Raphael Sznitman and myself.
+Raphael Sznitman contributed on the methodology, coding, and writing of the text.
+
+\textbf{My personal contributions include}:
+\begin{itemize}
+    \item Discussions on the method.
+  \item Providing the data: Videos/Volumes.
+    \item Producing manual groundtruth annotations of some of the latter.
+    \item Implementing an early prototype of the annotation software eye-gaze tracker
+    \item Collecting the point-wise annotations
+    \item Producing the superpixel segmentations and optical flow
+    \item Producing the deep features
+\end{itemize}
+
+\section{Introduction}
+Ground truth annotations play a critical role in the development of machine learning methods in medical imaging.
+Indeed, advances in deep learning strategies, coupled with the advent of
+image data in medicine have greatly improved performances for tasks such as structure detection and anatomical segmentation across most imaging modalities (e.g. MRI, CT, Endoscopy,Microscopy) \cite{kamnitsas17-3d}, \cite{anthimopoulos16}.
+Yet the process of acquiring ground truth data or annotations remains
+laborious and challenging, especially in video and 3D image data.
+
+To mitigate manual annotation dependence, semi and unsupervised methods have been
+key research areas to reduce the overall annotation burden placed on domain experts (e.g. radiologist, biologist, surgeon etc....).
+Most notably, \gls{al} \cite{KonSznFua15}, \cite{mosinska16}, \gls{tl} \cite{bermudez16}, \cite{shin16}, and \gls{cs} \cite{maier14}, \cite{cheplygina16}, provide frameworks for learning with either limited or noisy ground truth data and have been applied to a larger number of applications.
+Yet in \gls{al} domain experts are still necessary to actively provide ground truth data, sequentially or in batch.
+Similarly, \gls{cs} relies on manual annotators to follow carefully crafted labeling tasks in order to leverage non-experts, which produces highly variable ground truth quality \cite{cheplygina16}.
+
+Alternatively, Vilarino et al. \cite{vilarino07} used an eye gaze tracker to annotate polyps in video colonoscopy.
+In their approach an expert passively viewed a video and stared at polyps.
+From these, they trained an \gls{svm} classifier to label the sequence, treating regions around each gaze location as positives and the rest of the image domain as negative samples.
+As we show in our experiments however, this approach is limited to detecting objects of fixed size and does not extend well to pixel-wise segmentation tasks.
+Also related is the work in \cite{sadegh09}, which mapped out regions of interest using a gaze tracker on individual frames observed for extended periods of time.
+More recently, the work of \cite{khosravan16} is closely related to our setting, with the important distinction that our data is viewed in one pass and applied to video and volumetric data.
+
+To overcome this limitation, we propose a novel framework to produce pixel-wise segmentation for an object present in a volume (or video sequence) using gaze observations collected from a $200\$$ off-the-shelf gaze tracker.
+Assuming a single target is present throughout the image data, we cast our problem as a semi-supervised problem where samples are either labeled as positive (gazed image locations) or unknown (the rest of the image data which could be positive or negative).
+To learn in this regime, we introduce a new Expected Exponential loss
+function that can be used within a traditional gradient boosting framework.
+In particular, the expectation is taken with respect to the unknown labels, requiring a label probability estimate.
+We describe how to estimate these with a novel strategy and show that our approach not only provides superior performances over existing methods in a variety of medical imaging modalities (i.e. laparoscopy, microscopy, CT and MRI) but can be used in a \gls{cs} context as well.
+
+\section{Gaze-based pixelwise annotation}
+Our goal is to produce a pixel-wise segmentation of a specific structure of interest located in a video or in a volume (i.e. we treat a volume as a video sequence).
+To do this, we ask a domain expert to watch and follow the structure throughout the sequence.
+While viewing the sequence, we track the persons eye gaze by means of a commercially available eye gaze tracker.
+In our setting, this provides a single gaze location for each viewed image and we assume the observer is compliant in the task.
+
+To produce ground truth annotations, we cast this problem as a binary semi-supervised
+machine learning problem, where one must determine a pixel-wise segmentation of the structure of interest in each of the images using only the sequence itself and the gaze locations.
+We assume that gaze locations correspond to the structure and propose a novel Expected Exponential loss function that explicitly takes into account that some labels are known while others are not.
+This loss leverages probability estimates regarding the unknown labels and we present a strategy to estimate these effectively.
+Note that, we do not focus on learning a function that generalizes to other similar sequences, but one that annotates the given sequence as well as possible.
+
+For a given image sequence, our approach is organized as follows and is illustrated in Fig. \ref{fig:eel_pipeline}:
+(1) the expert views the sequence and 2D gaze locations are collected; (2) we estimate the label
+probability by using the image data and the gaze information; (3) we then train a gradient
+boosted classifier with our proposed loss on a subset of the image data; (4) using the trained
+classifier, we predict the remainder of the image data. We will detail these steps in the following
+sections but first define some notation used throughout this paper.
+
+\begin{figure}[h]
+\includegraphics[width=0.99\textwidth]{pipeline}
+\caption{Example Gaze-based annotation.
+  A surgical instrument must be annotated in a sequence.
+  (1) A domain expert watches the sequences and has their gaze collected during the
+  viewing.
+  (2) Our method then estimates object likelihoods over the sequence and (3) we then
+train a classifier with an Expected Exponential loss function using a subset of the image data.
+(4) The classifier is then used to evaluate the remainder of the sequence.}
+\label{fig:eel_pipeline}
+\end{figure}
 
 \section{Notation}
 Let an image sequence (or volume) be denoted $\mathcal{I} = [I_{0}, \cdots , I_{T}]$ and let $\mathcal{G} = \{g_{t} \}^{T}_{t=0}$ such that $g_t\in \mathbb{R}^{2}$ is a 2D gaze pixel location in $I_{t}$.

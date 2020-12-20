@@ -1,10 +1,21 @@
 \chapter{Deep Feature Learning}
+This chapter investigates several feature extraction methods as a contribution to the sparse point-wise annotation of the next chapter.
+
+\textbf{Author contributions} The software solutions presented in this chapter combine the contributions of Severin Tobler, Jan Grossrieder, Philipp Gerber, Olen Andoni, and myself.
+Severin Tobler, as part of his civil service, contributed to the coding of the annotation software, in particular, the design of the \gls{gui}, coding the video/volume decoding layers, and the documentation.
+Jan Grossrieder, Philipp Gerber, and Olen Andoni all contributed equally to the coding of the web platform.
+
+\textbf{My personal contributions include}:
+\begin{itemize}
+    \item Supervision and testing of both projects
+    \item Coding parts of the annotation software: Decoding of videos and gaze-tracker integration
+    \item Packaging of the annotation software for Linux platforms
+    \item Coding parts of the web-platform: Frontend, backend, packaging
+    \item Documentation of the web-platform
+\end{itemize}
 
 \section{Introduction}
 
-This chapter investigates several feature extraction methods as a contribution to the sparse point-wise annotation of the next chapter.
-
-In section \ref{sec:cnn}, we give a brief introduction to Deep Convolutional Neural Networks (CNN) by starting from multi-layer perceptron (MLP).
 In section \ref{sec:feat_method}, we introduce our experimental framework for the study of feature learning in the frame of our general problem of sparse point-wise annotation.
 In particular, several baseline methods are introduced along the deep learning approach used in \cite{lejeune18}.
 Extensive experiments are performed and results are given in section \ref{sec:feats_results}.

@@ -1,4 +1,5 @@
 \resetfigpath{intro}
+\glsresetall
 
 \chapter{Introduction}
 \label{intro}
@@ -54,52 +55,72 @@ The model, however, has over $70$ million parameters.
 In this scenario, collecting such quantity of example images and annotating them is tedious and cumbersome.
 In practice, the annotation task is performed by numerous individuals in parallel.
 
-Another example scenario is the Brain Tumor Segmentation (BraTS) Challenge \cite{menze15}, which consists in segmenting brain tumors from \gls{mri} scans.
-The training dataset contains about $450$ scans.
-State-of-the-art \gls{dl} models typically account for $\sim 50$ million parameters.
+Another example scenario, more relevant to the present thesis, is the Brain Tumor Segmentation (BraTS) Challenge \cite{menze15}, which consists in segmenting brain tumors from \gls{mri} scans.
+The training dataset contains about $450$ scans, each containing $\sim 70$ slices.
+State-of-the-art \gls{dl} models typically account for $\sim 50$ million parameters \cite{chen19}.
+Example annotations and images are shown on Fig. \ref{fig:brats}.
 
-The annotation of medical data, however, adds the following practical difficulties.
-First, the task can require a specific medical expertise.
-Second, assuming such experts are available and willing to participate to this task, their daily obligations imposes a limited time budget.
-These two factors largely explain why the medical field does not benefit from the latest and greatest \gls{ml} technologies used in more generic applications \cite{orting19}.
+\begin{figure}[!htpb]
+  \includegraphics[width=0.99\textwidth]{brats.png}
+  \caption{Examples from the BRATS dataset. Annotation of individual experts are in blue, consensus segmentations are in pink. Taken from \cite{menze15}}
+  \label{fig:brats}
+\end{figure}
 
+\section{Problem definition and thesis statement}
+
+Applying state-of-the-art \gls{dl} methods to segmentation of medical images poses important practical difficulties.
+In particular, the task requires a specific medical expertise.
+Second, assuming such experts are available and willing to participate to this task, their daily obligations impose a limited time budget.
+These two factors largely explain why the field of medical imaging does not benefit from the latest \gls{dl} technologies used in more generic applications \cite{orting19}.
+Indeed, the general rule of thumb is: More powerful and flexible model require more training examples.
+
+\textbf{Problem definition}
+The present thesis therefore endeavours to address this bottleneck by providing a
+fast and intuitive annotation method that allows to generate accurate segmentation of objects of interest on a wide variety of medical imaging modalities.
+
+\textbf{Thesis statement}
+Generating pixel-wise annotations of medical sequences over a wide range of modalities is possible.
 
 \section{Organization and Contribution of this Thesis}
 The organization of this thesis is summarized below per chapter:
 
-\textbf{Chapter 2} gives a detailed description of the proposed problematic.
+\textbf{Chapter 2} gives a detailed description of the experimental annotation setup.
 The datasets that were used in the elaboration and testing of the proposed methods are described.
-The requirements that ground our annotation protocol is then explicitated.
-Next, we describe our software solutions, namely a cross-platform and multi-device annotation software, and a web platform with a front-end that allows users to upload annotations, and a back-end that runs our segmentations algorithms.
+The requirements of our annotation protocol is then explicitated and justified.
+Next, we describe our software solutions, namely a cross-platform and multi-device annotation software, and a web platform with a frontend that allows users to upload annotations, while a backend runs our segmentations algorithms.
 
-\textbf{Chapter 3} gives a detailed description of the proposed problematic.
-First, the datasets that were used in the elaboration and testing of the proposed methods are described.
-Second, the requirements that ground our annotation protocol is explicitated.
-Third, we present software solutions implemented in the frame of thesis, namely a cross-platform and multi-device annotation software, and a web platform where a front-end allows users to upload annotations, and a back-end that runs our segmentations algorithms.
-
-\textbf{Chapter 4} gives an overview of the broad litterature related to the present thesis,
+\textbf{Chapter 3} gives an overview of the broad litterature related to the present thesis.
 In particular, we first give a state-of-the-art of computer vision methods related to segmentation of images and volumes using sparse annotations.
 Next, we review several categories of \gls{ml} applicable to the same scenario, namely \gls{ssl}, \gls{pu}, and \gls{da}.
 Last, we add some essential theoretical elements that intervene in the proposed solutions.
 
-\textbf{Chapter 5} contains our first segmentation method that relies on the Expected Exponential loss, optimized using a gradient boosting classifier. The probabilities of unlabeled samples are estimated using label propagation.
+\textbf{Chapter 4} contains our first segmentation method that relies on the Expected Exponential loss, optimized using a gradient boosting classifier. The probabilities of unlabeled samples are estimated using label propagation.
 
-\textbf{Chapter 6} gives a thorough study of feature extraction methods applicable to the present scenario.
+\textbf{Chapter 5} gives a thorough study of feature extraction methods applicable to the present scenario.
 We devise a simple evaluation framework based on a \gls{rf} classifier that operates on superpixels.
 As baselines, we implement traditional feature extraction methods, such as \gls{bovw}.
 Another baseline considers unsupervised deep feature extraction, where we use a \gls{cnn} trained to classify natural images.
-We then implement various methods based on Deep Learning that integrate motion priors, as well as priors derived from the user-provided point annotations.
-Through extensive experiments, we demonstrate the superiority of the proposed deep feature learning method over the baselines.
+We then implement various methods based on \gls{dl} that integrate motion priors, as well as priors derived from the user-provided point annotations.
+Through extensive experiments, we demonstrate the superiority of the \gls{ae} configuration aided by spatial priors over the baselines.
+This contribution constitutes a preliminary study that is relevant to the next chapter.
 
-\textbf{Chapter 7} develops an innovative framework based on multi-object tracking.
+\textbf{Chapter 6} presents an innovative framework based on multi-object tracking.
 Concretely, we formulate our segmentation problem as a maximum a-posteriori problem, where the random variable to optimize is the objectness of superpixels.
-Using deep features extracted to the best method of the previous chapter, we train an ensemble of decision trees using a sampling method applicable to Positive/Unlabeled setup.
+Using deep features extracted with the best method of the previous chapter, we train an ensemble of decision trees using a sampling method applicable to the \gls{pu} setup.
 Next, simple gaussian kernels provide pairwise similarity measures.
 These two models allow to define likelihoods of selecting a superpixel given the user's annotations, and transiting from one frame to the next.
 Using the network flow paradigm, we then build a graph that connects superpixels according to spatio-temporal relations.
+This chapter covers the content of our first journal article \cite{lejeune18}.
 
-\textbf{Chapter 8}
+\textbf{Chapter 7} continues on the same line as the previous chapter by improving on the foreground prediction model.
+Instead of using two components, where the first generates deep features, while the second estimates foreground probabilities, we aim at combining the two in an end-to-end fashion.
+We leverage a loss function applicable to the \gls{pu} scenario, where the foreground probabilities are inferred by a deep network configured as a predictor.
+As the latter loss function requires accurate class priors to render its full potential, we further devise a strategy to estimate the latter in a self-supervised manner.
+In particular, our approach consists in setting an initial upper-bound constant value (possibly misspecified) on the prior, and gradually decrease the latter using as evidence the output of the deep network.
+Our algorithm relies on the recursive bayesian estimation paradigm.
+This chapter covers the content of our second journal article, currently in preparation.
 
+\textbf{Chapter 8} gives a summary of our contributions, provides general discussions, and concludes by giving an outline on future works.
 
 %%% Local Variables:
 %%% mode: latex

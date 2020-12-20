@@ -9,6 +9,19 @@ In the last section, we present two software solutions that have been designed a
 The first is a flexible annotation software.
 The second is a web platform that allows users to upload their annotations and images, so as to receive, after the computations are done, the segmentation results.
 
+\textbf{Author contributions} The software solutions presented in this chapter combine the contributions of Severin Tobler, Jan Grossrieder, Philipp Gerber, Olen Andoni, and myself.
+Severin Tobler, as part of his civil service, contributed to the coding of the annotation software, in particular, the design of the \gls{gui}, coding the video/volume decoding layers, and the documentation.
+Jan Grossrieder, Philipp Gerber, and Olen Andoni all contributed equally to the coding of the web platform.
+
+\textbf{My personal contributions include}:
+\begin{itemize}
+    \item Supervision and testing of both projects
+    \item Coding parts of the annotation software: Decoding of videos and gaze-tracker integration
+    \item Packaging of the annotation software for Linux platforms
+    \item Coding parts of the web-platform: Frontend, backend, packaging
+    \item Documentation of the web-platform
+\end{itemize}
+
 \section{Proposed annotation protocol and requirements}
 
 In the present thesis, we devise solutions that allow to annotate medical sequences in a fast and intuitive manner, in an attempt to alleviate the bottleneck of scarcity of example data.
@@ -89,7 +102,7 @@ We design an annotation software that supports the following features.
 
 \begin{itemize}
     \item We want the software to be cross-platform, i.e. run on the most popular operating systems, i.e. Windows, MacOS, and Linux.
-    \item We wish to have a polished and intuitive GUI interface.
+    \item We wish to have a polished and user-friendly \gls{gui}.
     \item The software must support the most standard types of files, i.e. popular video formats and DICOM.
     \item We further wished to experiment on using an eye-gaze tracker in place of standard pointing devices.
 \end{itemize}
