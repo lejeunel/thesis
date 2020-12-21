@@ -28,10 +28,18 @@ Concretely, the image or volume is represented as a region adjacency graph where
 Each annotated positive pixels is connected to a source node, while annotated negatives are connected to a sink node.
 The energy minimization is then performed using the min-cut/max-flow algorithm \cite{goldberg88}.
 Using the same algorithm, grab-cut \cite{rother04}, further simplifies the scribble-based annotation protocol by considering bounding-boxes around the object of interest, which provide crude labels on both foreground and background in a single stroke.
+An illustration of the graph-cut framework is shown on Fig. \ref{fig:graphcut}.
 
 Along the same line, \cite{criminisi08}
 
-\subsection{On the Wise Use of Annotation Budget}
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=8cm]{graphcut.jpeg}
+  \caption{Min-cut/max-flow graph used for graph-cut segmentation. Taken from \cite{xiao17}.}
+  \label{fig:graphcut}
+\end{figure}
+
+\subsection{Active Learning and Crowd-sourcing}
 The problem of scarcity of labeled data can also be posed in the following manner:
 Given a limited annotation budget, i.e. when only a few hours of annotation work can be provided, how can one make the best use of it?
 
@@ -48,11 +56,33 @@ First, the difficulty of the annotation task can prohibit the effective use of c
 Another limitation is the nature of the data, i.e. one usually prefers to pre-classify brain scans and submit to workers the slices where tumors are present.
 Last, one must usually integrate a test-task to ensure the competence of workers, or filter-out annotations provided by ``poorly performing'' workers \cite{park18}.
 
+\subsection{Weakly supervised learning}
+An important line of research, weakly supervised learning, endeavors to transpose sparse annotation protocol to the \gls{ml} field.
+In \cite{dai15}, authors leverage bounding-box annotations to supervise the training of a \gls{cnn}.
+As a follow-up work, \cite{lin16} uses scribbles as annotations.
+In \cite{papandreou15}, authors train a \gls{cnn} for semantic segmentation of images by combining pixelwise semantic supervision with image-level supervision in the form of ``tags'' (dog, cat, ...).
+Closely related to the present thesis is the work of \cite{bearman16}, who train a \gls{cnn} with a combination of image-level and point-wise supervision.
+Concretely, annotations consists in a single 2D location on the object of interest, along with a semantic label corresponding to the class of the object.
+
+A transversal line of research endeavored to combine the traditional graph-cut paradigm to \gls{dl} in an end-to-end fashion.
+The problem is generally formulated as follows: A \gls{dl} predicts both the unary potentials and the parameters of the pairwise potentials, while a late-stage module minimizes the energy objective.
+In most cases, the fully-connected \gls{crf} model of \cite{krahenbuhl11} is leveraged, which considers that
+In \cite{rajchl16}, authors leverage the fully-connected \gls{crf} model of \cite{krahenbuhl11} to segment lung and brain images from bounding-box annotations using a \gls{cnn}.
+The fully-connected \gls{crf} model extends the traditional graph-cut approach by considering that pairwise pixel connections span the whole image frame.
+The \gls{cnn} of \cite{rajchl16} predicts the unary and pairwise potentials, minimize the energy function, and updates all parameters in an end-to-end fashion.
+In particular, the late-stage \gls{crf} is implemented as a \gls{rnn}.
+
+A new trend in weakly supervised segmentation is the attention map paradigm.
+The latter starts from a standard image-level classification \gls{cnn}, and considers that the response of late layers (before the classification layer), called \gls{cam}, can provide valuable cues on where the network is focusing.
+In particular, Grad-CAM \cite{selvaraju17} proposes to generate segmentation maps by combining the activations of late layers with a weighting factor, computed using the backpropagated gradient.
+In \cite{li18}, show that such attention maps, as provided by a \gls{cnn} trained only for classification, can be refined using a limited number of pixelwise annotated images.
+
+
 \subsection{Transfer Learning, Semi-supervised Learning, and Domain Adaptation}
 \gls{tl} consists in using a \gls{ml} model trained for the task of interest, but using a training set of different nature than the targeted domain, e.g. train a \gls{cnn} to segment natural objects (trees, cars, ...) for the segmentation of surgical tools.
 As pointed out by \cite{oliver18}, an important and implicit assumption in that context is that both datasets share similar data distributions.
 
-\gls{ssl} is a broad category of \gls{ml} algorithm that combines traditional supervised learning tasks, where a fully labeled training dataset is available, along with an abundant unlabeled dataset.
+\gls{ssl} is a broad category of \gls{ml} algorithm that combines traditional supervised learning tasks, where a scarce fully labeled training dataset is available, along with an abundant unlabeled dataset.
 The latter can, under specific conditions, boost the performance of an \gls{ml} model trained with labeled dataset only, i.e. in a fully-supervised manner.
 The basic idea is that the ML model may acquire knowledge of the data distribution from the unlabeled set.
 Here again, one assumes that both data domains share similar distributions.
