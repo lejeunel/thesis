@@ -30,8 +30,6 @@ The energy minimization is then performed using the min-cut/max-flow algorithm \
 Using the same algorithm, grab-cut \cite{rother04}, further simplifies the scribble-based annotation protocol by considering bounding-boxes around the object of interest, which provide crude labels on both foreground and background in a single stroke.
 An illustration of the graph-cut framework is shown on Fig. \ref{fig:graphcut}.
 
-Along the same line, \cite{criminisi08}
-
 \begin{figure}[!h]
   \centering
   \includegraphics[width=8cm]{graphcut.jpeg}
@@ -39,12 +37,17 @@ Along the same line, \cite{criminisi08}
   \label{fig:graphcut}
 \end{figure}
 
+More recently, \cite{krahenbuhl11} proposed an inference strategy to apply a fully-connected \gls{crf} model to coarse pixelwise class-predictions, as a mean to enforce spatial coherence.
+Similar to graph-cut, the latter minimizes an energy function that include unary and pairwise potentials, but considers that every pixel is connected all other pixels.
+Fig. \ref{fig:crf} shows examples on natural images.
+
 \subsection{Active Learning and Crowd-sourcing}
 The problem of scarcity of labeled data can also be posed in the following manner:
 Given a limited annotation budget, i.e. when only a few hours of annotation work can be provided, how can one make the best use of it?
 
 \gls{al} \cite{settles09} considers semi-supervised learning scenarios, where abundant unlabeled data are available.
-\gls{al} algorithms select unlabeled samples that are the most informative to the \gls{ml} model, i.e. it assumes that many unlabeled samples represent redundant information to the late-stage \gls{ml} model.
+\gls{al} algorithms aim at selecting the unlabeled samples that are the most informative to the \gls{ml} model.
+Conversely, \gls{al} assumes that many unlabeled samples represent redundant information to the late-stage \gls{ml} model.
 In \cite{KonSznFua15}, authors devise a strategy to select unlabeled supervoxels of a 3D volume so as to segment volumes of various modalities.
 The approach iteratively trains a classifier and takes its entropy as measure of uncertainty.
 Combining the latter with a geometric prior, which takes into account intuitive rules on spatial coherence, they sample a batch of most uncertain samples.
@@ -64,18 +67,42 @@ In \cite{papandreou15}, authors train a \gls{cnn} for semantic segmentation of i
 Closely related to the present thesis is the work of \cite{bearman16}, who train a \gls{cnn} with a combination of image-level and point-wise supervision.
 Concretely, annotations consists in a single 2D location on the object of interest, along with a semantic label corresponding to the class of the object.
 
-A transversal line of research endeavored to combine the traditional graph-cut paradigm to \gls{dl} in an end-to-end fashion.
-The problem is generally formulated as follows: A \gls{dl} predicts both the unary potentials and the parameters of the pairwise potentials, while a late-stage module minimizes the energy objective.
-In most cases, the fully-connected \gls{crf} model of \cite{krahenbuhl11} is leveraged, which considers that
-In \cite{rajchl16}, authors leverage the fully-connected \gls{crf} model of \cite{krahenbuhl11} to segment lung and brain images from bounding-box annotations using a \gls{cnn}.
-The fully-connected \gls{crf} model extends the traditional graph-cut approach by considering that pairwise pixel connections span the whole image frame.
-The \gls{cnn} of \cite{rajchl16} predicts the unary and pairwise potentials, minimize the energy function, and updates all parameters in an end-to-end fashion.
-In particular, the late-stage \gls{crf} is implemented as a \gls{rnn}.
+A transversal line of research endeavored to combine the traditional graph-cut/\gls{crf} paradigm to \gls{dl} in an attempt to enforce spatial coherence into semantic segmentation models as a refinement step, a requirement that is not immediately achievable through standard loss functions.
+The problem is generally formulated as follows: A \gls{dl} predicts the unary potentials, while a late-stage module generates the pairwise potentials and solves the energy objective.
+In \cite{rajchl16}, authors leverage the fully-connected \gls{crf} inference procedure of \cite{krahenbuhl11} to segment lung and brain images from bounding-box annotations using a \gls{cnn}.
+The \gls{cnn} of \cite{rajchl16} predicts the unary and pairwise potentials and minimize the energy function using a parameterized \gls{crf} using a \gls{rnn}, thereby allowing the parameters of the feature extractor and pairwise similarity model to be optimized in end-to-end fashion.
+In \cite{wang18}, authors propose a framework that relie on two steps, where the first generates an initial delineation using a \gls{cnn}, which an annotator can modify manually by drawing scribbles.
+Another \gls{cnn} generates refines the initial delineation by leveraging the geodesic distance transform \cite{criminisi08}, which combines the initial delineation and the users input.
+Their pipeline is shown on Fig. \ref{fig:deepigeos}.
 
-A new trend in weakly supervised segmentation is the attention map paradigm.
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=12cm]{crf.png}
+  \caption{Example segmentation using CRF on two images. (a) Input image (b) Response of the pixel-wise classifier (unary term) (c) Classification produced by the robust $P^{n}$ CRF \cite{kohli09} (d) Fully-connected CRF using Markov Chain Monte Carlo Inference (e) Approach of \cite{krahenbuhl11}. Taken from \cite{krahenbuhl11}.}
+  \label{fig:crf}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=8cm]{deepigeos.png}
+  \caption{Deep Interactive Geodesic framework of \cite{wang18}. P-Net proposes an initial automatic segmentation that is refined by R-Net with user interactions indicating mis-segmentations. CRF-Net(f) is a
+    back-propagatable CRF that uses freeform pairwise potentials.
+    It is extended to be CRF-Net(fu) that employs user interactions as hard constraints. Taken from \cite{wang18}}
+  \label{fig:deepigeos}
+\end{figure}
+
+Another trend in weakly supervised segmentation is the attention map paradigm.
 The latter starts from a standard image-level classification \gls{cnn}, and considers that the response of late layers (before the classification layer), called \gls{cam}, can provide valuable cues on where the network is focusing.
 In particular, Grad-CAM \cite{selvaraju17} proposes to generate segmentation maps by combining the activations of late layers with a weighting factor, computed using the backpropagated gradient.
 In \cite{li18}, show that such attention maps, as provided by a \gls{cnn} trained only for classification, can be refined using a limited number of pixelwise annotated images.
+
+More recently, adversarial techniques have been employed to semi-supervised semantic segmentation, as a mean to circumvent he computational burden at test time brought by the latter \gls{crf} approach.
+In particular, the \gls{gan} approach \cite{goodfellow14} considers a \gls{cnn} that divides in two sub-networks: A generator, and a discriminator.
+The first receives a random noise signal which it uses to generate an image that is as ``realistic'' as possible, while the second must distinguish images coming from the generator and real images.
+In \cite{luc16}, authors argue that a spatial coherence refinement step similar in spirit to \gls{crf}, can be achieved through the \gls{gan} framework.
+In particular, authors combine a standard segmentation network with a discriminator network,
+where the latter must distinguish between the predicted label maps of the segmentation network and the groundtruth maps.
+Both networks are then trained in parallel using a loss function that combines both objectives.
 
 
 \subsection{Transfer Learning, Semi-supervised Learning, and Domain Adaptation}

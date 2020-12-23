@@ -36,12 +36,12 @@ The training algorithm is described in Alg. \ref{alg:rf}.
 \label{sec:cnn}
 
 This chapter serves as an introduction to the basic notions that will come up in the remaining of this thesis, namely the notion of \gls{nn} and \gls{cnn}.
-We start by introducing generalities about gls{nn}.
+We start by introducing generalities about \gls{nn}.
 Most of the content of the present chapter is taken from \cite{goodfellow16}.
 
 \subsubsection{Neural Network}
 Deep learning essentially refers to a family of machine learning methods that historically derive from the \gls{mlp}, also known as Neural Network.
-An \gls{mlp} aims at approximating a function $f^{*}$ with a function $f(x;\theta)$ parameterized by $\theta$.
+An \gls{mlp} aims at approximating an unknown function $f^{*}$ with a function $f(x;\theta)$ parameterized by $\theta$.
 More concretely, an \gls{mlp} converts an input $x$ to an output $y$ using a chain of function $f^{(1)} \circ f^{2} \circ \cdots \circ f^{n}(x)$, which justifies its name ``network''.
 Each function is usually referred to as ``layer'', while the term ``neural'' comes from the fact that it is originally inspired by neuroscience \cite{mcculloch43}.
 
@@ -86,7 +86,8 @@ The convolutional operator brings the following advantage over the \gls{mlp}: (1
 Fig. \ref{fig:cnn_con} illustrates the idea of sparse connectivity brought by convolutional layers.
 
 \begin{figure}[!htpb]
-  \includegraphics[width=13cm]{fc_vs_conv}
+  \centering
+  \includegraphics[width=10cm]{fc_vs_conv}
   \caption{(Left) A fully-connected (linear) layer with 1D input at the bottom. (Right) Convolutional layer with a kernel of size 3.}
   \label{fig:cnn_con}
 \end{figure}
@@ -98,7 +99,8 @@ This effectively allow to capture, in the case of images, visual features at dif
 In particular, the max-pooling operator computes for each spatial location the maximal filter response over a pre-defined neighborhood (see fig. \ref{fig:max_pool})
 
 \begin{figure}[!htpb]
-  \includegraphics[width=13cm]{max_pooling}
+  \centering
+  \includegraphics[width=10cm]{max_pooling}
   \caption{(Left) Input. (Right) Output of max-pooling layer. Each color represents a set of values included in the sliding window.}
   \label{fig:max_pool}
 \end{figure}
@@ -188,6 +190,146 @@ For example, using the \gls{mse} criterion, one writes:
     In yellow is the bottleneck.}
   \label{fig:ae}
 \end{figure}
+
+\section{Multi-path tracking}
+This section gives a theoretical background to the multi-path tracking problem, as first developed in \cite{berclaz11}.
+The latter framework is leveraged in our first major contribution, where we perform tracking of over-segmented regions accross a sequence, where each region can be part of object of interest.
+
+We develop our multi-path tracking framework through the following steps.
+(1) We first represent our sequence as a stack of occupancy grid, where each element of a grid represent an over-segmented region.
+The elements of these grids are then represented as the nodes of a directed acyclic graph, connected by edges that represent admissible motions.
+(2) We introduce the notion of discrete flow variables, which represent the number of objects passing from one position of the grid to another.
+(3) We formulate the multi-path tracking problem as a \gls{map} problem, where the grid occupancies are binary random variables.
+(4) We show how the latter problem, under the Markov assumption, is identical to an \gls{ip}.
+(5) As the latter is NP hard, we show that relaxing it to a continuous \gls{lp} and solving it using off-the-shelf solvers converges to the optimal solution.
+(6) We further show that the implicit spatio-temporal relations of our occupancy grid allow to leverage the \gls{ksp} algorithm.
+
+Formally, we start by formulating our problem in the network-flow paradigm.
+Next, we show the latter allow to solve a \gls{map} problem, where the objectness of over-segmented regions are the variables to optimize, and show how the likelihoods can be modeled by appearance similarity models.
+Last, we show how solving the latter \gls{map}, when cast into a network flow problem, can be solved efficiently.
+
+\subsection{Segmentation as a network flow problem on over-segmented regions}
+We depart from the work of \cite{berclaz11} on two aspects: (1) In contrast to the latter authors, who represent a sequence as a stack of coarse grids, i.e. each cell represent a physical position and the relative locations are fixed in advance, we rather consider that our sequence is over-segmented into superpixels.
+(2) We leverage the ``tracklet'' paradigm, where each over-segmented region is represented as a short track in which flow is allowed to pass through.
+
+
+In particular, we generate on each frame, indexed by a time variable $t$, a set of $N_{t}$ non-overlapping over-segmented regions $\mathcal{S}_{t}=\{s_{t}^{n}\}_{n=1}^{N_{t}}$.
+Within the directed graph representation, we represent each over-segmented region $s^{t}_{n}$ by a couple of nodes connected by a \textit{visiting} edge $e^{n}_{t}$.
+As a sidenote, the latter is often refered to as a ``tracklet'' \cite{zhang08}.
+So as to allow objects to transit from one frame to the next, we add \textit{transition} edges $e^{(n,m)}_{t}$ that connect region $s^{n}_{t}$ to region $s^{m}_{t+1}$.
+Each edge is labeled with a discrete non-negative flow variable.
+In particular, $f_{t}^{n}$ corresponds to the flow transiting through edge $e_{t}^{n}$, while $f_{t}^{n,m}$ corresponds to the flow passing from region $s_{t}^{n}$ to region $s_{t+1}^{m}$.
+Next, we impose conservation of flow, which imposes that the quantity of flow that passes into a visiting edge is equal to the quantity of flow that leaves it. Formally:
+
+\begin{equation}
+  \label{eq:flow_conserv}
+  \forall t,n \quad f_{t}^{n} = \sum_{n:m\in \mathcal{N}(n)}f_{t}^{n,m}
+\end{equation}
+
+When $\mathcal{N}(n)$ is a spatial neighborhood centered on region $n$ that defines admissible motion.
+
+Next, as we assume that each region can contain a maximum of one object. Formally:
+
+\begin{equation}
+  \label{eq:capa_constrain}
+  \forall t,n \quad f_{t}^{n} \leq 1
+\end{equation}
+
+Note that Eq. \ref{eq:flow_conserv} and \ref{eq:capa_constrain} implictly enforce a maximum flow constraints on transition edges.
+
+At the root of our segmentation framework lies the basic idea that our object to segment is composed of over-segmented regions that are spatially and temporally organized.
+Moreover, we expect that the size of our object of interest changes through time/slice, e.g. a brain tumor on transversal slices appears to grow and shrink again as one scrolls from one end of the scan to the other end.
+To address this requirement, we introduce two kinds of \textit{virtual} nodes: A source node and a sink node.
+The first acts like a tap, i.e. it pushes flow inside the graph and increases the total mass, while the second allows to evacuate mass.
+We ensure a flow-mass conservation through the constraint:
+
+\begin{equation}
+  \label{eq:mass_constrain}
+  \sum_{t,m\in \mathcal{N}(\xi_{t})}f_{xi_{t},m} = \sum_{k:\mathcal{X}\in\mathcal{N}(k)}f^{t}_{k,\mathcal{X}}
+\end{equation}
+
+Where the $\xi_{t}$ are proxy source nodes that allow pushing flow on frame $t$, and $\mathcal{X}$ is the sink node.
+Fig. \ref{fig:flownetwork} illustrates our network flow.
+
+\begin{figure}[!htpb]
+  \centering
+  \includegraphics[width=13cm]{network}
+  \caption{Illustration of our flow network. Each over-segmented region is assigned a visiting edge (in blue).
+    Flow is allowed to pass from one frame to the next through the transition edges (in green).
+    A set of proxy source nodes $\xi_{t}$ allow to push flow into the network through entrance edges (in red).
+  The sink node $\mathcal{X}$ allows to evacuate flow through exit edges (in orange).}
+  \label{fig:flownetwork}
+\end{figure}
+
+\subsection{Maximum a Posteriori formulation}
+We first formulate an \gls{map} estimation problem, where the random variable to optimize for denotes the presence of objects at discrete time-space locations.
+Next, we emphasize how the network flow paradigm developed above is leveraged in order to solve the \gls{map} estimation problem.
+
+Let $\bm{Y}={Y^{n}_{t}|\forall(t,n)}$ a set of binary random variable that take value $1$ when region $s^{n}_{t}$ is object, and $0$ otherwise, while $\bm{I}_{t=1}^{N}$ and $\bm{g}_{t=1}^{N}$ are a set of $N$ images and user-provided 2D locations, respectively.
+We define our segmentation task as.
+
+\begin{equation}
+  \label{eq:map}
+  y^{*} = \arg \max_{y \in \mathcal{Y}}P(\bm{Y}=\bm{y}|\bm{I}, \bm{g})
+\end{equation}
+
+where $y^{*}$ are the optimal binary labels.
+Assuming that $Y^{t}_{n}$ is conditionally independent given the observed variables, we rewrite Eq. \ref{eq:map} as
+
+\begin{equation}
+  \label{eq:bg_map2}
+  y^{*} = \arg \max_{y \in \mathcal{Y}}\prod_{i,j,t} P_{visit}(Y^{t}_{n}|\bm{I}, \bm{g}) P_{trans}(Y^{t}_{n}|I^{t-1},\bm{g}) P_{in}(Y^{t}_{n}|I^{t},\bm{g})
+\end{equation}
+
+The decomposition of \ref{eq:bg_map2} shows three different likelihood models that will provide the costs of blue, red, and green edges of Fig. \ref{fig:flownetwork}, respectively.
+Next, we want to convert Eq. \ref{eq:bg_map2} to a linear sum of its random variables.
+To this end, we provide the following lemma:
+
+\begin{lemma}
+  \label{lm:linprog}
+  Let $y^{*}=\arg\max_{y\in\mathcal{Y}}P(Y^{t}_{n}|\bm{x})$ an \gls{map} problem to solve, and $\rho^{t}_{n}=P(Y^{t}_{n}=1|\bm{x})$ the marginal posterior probability that $Y^{t}_{n}$ contains an object.
+  The latter \gls{map} problem can be rewritten as a linear expression of the binary random variables through:
+
+  \begin{align}
+    y^{*} &= \arg \max_{y\in\mathcal{Y}} \quad \log \prod_{t,n} P(Y^{t}_{n}=y^{t}_{n}|\bm{x})\\
+          &= \arg \max_{y\in\mathcal{Y}} \sum_{t,n} \log P(Y^{t}_{n}=y^{t}_{n}|\bm{x}) \\
+    &= \arg \max_{y\in\mathcal{Y}} \sum_{t,n} (1-y^{t}_{n})\log P(Y^{t}_{n}=0|\bm{x}) + y^{t}_{n}\log P(Y^{t}_{n}=1|\bm{x}) \label{eq:lmbinary}\\
+    &= \arg \max_{y\in\mathcal{Y}} \sum_{t,n} y^{t}_{n}\log \frac{P(Y^{t}_{n}=1|\bm{x})}{P(Y^{t}_{n}=0|\bm{x})} \label{eq:lmignore}\\
+    &= \arg \max_{y\in\mathcal{Y}} \sum_{t,n} y^{t}_{n}\log \frac{\rho^{t}_{n}}{1-\rho^{t}_{n}}
+  \end{align}
+
+Where Eq. \ref{eq:lmbinary} is true because of the binarity of the random variables, and Eq. \ref{eq:lmignore} is obtained by ignoring a term independent on $\bm{y}$.
+\end{lemma}
+
+\subsection{Linear Programming Formulation}
+Our original \gls{map} problem of Eq. \ref{eq:map} can now be rewritten as an \gls{ip} thanks to lemma \ref{lm:linprog}.
+In particular, we let our binary random variables $y^{t}_{n}=1$ when the flow variables $f^{t}_{n}=1$, and $0$ otherwise.
+Our \gls{ip} writes:
+
+\begin{subequations}
+\label{eq:bg_int_prog}
+\begin{align}
+\intertext{Maximize}
+&\sum_{t,n} \log{\frac{\rho_n^t}{1-\rho_n^t}}f_n^t + \sum_{t,m} \log{\frac{\alpha_{m,n}^{t}}{1-\alpha_{m,n}^{t}}}\sum_{t,n}f_{m,n}^{t} + \sum_{t,n} \log{\frac{\beta_n^t}{1-\beta_n^t}}f_{\mathcal{E}_t,n}^{t},\label{eq:bg_loglikelihood}\\
+\intertext{subject to,}
+&f_{m,n}^{t} \geq 0, \qquad \forall t,m,n \label{eq:nonneg_flow}\\
+&\sum\limits_{n}f_{m,n}^{t} \leq 1, \qquad \forall t,m,n \label{eq:bg_cap1_trans}\\
+&\sum_m f_{m,n}^{t} - \sum_p f^{t-1}_{p,m} \leq 0, \qquad \forall t,m,n,p \label{eq:bg_conserv1}\\
+&\sum_{m,t} f^t_{\mathcal{E}_t,m} - \sum_p f_{p,\mathcal{X}} \leq 0, \qquad \forall t,m\label{eq:bg_conserv2}
+\end{align}
+\end{subequations}
+
+As mentioned in \cite{berclaz11}, the above \gls{ip} is NP-complete, which prohibits the use of off-the-shelf \gls{lp} solvers.
+To circumvent that, authors suggest to relax the \gls{ip} into an \gls{lp}.
+In particular, the problem of Eq. \ref{eq:bg_int_prog} is converted to its \textit{canonical form}, by aggregating Eq. \ref{eq:bg_cap1_trans}, \ref{eq:bg_conserv1}, and \ref{eq:bg_conserv2} into a constraint matrix $C$ such that
+
+\begin{equation}
+  C \cdot \bm{f} \leq [1, \ldots, 1, 0, \ldots, 0]^{T}
+\end{equation}
+Thanks to the  \textit{total unimodularity} of the constraint matrix, the \gls{lp} converges to integer solutions.
+We kindly redirect the reader to the proof given in \cite{berclaz11}.
+
+\section{Bayesian Parameter Estimation}
 
 %%% Local Variables:
 %%% mode: latex
