@@ -117,7 +117,11 @@ These two models allow to define likelihoods of selecting a superpixel given the
 Using the network flow paradigm, we then build a graph that connects superpixels according to spatio-temporal relations.
 This chapter covers the content of our first journal article \cite{lejeune18}.
 
-\textbf{Chapter 7} continues on the same line as the previous chapter by improving on the foreground prediction model.
+\textbf{Chapter 7} investigates on using a self-supervised clustering method to improve on the feature learning component used in the two previous chapters.
+In particular, we speculate that our sequences contain
+% TODO: continue this
+
+\textbf{Chapter 8} continues on the same line as the previous chapter by improving on the foreground prediction model.
 Instead of using two components, where the first generates deep features, while the second estimates foreground probabilities, we aim at combining the two in an end-to-end fashion.
 We leverage a loss function applicable to the \gls{pu} scenario, where the foreground probabilities are inferred by a deep network configured as a predictor.
 As the latter loss function requires accurate class priors to render its full potential, we further devise a strategy to estimate the latter in a self-supervised manner.

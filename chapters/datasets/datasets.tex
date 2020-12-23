@@ -32,13 +32,13 @@ As the sequence unfolds, the annotator is asked to point at the object of intere
 In contrast with the traditional approach, where the object must be manually segmented on each frame individually, the proposed protocol drastically reduces the annotation time.
 In essence, our contribution ambitions an annotation time equal to the duration of the video/volume playback.
 For example, assuming the sequence contains $100$ frames playing at $5fps$, the total annotation time is $20$ seconds.
-In comparison, the traditional pixel-wise annotation task of a sequence of similar size could take anywhere from $10$ min. to $1$ hour.
+In comparison, the traditional pixel-wise annotation task of a sequence of similar size could take anywhere from $10$ min. to $1$ hour, depending on the image modality and nature of object.
 
 Concretely, we set the following requirements on the annotation protocol:
 \begin{itemize}
-  \item The annotator does not need to manually change the frame being annotated, e.g. by hitting a forward or backward key. The sequence automatically unfolds according to a specified frame-rate.
+  \item The annotator does not need to manually change the frame being annotated, e.g. by hitting a forward or backward key. The sequence automatically unfolds according to a pre-specified frame-rate.
   \item The annotator handles a single pointing device, which he/she uses to indicate the location of the object of interest.
-  \item The annotator must be able to watch and annotate the sequence in a single go, i.e. he/she does not need to review annotations and modify them manually afterwards.
+  \item The annotator must be to annotate the sequence in a single go, i.e. he/she does not need to review annotations and modify them manually afterwards.
 \end{itemize}
 
 The segmentation method must be functional in a variety of situations, namely produce acceptable accuracy for:
