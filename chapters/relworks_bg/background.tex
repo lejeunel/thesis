@@ -470,7 +470,8 @@ We now give an overview of the \gls{ukf}, which attempts to amend the flaws of \
 This approach departs from \gls{ekf} in that, the non-linear functions are applied to these transformed points directly.
 
 In particular, let $\bm{x}$ a \gls{grv} of dimension $L$ with mean $\bm{\bar x}$ and covariance $P_{x} \in \mathbb{R}^{L \cdot L}$.
-Next, let $\bm{\mathcal{X}}$ a matrix whose rows contain $2L+1$ sigma-vectors $\bm{\mathcal{X}}_{i}$, and $\mathcal{Y} = g(\mathcal{X})$ its transformation trough an arbitrary function $g$.
+The goal is to find a set of $2L$ from the rows or columns of the matrices $\pm \sqrt{L P_{x}}$ with zero mean and sample covariance $P$, and apply a translation of each point to get a mean of $\bm{\bar x}$.
+We let $\bm{\mathcal{X}}$ a matrix whose rows contain $2L+1$ sigma-vectors $\bm{\mathcal{X}}_{i}$, and $\mathcal{Y} = g(\mathcal{X})$ its transformation trough an arbitrary function $g$.
 The procedure is \cite{wan00}:
 \begin{enumerate}
   \item Compute sigma-points $\mathcal{X}$ and corresponding weight matrix $W$ as:
@@ -506,8 +507,8 @@ Finally, we obtain the statistics of the output through the following approximat
 Fig. \ref{fig:ukf} illustrates three strategies where a \gls{pdf} is propagated through a non-linear function, where the first samples arbitrary points, the second performs a linearization of the function as in \gls{ekf}, and the third follows the above \gls{ut} strategy.
 
 The full procedure for \gls{ukf} is identical to the original \gls{kf}, i.e. performs
-a prediction step (as in Eq. \cref{eq:bg_apriori_estim,eq:bg_apriori_cov}), and
-a correction step (as in Eq. \cref{eq:bg_innov,eq:bg_innov_cov,eq:bg_kf_gain,eq:bg_aposteriori_state_estim,eq:bg_aposteriori_cov_estim}) by applying the above sigma-points sampling and propagation step.
+a prediction step (as in \cref{eq:bg_apriori_estim,eq:bg_apriori_cov}), and
+a correction step (as in \cref{eq:bg_innov,eq:bg_innov_cov,eq:bg_kf_gain,eq:bg_aposteriori_state_estim,eq:bg_aposteriori_cov_estim}) by applying the above sigma-points sampling and propagation step.
 
 %%% Local Variables:
 %%% mode: latex

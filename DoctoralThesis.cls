@@ -215,6 +215,7 @@
 \DeclareDocumentCommand{\author}{m}{\newcommand{\authorname}{#1}\renewcommand{\@author}{#1}}
 \NewDocumentCommand{\supervisor}{m}{\newcommand{\supname}{#1}}
 \NewDocumentCommand{\coadvisor}{m}{\newcommand{\examname}{#1}}
+\NewDocumentCommand{\mentor}{m}{\newcommand{\mentorname}{#1}}
 \NewDocumentCommand{\degree}{m}{\newcommand{\degreename}{#1}}
 \NewDocumentCommand{\addresses}{m}{\newcommand{\addressname}{#1}}
 \NewDocumentCommand{\university}{m}{\newcommand{\univname}{#1}}
@@ -357,8 +358,8 @@
 }{%
 	\DeclareDocumentEnvironment{abstract}{ O{\null\vfill} }{
 		\checktoopen
-		\tttypeout{\abstractname}
-		#1%added to be able to have abstract more than one page long
+		% \tttypeout{\abstractname}
+		% #1%added to be able to have abstract more than one page long
 		\thispagestyle{plain}
 		\begin{center}
 			{\normalsize \MakeUppercase{\univname} \par}% University name in capitals

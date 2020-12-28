@@ -596,26 +596,8 @@ Weights are initialized with the Glorot method \cite{glorot10}.
 
 The batch size depends on the GPU memory, the model architecture, and the input size.
 % We trained our models on a \textit{GeForce GTX 1080 Ti}, with 11GB memory.
-The model architectures are all similar in size except for the \textit{U-Net Motion Pred LSTM}, which contains another recurrent part.
-The datasets also have similar resolution except for \textit{Cochlea A + B}.
-Tab. \ref{tab:batch_size} gives the batch sizes.
+In terms of number of parameters, our models are all roughly equal, except for the \textit{U-Net Motion Pred LSTM} which contains a recurrent part.
 \vspace{30pt}
-
-\begin{table}[htbp]
-   \centering
-   \caption[Mini-batch size]{Mini-batch size used for training U-Net based methods.}
-   \begin{tabular}{|c||c|c|}
-      \hline
-      \diagbox{Dataset}{Method} & \textbf{U-Net Motion Pred LSTM} & \textbf{All others} \\
-      \hline
-      \hline
-      \Gape[2pt][2pt]{\textbf{\makecell[c]{Cochlea\\ A + B}}} & 4 & 16 \\
-      \hline
-      \Gape[11pt][11pt]{\textbf{All others}} & 1 & 4 \\
-      \hline
-   \end{tabular}
-   \label{tab:batch_size}
-\end{table}
 
 \clearpage
 \subsubsection{Data Augmentation} \label{results_data_gen}

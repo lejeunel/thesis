@@ -11,60 +11,92 @@ Similarly, surgical instruments can be segmented automatically and accurately in
 
 Before diving into the underlying intricacies of these systems, we
 first wish to give the reader some insights on the genesis of \gls{ai}.
-In particular, we describe the two main paradigms that underlie common automated systems, namely the descriptive and predictive analysis paradigms.
+In particular, we describe the two main paradigms that underlie common automated systems, namely the conventional programming and machine learning paradigms.
 In a second section, we explain why one needs large amounts of annotated data to make modern \gls{ai} solutions practical, and how the medical imaging field, in particular, is hindered by this requirement.
 Next, we emphasize how the present thesis aims at solving this issue.
 Last, we give an overview of the organization of the present thesis.
 
-\section{Descriptive VS. predictive analysis}
+\section{Conventional Programming VS. Machine Learning}
 \Gls{ml}, a term that denote a sub-category of \gls{ai}, is grounded on the ``learning by example'' paradigm.
-Whereas traditional approaches generally consisted in explicitly formalizing and implementing complex tasks as a combination of simpler programmatic instructions,
+Whereas the conventional programming paradigm consists in explicitly formalizing and implementing complex tasks as a combination of simpler programmatic instructions,
 \gls{ml} rather considers that a flexible system can learn such instructions automatically through repeated experiences.
 While both paradigms are in practice complementary, the general trend in many research domains such as computer vision, medical image analysis, computer-assisted intervention in medical applications, shows an increasing shift toward the predictive paradigm, on which \gls{ml} approaches are based.
-% Computer vision tasks such as image segmentation and classification were in the early days addressed according to the descriptive analysis paradigm.
-% More recently, \gls{ml} approaches, which relie on the predictive analysis paradigm have largely supplanted the latter \cite{omahony19}.
 We wish to give the reader some insights on the main differences between these two paradigms.
-We first give some generalities, and show, through a concrete example, how the predictive approaches can overcome the limitations of descriptive approaches.
+We first give some generalities, and show, through a concrete example, how the \gls{ml} paradigm can overcome the limitations of conventional programming.
 
-The descriptive approach consists in devising a mathematical model that describes the phenomenon we wish to observe.
-This requires to collect a representative dataset of the phenomenon, and identify patterns (or features) that are relevant to the task at hand.
-Next, a system is conceived that applies a set of rules to these features, in such a way as to produce the expected outcome.
-In practice, finding such set of rules is tedious and error-prone, as the engineer is at risk of missing or misspecifying some important aspects of the phenomenon.
-The predictive analysis approach rather considers that the latter component can be obtained by letting a flexible system discover these rules by means of a training procedure.
-In particular, predictive analysis considers a model that includes parameterized mathematical operations. The training tasks consists in optimizing these parameters by minimizing an error, taken as a discrepancy measure between the system's output and the expected output.
+The term \gls{ml} can be dated back to 1959, where it appears in the seminal work of Arthur Samuel: \textit{Some studies in machine learning using the game of checkers} \cite{samuel59}.
+The author defines \gls{ml} as \texit{a field of study that gives computers the ability to learn without being explictly programmed}.
+The pretext goal of the latter work is to produce a computer program that can play the game of checkers with reasonable skill, i.e. be a challenging opponent to a human player, while overcoming the limitations of the conventional programming paradigm.
 
-To better illustrate the differences between the two approaches, let us examine a concrete scenario in which we are interested in elaboring a system that takes as input an image, and must provide at the output an answer to the question ``Does this image contain a car?''.
-As a first step, we compute distinctive visual features, assumed to be relevant cues for the task at hand, e.g. large, square-shaped, and homogeneous blobs (assumed to reflect the body of the car), and circular and dark-colored regions (assumed to reflect the wheels).
-Both components are characterized by their size, orientation, and location.
-A naive approach grounded on the descriptive analysis paradigm, would apply a serie of logical operations such as: (1) Are the wheels located below the body? (2) Are the wheels located at both ends of the body? (3) Is the average size of the wheels inferior to the size of the body?
-While these rules seem sensible, they might not cover a number of scenarios, for example: The wheels might be hidden by some objects lying on the scene.
+First, the author emphasizes that this game, however simple it may seem when compared to chess, allows a very large number of possible different games: around $10^{40}$.
 
-The predictive analysis approach would typically consider a flexible system that defines a number of logical and arithmetic operations between any combination of features.
-This system, by being fed a large number of training patterns, i.e. an image with its corresponding correct answer, must discover which logical operation must be applied to which features, which feature to combine, which arithmetic operation to apply, etc..
-The task then resolves to inferring by trial-and-error a combination of operations that would best separate the two sets of images.
-This is called the ``learning by example'' paradigm.
+Before delving into the \gls{ml} approach, let us first describe how a typical conventional approach would work, so as to emphasize the inherent challenges that it would have to overcome.
+First, as the number of situations, i.e. the possible configurations of the checker-board, is very large, the programmer would first need to gather and analyze a representative set of possible checker-board configurations, and devise a fixed set of logical rules so as to determine, in each situation, the move that would guarantee a win.
+In particular, a skilled player, which the machine must mimic, combines different intermediate goals so as to reach the final goal of winning the game, e.g. capturing many opponent's pieces without losing one's own pieces, and improving the overall positioning of pieces.
+Furthermore, assuming the above sub-goals can be programmatically combined in a coherent and flexible manner, each one of them would require a logical reasoning that would span several turns, both backward and forward.
+In this particular example of the game of checkers, one sees that devising such set of rules is tedious and error-prone, as the programmer is at risk of missing or misspecifying important combinations.
 
-\section{On the importance of large quantities of annotated data}
-\Gls{ml} methods, as the name implies, are built on the ``learning by example'' paradigm.
-In their most primitive form, \gls{ml} methods considered feature extraction as a preliminary ad-hoc step, while the design and training of the late-stage predictive model formed another step.
-Engineers had to choose for the task at hand which features to choose, which was a tedious and cumbersome task.
+A typical \gls{ml} approach would rather consider a flexible model that includes a large and redundant set of parameters, which need to be combined through mathematical operations to output an optimal decision.
+Furthermore, such model is designed to integrate elementary knowledge related to the rules of the game.
+Importantly, the programmer does not specify in advance, as was the case in the conventional programming paradigm, which operations need to be applied to which parameter, and what importance (also called weights) to give to each one of them.
+The key component of the \gls{ml} approach is then to devise a training procedure, which consists in optimizing these parameters by minimizing an error, taken as a discrepancy measure between the system's output and the desired output.
+
+In particular, the model is be given, throughout the training procedure, inputs that consist in a numerical representation of the checker-board, possibly with a history of previous checker-board configuration.
+At the beginning of the training procedure, the model is totally ignorant of the complex decision making process, and will typically produce a poor move.
+The \textit{goodness} of this move will be assessed using a reference move that has been generated by an expert checker player.
+Concretely, the programmer must define a quantitative measure of goodness, usually called \textit{error}.
+Next, an update scheme allows to update the numerous parameters of the model so as to minimize the error.
+Simply put, if the error is large, we would like to encourage the model to produce a drastically different move when facing a similar checker-board configuration.
+Conversely, when the move is adequate to the expected move, the model must give a high priority to the latter decision.
+Intuitively, one sees that a single experience of this kind does not allow to fully explore the strategic depth of the game.
+One therefore needs to generate a large number of such experiences so as to make the model capable of competing against creative and competent human opponents.
+The above paradigm, which stands at the root of \gls{ml} is called ``learning by example'', and conveys the idea that machines are able to learn to perform complex tasks \textit{without being explictly programmed to do so}, through repeated experiences.
+
+In practice, however, conventional and \gls{ml} paradigms are often used complementarily.
+For example, in the present scenario, an early-stage instance could allow to select among different game strategies selected by a pre-defined algorithm, e.g. ``aggressively give-away pieces'', ``play conservative'', and let the trained module select which move to perform whithin it.
+
+We now wish to emphasize the fact that \gls{ml} approaches, which in principle allows to solve more and more complex tasks, comes with its own limitations, namely that the considered model must be able to explore an increasingly large amount of situations, while its decisions must be compared to reference outputs.
+In the \gls{ml} terminology, we call such input data coupled with its reference output a \textit{training sample}.
+In practice, producing these reference outputs (called \textit{annotations} or \textit{labels}) often requires human interventions, in which human experts
+are shown a serie of inputs, and must provide the ``optimal'' output.
+
+From these considerations, we pull out the following rule-of-thumb.
+
+\textbf{\textit{As the complexity of the task increases, \gls{ml}-based solutions require an increasing amount of annotated training samples to be effective.}}
+
+We now elaborate on the fact that the latter requirement constitutes a bottleneck in the deployment of modern \gls{ml} methods, as many fields of applications, and in particular medical imaging applications, require intensive contributions of medical experts.
+
+\section{On the growing importance of large quantities of annotated data}
+In their most primitive form, \gls{ml} methods considered that the model to train takes as input a pre-defined numerical representation of the ``situations'', which we now call \textit{features}.
+In the above checkers example, the board-position was represented as a set of numbers corresponding to the position on the checkboard and the occupancy of that position.
+
+Extracting such set of features was originally a preliminary ad-hoc step, while the design and training of the late-stage \gls{ml} model formed another step.
+Engineers had to devise for the task at hand a feature extraction method, in such a way that this encoding embodies a wide spectrum of situations in a dense and sufficiently rich form.
+The latter task was in itself tedious and cumbersome, as it presupposes that the engineer understands the full range of characteristics of these situations, which characteristics are relevant, and how to quantify them.
+
 More recently, thanks to the technical progress in computing hardware, \gls{dl}, a class of models that elaborate on \gls{nn}, allowed to overcome this limitation.
-In essence, \gls{dl} models allow one to optimize both the feature extraction and predictive instances in a joint manner, i.e. through the optimization of a single objective.
-This has brought spectacular improvements in performance over traditional methods, making \gls{dl} the de-facto standard in most \gls{ml} fields.
-As will be further developped in a next chapter, \gls{dl} models are composed of a concatenation of layers that each perform simple mathematical operations, such as matrix multiplication or convolutions.
-The power, flexibility, and hence impressive performance boost of \gls{dl} models, namely comes from the fact that stacking many layers allows to produce rich and abstract features, while the predictive instance can model complex relations.
+In essence, \gls{dl} models allow one to train both the feature extraction instance and the predictive instance in a joint manner, i.e. through the optimization of both instances through an update scheme devised from a single objective.
+This has brought spectacular improvements in performance over traditional methods, making \gls{dl} the de-facto standard in many fields of application, e.g. classification and segmentation of images.
+As will be further developed in a next chapter, \gls{dl} models are composed of a concatenation of layers that each perform simple mathematical operations, such as matrix multiplication or convolutions.
+The power, flexibility, and hence impressive performance boost of \gls{dl} models, namely comes from the fact that stacking many layers allows to produce rich and abstract features, while the same principle allows the predictive instance to model complex interactions between the components of features.
 
 As showcase application, let us mention the ImageNet Large Scale Visual Recognition Challenge \cite{ILSVRC15}, which consists in classifying natural images into semantic categories such as ``balloon'', ``dog'', etc..
+The inputs are taken as the images themselves, i.e. a grid of numbers, each representing a pixel that encodes a single value for each color channel.
 The training dataset contains $150'000$ images, classified into $1000$ categories.
-As of today, the state-of-the-art performance uses a \gls{dl} model, in particular a Deep Convolutional Neural Network, which classifies unseen images with an accuracy of $88.6\%$ \cite{tan19}, a performance on par with human capacities.
-The model, however, has over $70$ million parameters.
-In this scenario, the images has been annotated by many individuals in parallel.
+As of today, state-of-the-art solution leverage \gls{dl}-based models.
+In particular, Deep Convolutional Neural Network can classify unseen images with an accuracy of $88.6\%$ \cite{tan19}, a performance on par, if not superior, with human skills.
+The full model contains a feature extraction module, which extracts salient characteristics of the image such as texture, colors, and shapes.
+At its output lies a classification module, which is responsible to combine these features through cascaded mathematical operations.
+In order to get and idea of the complexity of the task, think about recognizing a dog in an image taken at random from the internet, and try to evaluate the huge variety of situations in which such object can appear, e.g. field of view of the photographer, position of the dog, lightning condition, breed of the dog, clutter in the background.
+Next, multiply this already daunting task to a thousand kind of objects, and you will easily understand why the latter state-of-the-art model accounts for over $70$ million parameters.
+In this scenario where natural images must be classified, the tedious task of annotating training images has been performed by many individuals in parallel, an approach called \textit{crowd-sourcing}.
 
-Another example scenario where the above strategy is less practical, is the Brain Tumor Segmentation (BraTS) Challenge \cite{menze15}, which consists in segmenting brain tumors from \gls{mri} scans.
-State-of-the-art \gls{dl} models typically account for $\sim 50$ million parameters \cite{chen19}, which are trained using $450$ scans, each containing $\sim 70$ slices (see Fig. \ref{fig:brats}).
-A first requirement is that each slice has to be annotated several times to account for disagreements between medical experts.
-Second, the tumor are often composed of several distinct regions, e.g. necrotic and non-enhancing tumor, peritumoral edema, and enhancing tumor \cite{akil20}.
+Another example, closer in nature to the present thesis, is the Brain Tumor Segmentation (BraTS) Challenge \cite{menze15}, which consists in segmenting brain tumors from \gls{mri} scans, where the model needs to output for each pixel of a given slice a prediction that will help a clinician in his/her diagnosis.
+State-of-the-art \gls{dl} models typically account for $\sim 50$ million parameters \cite{chen19}, which are trained using $450$ annotated scans, each containing $\sim 70$ slices (see Fig. \ref{fig:brats}).
+A first requirement for the training of such model, is that each pixel of each slice has to be annotated several times to account for disagreements between medical experts.
+Second, tumors are often composed of several distinct regions, e.g. necrotic and non-enhancing tumor, peritumoral edema, and enhancing tumor \cite{akil20}.
 All in all, annotating a full MRI scan is estimated to take between 3 and 5 hours of work \cite{kaus01}.
+
 
 \begin{figure}[!htpb]
   \includegraphics[width=0.99\textwidth]{brats.png}
@@ -72,17 +104,38 @@ All in all, annotating a full MRI scan is estimated to take between 3 and 5 hour
   \label{fig:brats}
 \end{figure}
 
+As a last example, let us mention the Robotic Instrument Segmentation Challenge \cite{allan19}, where a variety of surgical instruments, part of a minimally invasive surgical robot, must be detected.
+In particular, the provided set consists of $10$ videos, each containing around $300$ frames.
+Also, each frame can contain several instruments, while each instrument contains several parts that must be annotated separately.
+An example of the provided images and annotations is shown in Fig. \ref{fig:intro_endovis}.
+The annotation time is estimated to $1$ minute per image per instrument.
+
+\begin{figure}[t!]
+    \centering
+    \begin{subfigure}[b]{0.5\textwidth}
+        \centering
+        \includegraphics[height=3cm]{endovis_trainset}
+        \caption{Examples frames from the training set.}
+    \end{subfigure}%
+    \begin{subfigure}[b]{0.5\textwidth}
+        \centering
+        \includegraphics[height=3.5cm]{endovis_gt}
+        \caption{Examples of pixel-wise semantic labels on different instruments}
+    \end{subfigure}
+    \caption{Examples from the EndoVision surgical instrument segmentation challenge. Taken from \cite{allan19}.}
+    \label{fig:intro_endovis}
+\end{figure}
 
 \section{Problem definition and thesis statement}
 
-Applying state-of-the-art \gls{dl} methods to segmentation of medical images poses important practical difficulties.
-In particular, the task requires a specific medical expertise.
-Second, assuming such experts are available and willing to participate to this task, their daily obligations impose a limited time budget.
-These two factors largely explain why the field of medical imaging does not benefit from the latest \gls{dl} technologies used in more generic applications \cite{orting19}.
-Indeed, the general rule of thumb is: More powerful and flexible model require more training examples.
+Comparing the above scenarios, we emphasize that applying state-of-the-art \gls{dl} methods to the segmentation of medical images poses additional practical difficulties with respect.
+In particular, the annotation task requires a medical expertise.
+Second, assuming such experts are available and willing to participate to this task, their daily obligations usually imposes a limited time budget.
+Third, the task itself is considered tedious and repetitive.
+These three factors alone largely explain why the field of medical imaging tends to not benefit from the latest \gls{dl} technologies used in more generic applications \cite{orting19}.
 
 \textbf{Problem definition}
-The present thesis therefore endeavours to address the bottleneck of scarcity of annotated medical images by proposing a fast and intuitive annotation that allows to generate accurate segmentation of objects of interest on a wide variety of medical imaging modalities.
+The present thesis addresses the bottleneck of scarcity of annotated medical images by proposing a fast and intuitive annotation protocol, along with appropriate segmentation methods that allow to generate accurate segmentation of objects of interest on a wide variety of medical imaging modalities.
 
 \textbf{Thesis statement}
 Generating pixel-wise annotations of medical sequences over a wide range of modalities is greatly facilitated by means of a novel fast and intuitive protocol that relie on sparse point-wise cues, aided by a segmentation framework that relies on \gls{dl} and multi-object tracking.
@@ -117,9 +170,8 @@ These two models allow to define likelihoods of selecting a superpixel given the
 Using the network flow paradigm, we then build a graph that connects superpixels according to spatio-temporal relations.
 This chapter covers the content of our first journal article \cite{lejeune18}.
 
-\textbf{Chapter 7} investigates on using a self-supervised clustering method to improve on the feature learning component used in the two previous chapters.
-In particular, we speculate that our sequences contain
-% TODO: continue this and make it look interesting
+\textbf{Chapter 7} investigates on using a self-supervised clustering method to improve on the feature learning component used in the previous chapter.
+Even though this approach did not show substantial improvements in performance, we choose to mention it here as a negative result.
 
 \textbf{Chapter 8} continues on the same line as the previous chapter by improving on the foreground prediction model.
 Instead of using two components, where the first generates deep features, while the second estimates foreground probabilities, we aim at combining the two in an end-to-end fashion.

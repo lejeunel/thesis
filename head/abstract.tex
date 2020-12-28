@@ -1,7 +1,33 @@
 \begin{abstract}
 \addchaptertocentry{\abstractname} % Add the abstract to the table of contents
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam bibendum, mi non lacinia aliquet, orci nisi commodo ex, ac malesuada nunc libero eget metus. Proin vel enim risus. Nullam lobortis posuere sodales. Quisque ac placerat sapien. Praesent in pulvinar dolor. Pellentesque faucibus quam at dui consectetur scelerisque. Donec laoreet pharetra neque, id cursus metus venenatis eu. Quisque tempor molestie velit, ac euismod ligula ullamcorper a. Aliquam lacus ligula, ultrices id vehicula et, hendrerit non turpis. Phasellus molestie erat quis sem iaculis, sed posuere metus tempus. Nullam suscipit lorem et accumsan convallis. Cras eleifend mauris ultrices nunc hendrerit condimentum. 
-\\
-\textbf{Keywords --} \keywordnames
-\\ ~ \\ ~ \\ ~ \\
+State-of-the-art supervised Machine Learning methods, and in particular the ones grounded on Deep Learning, have already shown their superiority over traditional methods on a variety of tasks, namely classification and segmentation of images.
+However, this performance boost comes at a price: As the flexibility of the models increase, machine learning practitioner need an increasing amount of annotated training examples to fully exploit that potential.
+In particular, the present thesis considers the semantic segmentation of medical images, where a model must associate each pixel of an image to a meaningful category.
+This application has, to this day, been hindered by the fact that generating large amounts of annotated images is unpractical, due to the limited time-budget that medical experts can dedicate to the tedious task of producing pixel-wise annotations.
+
+\medskip
+
+The present thesis provides contributions to the latter bottleneck.
+In particular, we devise a fast and intuitive annotation protocol, where a video or volume plays on a screen automatically.
+The annotator must provide, using a pointing device, 2D locations that indicate the position of an object of interest.
+
+\medskip
+Next, we propose a number of segmentation methods that allow to infer, from this very limited set of annotations, pixel-wise segmentation masks of the object on the whole sequence.
+By explicitly leveraging spatio-temporal relations between over-segmented regions, our first contribution formulates the segmentation problem as a maximum a posteriori problem.
+The latter is then cast into the network flow paradigm, where paths are produced that connect regions accross the whole sequence so as to minimize a global cost.
+The costs assigned to allowed trajectories are namely given by a foreground model which, grounded on a bagging of decision trees algorithm, is trained in a transductive manner using the provided positive regions, where positive regions are assigned features computed using a deep network configured as an autoencoder.
+
+\medskip
+Our next contribution improves on the latter foreground model by leveraging a risk estimator applicable to Positive/Unlabeled scenarios.
+This allows to perform foreground prediction in an end-to-end fashion using a deep convolutional neural network.
+Furthermore, as this risk estimator requires accurate class-priors to perform well, we devise a self-supervised
+strategy to infer the latter from data using a recursive bayesian filtering approach.
+
+
 \end{abstract}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:
