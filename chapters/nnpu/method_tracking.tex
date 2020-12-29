@@ -11,11 +11,10 @@ Let \(\mathcal{P}=\{x_i\}_{i=1}^{|\mathcal{P}|}\) as a path formed by temporally
 The segmentation task reduces to finding an optimal set of paths \(\bm{\mathcal{P}}^*=\{ \mathcal{P}_k\}_{k=1}^K\) so as to minimize a cost.
 As further developped in \cite{lejeune18}, the latter problem is first formulated as a maximum a posteriori problem and converted to the integer program:
 
-\begin{multline}
+\begin{equation}
 \label{eq:lin_prog}
-\bm{\mathcal{P}}^* = \operatorname*{argmin}_{\bm{\mathcal{P}}} \sum_i C_{fg}(i) f_{visit}(i) + \\ \sum_{i,j} C_{trans}(i,j)f_{trans}(i,j) + \sum_{i} C_{in} f_{in}(i)
-\label{eq:lin_prog}
-\end{multline}
+\bm{\mathcal{P}}^* = \operatorname*{argmin}_{\bm{\mathcal{P}}} \sum_i C_{fg}(i) f_{visit}(i) + \sum_{i,j} C_{trans}(i,j)f_{trans}(i,j) + \sum_{i} C_{in} f_{in}(i)
+\end{equation}
 
 Considered as a network flow problem, the latter integer program is further restricted to edge capacity constraints and flow conservation at the nodes inputs and outputs.
 

@@ -1,0 +1,134 @@
+%% start of file `template.tex'.
+%% Copyright 2006-2012 Xavier Danaux (xdanaux@gmail.com).
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License version 1.3c,
+% available at http://www.latex-project.org/lppl/.
+
+
+\documentclass[11pt,a4paper,sans]{moderncv}   % possible options include font size ('10pt', '11pt' and '12pt'), paper size ('a4paper', 'letterpaper', 'a5paper', 'legalpaper', 'executivepaper' and 'landscape') and font family ('sans' and 'roman')
+
+% moderncv themes
+\moderncvstyle{casual}                        % style options are 'casual' (default), 'classic', 'oldstyle' and 'banking'
+\moderncvcolor{blue}                          % color options 'blue' (default), 'orange', 'green', 'red', 'purple', 'grey' and 'black'
+%\renewcommand{\familydefault}{\sfdefault}    % to set the default font; use '\sfdefault' for the default sans serif font, '\rmdefault' for the default roman one, or any tex font name
+%\nopagenumbers{}                             % uncomment to suppress automatic page numbering for CVs longer than one page
+
+% character encoding
+%\usepackage[utf8]{inputenc}                  % if you are not using xelatex ou lualatex, replace by the encoding you are using
+%\usepackage{CJKutf8}                         % if you need to use CJK to typeset your resume in Chinese, Japanese or Korean
+
+% adjust the page margins
+\usepackage[scale=0.75]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{fontawesome}
+
+%\usepackage{floatrow}
+%\setlength{\hintscolumnwidth}{3cm}           % if you want to change the width of the column with the dates
+%\setlength{\makecvtitlenamewidth}{10cm}      % for the 'classic' style, if you want to force the width allocated to your name and avoid line breaks. be careful though, the length is normally calculated to avoid any overlap with your personal info; use this at your own typographical risks...
+
+% personal data
+\firstname{Laurent}
+\familyname{Lejeune}
+%\title{Resumé title}                          % optional, remove / comment the line if not wanted
+\address{Sonnhalde, 25}{3063 Ittigen, Switzerland}    % optional, remove / comment the line if not wanted
+\mobile{+41 (78) 910 52 44}                     % optional, remove / comment the line if not wanted
+%\fax{+3~(456)~789~012}                        % optional, remove / comment the line if not wanted
+\email{laurent.lejeune@artorg.unib.ech}                          % optional, remove / comment the line if not wanted
+%\homepage{www.johndoe.com}                    % optional, remove / comment the line if not wanted
+%\extrainfo{additional information}            % optional, remove / comment the line if not wanted
+\extrainfo{Age: 35, Nationality: Belgian}
+%\photo[64pt][0.4pt]{picture}                  % optional, remove / comment the line if not wanted; '64pt' is the height the picture must be resized to, 0.4pt is the thickness of the frame around it (put it to 0pt for no frame) and 'picture' is the name of the picture file
+%\quote{Some quote}                            % optional, remove / comment the line if not wanted
+
+% to show numerical labels in the bibliography (default is to show no labels); only useful if you make citations in your resume
+%\makeatletter
+%\renewcommand*{\bibliographyitemlabel}{\@biblabel{\arabic{enumiv}}}
+%\makeatother
+
+% bibliography with mutiple entries
+%\usepackage{multibib}
+%\newcites{book,misc}{{Books},{Others}}
+%----------------------------------------------------------------------------------
+%            content
+%----------------------------------------------------------------------------------
+\begin{document}
+%\begin{CJK*}{UTF8}{gbsn}                     % to typeset your resume in Chinese using CJK
+%-----       resume       ---------------------------------------------------------
+\makecvtitle
+
+\section{Research position}
+\cventry{2016--current}{PhD candidate}{ARTORG Center, University of Bern}{Bern}{Switzerland}{Segmentation of Medical Sequences using Sparse Point-wise Supervision}
+\cventry{2012-2016}{Research}{Université Libre de Bruxelles, Erasme Hospital}{Brussels}{Belgium}{Modelization of the cardiovascular system in
+3D-ballistocardiography}
+\cvlistitem{Research based on the development and validation of a blood flow model for the evaluation of cardiovascular performances in ballistocardiography}
+\cvlistitem{Lead engineer for the development of an embedded data logger for the acquisition of electrocardiogram and 6DOF ballistocardiogram}
+
+\section{Publications}
+\cvlistitem{\textbf{In preparation} Lejeune L, Sznitman R. A Positive/Unlabeled Approach for the
+Segmentation of Medical Sequences using Point-Wise Supervision. IEEE Trans Med Imaging. 2020}
+\cvlistitem{Lejeune L, Grossrieder J, Sznitman R. Iterative multi-path tracking for video and volume segmentation with sparse point supervision. Medical image analysis. 2018}
+\cvlistitem{Lejeune L, Caiani EG, Prisk GK, Migeotte PF. Evaluation of ensemble averaging methods in 3D ballistocardiography. Conf Proc IEEE Eng Med Biol Soc. 2015}
+\cvlistitem{ Lejeune L, Prisk, G.K, Nonclercq A, Migeotte P-F. MRI-Based Aortic Blood Flow Model in 3D Ballistocardiography.  Conf Proc IEEE Eng Med Biol Soc. 2015 }
+\cvlistitem{Guerquin-Kern M, Lejeune L, Pruessmann KP, Unser M. Realistic analytical phantoms for parallel magnetic resonance imaging. IEEE Trans Med Imaging. 2012 Mar 31}
+
+\section{Education}
+\cventry{2011}{Masters thesis}{University of British Columbia
+(UBC)}{Vancouver}{\textit{Canada}}{}  % arguments 3 to 6 can be left empty
+
+\cvlistitem{Title: Gripping performance evaluation of upper limb prosthetic devices}
+
+\cvlistitem{Description: Development of a physical apparatus and signal processing
+tools for the evaluation of the gripping performances of upper limb
+prosthetics.}
+
+
+\cventry{2010--2011}{Minor in Biomedical Technologies}{Lausanne
+Federal Institute of Technology (EPFL)}{Lausanne}{Switzerland}{}
+
+
+\cvlistitem{Project: Realistic Analytical Phantoms for Parallel Magnetic Resonance Imaging,
+performed in collaboration with Matthieu Guerquin-Kern. Soon to be
+published in IEEE Transactions on Medical Imaging. }
+
+
+\cvlistitem{Courses: Bioinspired artificial intelligence, Biomaterials, Biomedical Signal Processing, Biometrics, Sensors in medical instrumentation, bioMEMS}
+
+\cventry{2009--2010}{Masters in Electrical Engineering}{EPFL}{Lausanne}{Switerland}{Specialization
+in Signal Processing}
+
+\cvlistitem{Semester project: Atrial Fibrillation signals classification using
+entropy measures. }
+
+\cvlistitem{Courses: Advanced Signal Processing, Image Processing, Image Analysis
+and Pattern Recognition, Microwaves, Optical Signal Processing, Architectures
+for Information Processing, Image and Video Processing, Image Communication,
+Media Security, Speech Processing}
+
+\cventry{2006--2009}{Bachelor in Electrical Engineering}{EPFL}{Lausanne}{Switerland}{}
+
+\cvlistitem{Semester project: Linear estimation in parallel MRI.
+- Comparisons of two linear reconstruction methods: Minimum mean squared
+error and maximum a posteriori. }
+
+\section{Publications}
+\cvlistitem{Guerquin-Kern M, Lejeune L, Pruessmann KP, Unser M. Realistic analytical phantoms for parallel magnetic resonance imaging. IEEE Trans Med Imaging. 2012 Mar 31}
+\cvlistitem{Lejeune L, Caiani EG, Prisk GK, Migeotte PF. Evaluation of ensemble averaging methods in 3D ballistocardiography. Conf Proc IEEE Eng Med Biol Soc. 2015}
+\cvlistitem{ Lejeune L, Prisk, G.K, Nonclercq A, Migeotte P-F. MRI-Based Aortic Blood Flow Model in 3D Ballistocardiography.  Conf Proc IEEE Eng Med Biol Soc. 2015 }
+
+
+\section{Technical skills}
+%\cventry{2004--2006}{Special Mathematics Courses}{EPFL}{Lausanne}{Switerland}{}
+\cvlistitem{Embedded electronics: SPI/USART protocols, power-management, hardware design and routing}
+\cvlistitem{Platforms: RaspberryPi, Arduino, STM32 family microcontrollers}
+\cvlistitem{Embedded programming: low-level programming in C/C++. Qt API for graphical user interface, Bluetooth, Android and iOS application development }
+\cvlistitem{Programming: C/C++, JAVA, MATLAB, Python, Linux/Unix shell scripting}
+\cvlistitem{CAD: Altium/Eagle, SolidWorks, 3D-Slicer/Osirix}
+
+\section{Languages}
+\cvlistitem{French: Native}
+\cvlistitem{English: Fluently spoken and scientific/technical writing}
+
+\end{document}
+
+%% end of file `template.tex'.

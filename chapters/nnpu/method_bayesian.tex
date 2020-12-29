@@ -125,19 +125,19 @@ In practice, we want the above conditions to be verified for several iterations 
 We therefore impose that these conditions are verified for $T_{s}$ iterations.
 In particular, we denote $C(\bm{\hat \pi}_{k})$ a boolean function that represents the above conditions, and select the optimal prior $\bm{\hat \pi}^{*}$ as
 
-\begin{multline}
+\begin{equation}
   \label{eq:prior_opt}
   \bm{\hat \pi}^{*} = \bm{\hat \pi}_{k} \quad \text{iff} \quad C(\bm{\hat \pi}_{k}) \wedge
   C(\bm{\hat \pi}_{k+1})
   \wedge \cdots \wedge  C(\bm{\hat \pi}_{k+T_{s}})
-\end{multline}
+\end{equation}
 
 
 \begin{algorithm}[H]
 \caption{Self-supervised class-prior estimation}
 \label{alg:prior_estim}
-\begin{algorithmic}[1]
-\Require{$\hat \pi_{0}$: Upper-bound on class-priors \newline
+\begin{algorithmic}
+\Require{$\hat \pi_{0}$: Upper-bound on class-priors} \newline
   $T$: Number of epochs \newline
   $f_\theta$: Foreground prediction model
 \Ensure {Optimal estimate of class-prior $\bm{\hat{\pi}}^{*}$}
@@ -153,6 +153,7 @@ In particular, we denote $C(\bm{\hat \pi}_{k})$ a boolean function that represen
     \State Clip $\bm{\hat\Pi}_{k+1}^{-}$ to $[0, \hat \pi_{0}]$
     \State Compute a-posteriori state $\bm{\hat\pi}_{k+1}$ using observations $\bm{\rho}_{k}$
     \State $k \gets k+1$
+\EndWhile
 \end{algorithmic}
 \end{algorithm}
 

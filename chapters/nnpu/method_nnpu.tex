@@ -13,11 +13,11 @@ To simply notations we write $f_{\theta}(x) = f_{\theta}(\mathcal{I})\big|_x$ as
 response of $f_{\theta}$ on image $\mathcal{I}$ averaged on the region defined by superpixel $x$.
 
 Given a known class prior for every image $\bm{\pi} = \{\pi^i\}_{i=1}^{N}$, one aims to optimize $\theta$ by minimizing an objective of the form:
-\begin{multline}
+\begin{equation}
   \label{eq:pn}
-R_{pn}=\sum_{i=1}^{N} \left[ \frac{\pi^i}{|\mathcal{X}_p^i|}\sum_{x \in \mathcal{X}_p^i}\ell(f_{\theta}(x),+1) + \\
+R_{pn}=\sum_{i=1}^{N} \left[ \frac{\pi^i}{|\mathcal{X}_p^i|}\sum_{x \in \mathcal{X}_p^i}\ell(f_{\theta}(x),+1) +
 \frac{1-\pi^i}{|\mathcal{X}_n|}\sum_{x \in \mathcal{X}_n^i}\ell(f_{\theta}(x),-1) \right]
-\end{multline}
+\end{equation}
 
 A popular objective is the logistic loss, for which \(\ell(z,+1)=\log(1+ e^{-z})\), \(\ell(z, -1)=\log(1+e^{z})\) are the positive and negative entropy loss terms, respectively.
 When using both the logistic loss and class-priors, the objective of Eq. \ref{eq:pn} is called Balanced Cross-Entropy loss (BBCE).
@@ -34,21 +34,21 @@ The distribution of unlabeled samples can be written:
 \end{equation}
 
 We then express the estimated negative risk as:
-\begin{multline}
+\begin{equation}
   \label{eq:estim_neg_risk}
-   (1-\pi) \mathbb{E}_{X \sim p(x|Y=-1)}\left[\ell(f_\theta(X,-1)) \right] = \\
+   (1-\pi) \mathbb{E}_{X \sim p(x|Y=-1)}\left[\ell(f_\theta(X,-1)) \right] =
     \mathbb{E}_{X \sim p(x)}\left[\ell(f_\theta(X,-1)) \right]
     - \pi \mathbb{E}_{X \sim p(x|Y=+1)}\left[\ell(f_\theta(X,-1)) \right]
-\end{multline}
+\end{equation}
 
 The two bottom terms of Eq. \ref{eq:estim_neg_risk} can be approximated using the available data to give the empirical risk.
 Injecting the latter into Eq. \ref{eq:pn}, one gets the empirical PU risk estimator:
-\begin{multline}
+\begin{equation}
   \label{eq:nnpu}
-R_{pu}=\sum_{i=1}^{N}\Biggl[ \frac{\pi^{i}}{|\mathcal{X}^{i}_{p}|}\sum_{x \in \mathcal{X}^{i}_p}\ell(f_{\theta}(x),+1) + \\
+R_{pu}=\sum_{i=1}^{N}\Biggl[ \frac{\pi^{i}}{|\mathcal{X}^{i}_{p}|}\sum_{x \in \mathcal{X}^{i}_p}\ell(f_{\theta}(x),+1) +
 \Biggl( \frac{1}{|\mathcal{X}^{i}_{u}|}\sum_{x \in \mathcal{X}^{i}_u}\ell(f_{\theta}(x),-1) -
 \frac{\pi^{i}}{|\mathcal{X}^{i}_{p}|}\sum_{x \in \mathcal{X}^{i}_p}\ell(f_{\theta}(x),-1) \Biggr) \Biggr]
-\end{multline}
+\end{equation}
 
 In practice, we aim at minimizing the objective of Eq. \ref{eq:nnpu} using a Convolutional Neural Network by applying stochastic gradient descent on mini-batches of images.
 However, such expressive models tend to overfit to the training data, which tends to make the negative risk, i.e. the bottom term of Eq. \ref{eq:nnpu} go negative.
@@ -57,12 +57,12 @@ To circumvent that, \cite{kiryo17} suggest two solutions.
 Preliminary experiments showed that the second option works best.
 
 In particular, the negative risk writes
-\begin{multline}
+\begin{equation}
   \label{eq:neg_risk}
 R_{i}^{-}=\sum_{i}\Biggl(
- \frac{1}{|\mathcal{X}^{i}_{u}|}\sum_{x \in \mathcal{X}^{i}_u}\ell(f_{\theta}(x),-1) - \\
+ \frac{1}{|\mathcal{X}^{i}_{u}|}\sum_{x \in \mathcal{X}^{i}_u}\ell(f_{\theta}(x),-1) -
 \frac{\pi^{i}}{|\mathcal{X}^{i}_{p}|}\sum_{x \in \mathcal{X}^{i}_p}\ell(f_{\theta}(x),-1) \Biggr)
-\end{multline}
+\end{equation}
 
 When \(R_{i}^{-} < 0\), we do gradient ascent by setting the gradient to \(-\nabla_\theta R_{i}^{-}\).
 When \(R_{i}^{-} \geq 0\), the gradient is set to \(\nabla_\theta R_{pu}\).

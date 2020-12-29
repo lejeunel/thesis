@@ -6,7 +6,7 @@ This section describes the \gls{rf} method, which we will use in the evaluation 
 Most of the following content is taken from \cite{hastie09}.
 
 \gls{rf} is an algorithm that builds up from the idea of bootstrap aggregation (bagging).
-Bagging consists in combining a commitee of weak learners (high variance and low bias estimators).
+Bagging consists in combining a committee of weak learners (high variance and low bias estimators).
 Combining such learners allows to decrease the variance one would get when using a single learner.
 The \gls{rf} algorithm generates a single decision tree per bootstrap sample.
 In the present experimental setup, our task is to predict the class of a given sample (foreground or background).
@@ -69,7 +69,7 @@ It writes:
 \end{equation}
 
 \subsubsection{Convolutional Network}
-Many machine learning applications relie on structured data, i.e. data that respect a grid-like topology.
+Many machine learning applications rely on structured data, i.e. data that respect a grid-like topology.
 Typical examples include time-series and images.
 For this reason, \cite{lecun95} introduced the notion of convolutional network, which adapts the previous MLP to leverage the grid-like topolgy in an effective manner.
 In particular, the author replaces one or several layers of an MLP with convolutional layers.
@@ -193,7 +193,7 @@ For example, using the \gls{mse} criterion, one writes:
 
 \section{Multi-path tracking}
 This section gives a theoretical background to the multi-path tracking problem, as first developed in \cite{berclaz11}.
-The latter framework is leveraged in our first major contribution, where we perform tracking of over-segmented regions accross a sequence, where each region can be part of object of interest.
+The latter framework is leveraged in our first major contribution, where we perform tracking of over-segmented regions across a sequence, where each region can be part of object of interest.
 
 We develop our multi-path tracking framework through the following steps.
 (1) We first represent our sequence as a stack of occupancy grid, where each element of a grid represent an over-segmented region.
@@ -215,7 +215,7 @@ We depart from the work of \cite{berclaz11} on two aspects: (1) In contrast to t
 
 In particular, we generate on each frame, indexed by a time variable $t$, a set of $N_{t}$ non-overlapping over-segmented regions $\mathcal{S}_{t}=\{s_{t}^{n}\}_{n=1}^{N_{t}}$.
 Within the directed graph representation, we represent each over-segmented region $s^{t}_{n}$ by a couple of nodes connected by a \textit{visiting} edge $e^{n}_{t}$.
-As a sidenote, the latter is often refered to as a ``tracklet'' \cite{zhang08}.
+As a side note, the latter is often referred to as a ``tracklet'' \cite{zhang08}.
 So as to allow objects to transit from one frame to the next, we add \textit{transition} edges $e^{(n,m)}_{t}$ that connect region $s^{n}_{t}$ to region $s^{m}_{t+1}$.
 Each edge is labeled with a discrete non-negative flow variable.
 In particular, $f_{t}^{n}$ corresponds to the flow transiting through edge $e_{t}^{n}$, while $f_{t}^{n,m}$ corresponds to the flow passing from region $s_{t}^{n}$ to region $s_{t+1}^{m}$.
@@ -235,7 +235,7 @@ Next, as we assume that each region can contain a maximum of one object. Formall
   \forall t,n \quad f_{t}^{n} \leq 1
 \end{equation}
 
-Note that Eq. \ref{eq:flow_conserv} and \ref{eq:capa_constrain} implictly enforce a maximum flow constraints on transition edges.
+Note that Eq. \ref{eq:flow_conserv} and \ref{eq:capa_constrain} implicitly enforce a maximum flow constraints on transition edges.
 
 At the root of our segmentation framework lies the basic idea that our object to segment is composed of over-segmented regions that are spatially and temporally organized.
 Moreover, we expect that the size of our object of interest changes through time/slice, e.g. a brain tumor on transversal slices appears to grow and shrink again as one scrolls from one end of the scan to the other end.
@@ -352,7 +352,7 @@ where $\bm{x}$ denotes the state variable, $\bm{z}$ denotes the observations,
 $F$ and $H$ are the transition and process models, respectively, while $\bm{v}$ and $\bm{n}$ are the process and transition noise, respectively.
 Fig. \ref{fig:hmm} represents the dynamic system of Eq. \ref{eq:bg_state_trans} and \ref{eq:bg_proc} as a directed graph, where edges represent probabilistic relationships.
 In the recursive bayesian filtering paradigm, we assume that all variables are stochastic.
-Furthermore, the systems follows the Markov assumption, i.e. every variable is conditionally independent of its nondescendents, given its parents \cite{geiger90}.
+Furthermore, the systems follows the Markov assumption, i.e. every variable is conditionally independent of its non-descendants, given its parents \cite{geiger90}.
 Formally,
 
 \begin{align}
@@ -397,7 +397,7 @@ However, many algorithms exists that solve this problems approximately under spe
 
 \subsubsection{Kalman Filter}
 
-Under the more restrictive assumptions that (1) models $F$ and $G$ are linear functions, (2) the initial values of the state variables follow a multivariate normal distribution, and (3) the process and observation noise are additive, zero-mean and normally distributed, the \gls{KF} algorithm provides exact solutions.
+Under the more restrictive assumptions that (1) models $F$ and $G$ are linear functions, (2) the initial values of the state variables follow a multivariate normal distribution, and (3) the process and observation noise are additive, zero-mean and normally distributed, the \gls{kf} algorithm provides exact solutions.
 This comes from the fact that under the above conditions, the a-posteriori pdf \ref{eq:bg_aposteriori} is also normally distributed, and is therefore fully characterized by its first and second moment, i.e. its mean and covariance.
 Under these conditions, the condition \gls{pdf} is fully characterized by its first and second moment, i.e. mean and covariance.
 

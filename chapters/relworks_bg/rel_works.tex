@@ -1,7 +1,7 @@
 \section{Related Works}
 
 Past research that address image and volume segmentation using sparse supervision can be roughly divided in two categories,
-The first category, mainly focuses on computer vision techniques, while the second focuses on developping Machine Learning techniques.
+The first category, mainly focuses on computer vision techniques, while the second focuses on developing Machine Learning techniques.
 In practice, both categories often overlap.
 
 We now give an overview of the state-of-the-art in computer vision.
@@ -71,7 +71,7 @@ A transversal line of research endeavored to combine the traditional graph-cut/\
 The problem is generally formulated as follows: A \gls{dl} predicts the unary potentials, while a late-stage module generates the pairwise potentials and solves the energy objective.
 In \cite{rajchl16}, authors leverage the fully-connected \gls{crf} inference procedure of \cite{krahenbuhl11} to segment lung and brain images from bounding-box annotations using a \gls{cnn}.
 The \gls{cnn} of \cite{rajchl16} predicts the unary and pairwise potentials and minimize the energy function using a parameterized \gls{crf} using a \gls{rnn}, thereby allowing the parameters of the feature extractor and pairwise similarity model to be optimized in end-to-end fashion.
-In \cite{wang18}, authors propose a framework that relie on two steps, where the first generates an initial delineation using a \gls{cnn}, which an annotator can modify manually by drawing scribbles.
+In \cite{wang18}, authors propose a framework that relies on two steps, where the first generates an initial delineation using a \gls{cnn}, which an annotator can modify manually by drawing scribbles.
 Another \gls{cnn} generates refines the initial delineation by leveraging the geodesic distance transform \cite{criminisi08}, which combines the initial delineation and the users input.
 Their pipeline is shown on Fig. \ref{fig:deepigeos}.
 
@@ -86,7 +86,7 @@ Their pipeline is shown on Fig. \ref{fig:deepigeos}.
   \centering
   \includegraphics[width=8cm]{deepigeos.png}
   \caption{Deep Interactive Geodesic framework of \cite{wang18}. P-Net proposes an initial automatic segmentation that is refined by R-Net with user interactions indicating mis-segmentations. CRF-Net(f) is a
-    back-propagatable CRF that uses freeform pairwise potentials.
+    back-propagatable CRF that uses free-form pairwise potentials.
     It is extended to be CRF-Net(fu) that employs user interactions as hard constraints. Taken from \cite{wang18}}
   \label{fig:deepigeos}
 \end{figure}
@@ -113,7 +113,7 @@ As pointed out by \cite{oliver18}, an important and implicit assumption in that 
 The latter can, under specific conditions, boost the performance of an \gls{ml} model trained with labeled dataset only, i.e. in a fully-supervised manner.
 The basic idea is that the ML model may acquire knowledge of the data distribution from the unlabeled set.
 Here again, one assumes that both data domains share similar distributions.
-In \cite{ghafoorian17}, authors show experimentally that a \gls{nn} trained to segment tumors on MRI brain scans acquired in a given MRI protocol, perform poorly when transfered to another protocol, as the shape, intensities, and contrast level are inconsistent.
+In \cite{ghafoorian17}, authors show experimentally that a \gls{nn} trained to segment tumors on MRI brain scans acquired in a given MRI protocol, perform poorly when transferred to another protocol, as the shape, intensities, and contrast level are inconsistent.
 
 \gls{da} addresses the problem of adapting the model so as to take into account domain shift, i.e. the discrepancies between the training and target domain.
 In \cite{perone19}, authors devise a strategy to segment MRI scans of spinal cords using a model trained with images taken at a specific field-of-view, and transfer to another field-of-view in an unsupervised fashion.
