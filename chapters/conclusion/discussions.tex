@@ -1,0 +1,64 @@
+\section{Discussions}
+
+\textbf{Sparse point-wise annotation protocol}
+In our first chapter, we reminded the general burden brought by traditional annotation protocols in the frame of pixel-wise segmentation, which rely on labeling each frame of a sequence pixel by pixel.
+Even though past research have made great efforts to relieve this burden, we emphasized that most approaches are either inappropriate or remain too demanding.
+The protocol proposed in the present thesis consists in giving, on each frame, a maximum of $1$ 2D location that indicates the position of the object of interest.
+We justified the efficiency of the latter protocol by the fact that it does not require manual intervention to switch from one frame to the next, as the sequence plays automatically, and possible at frame-rate.
+Also, the minimal annotation requirement allows the annotator to simply point at the object of interest and leave his/her cursor on it while following the movement of the object.
+
+Next, we showcased a number of software solutions.
+In particular, we implemented an elegent and intuitive annotation software that allows to decode and play a variety of file formats.
+Also, our software supports many features, namely the tuning of the frame-rate and the selection of input methods.
+Our next software solutions is a web-platform that allows users to register an account and upload their point-wise annotations along with their sequence.
+In the backend, a script is then executed that generates pixel-wise segmentations on a dedicated server, and allows the user to download the results.
+
+\textbf{Expected-Exponential Loss}
+As a first contribution to the segmentation task, we devised a method that rely on a novel loss function applicable to the \gls{pu} scenario: The expected-exponential loss.
+In particular, we extend on the traditional exponential loss and devise and weighting method on the unlabeled samples based on label propagation.
+Next, we assign to each region a feature vector by means of a deep network trained for image classification.
+Our loss function is then minimized using the traditional gradient boosting method.
+Also, this first approach takes into account the frame-to-frame dynamics by integrating the optical-flow in the label propagation model.
+We demonstrate experimentally substantial improvement on the state-of-the-art on all image modalities.
+Furthermore, we evaluate our method in a crowd-sourcing context, where each sequence is annotated by several users, and demonstrate its applicability.
+
+\textbf{Deep Feature Learning}
+In our next contribution, we investigated several feature learning methods, a component that plays an important role in the performance of classifiers.
+In particular, we devise an evaluation framework based on a \gls{rf} classifier configured in a \gls{pn} regime, where superpixels of an unseen sequence must be segmented.
+As feature extraction method, we implement three baselines that leverage unsupervised methods.
+We implement the \gls{bovw} method, its later extension \gls{scsp} that leverages spatial coherence.
+Last, we extract features from a \gls{cnn} pre-trained for image classification.
+As proposed methods, we select as core model the U-Net.
+Our first attempt is to configure and train the latter model in an autoencoder fashion.
+We then assign features to superpixel by average-pooling on the bottleneck layers.
+The next approach increments on the latter by modifying the reconstruction loss so as to include a prior on the location of the object using our user-provided 2D locations.
+Our next approaches explore different manners of leveraging the 2D locations, e.g. by directly predicting an objectness-prior at the output, or predicting the location of the object at the next time-step using the image and location at the current time-step.
+Through extensive quantitative studies, we demonstrate that the simple model configured as an autoencoder with location prior added to the loss works best.
+
+\textbf{Iterative multi-path tracking for video and volume segmentation with sparse point supervision}
+This contribution started as an attempt to overcome the limitations of our first contribution, where the spatio-temporal relations of samples were effectively exploited, but only within a limited frame of 2 time-steps.
+In particular, we addressed this issue by formulating a segmentation method based on the network-flow paradigm, where spatio-temporal relations are explicitly modeled.
+Also, this paradigm allows to produce spatially and temporally coherent paths that connect over-segmented regions, while minimizing a global cost.
+We also leveraged the deep feature learning method of the last chapter to train a classifier, taken as a bagging of decision trees, that assigns to each region a probability of being object.
+Next, our network-flow formulation was translated to an integer program, and solved using an efficient shortest-paths algorithm.
+In our experiments, we demonstrate substantial improvements in segmentation accuracies on all image modalities.
+Also, we performed an ablation study that shows the impact of reducing the amount of provided 2D locations.
+
+\textbf{A Positive/Unlabeled Approach for the
+Segmentation of Medical Sequences using
+Point-Wise Supervision}
+Our last contribution continues on the same trajectory as the last ones.
+We first emphasize that the above foreground classifier based on a bagging of decision trees brings several limitations.
+First, the feature extraction step and the classification step are disjoint, i.e. the late-stage classifier does not explicitly leverage the spatial coherence of samples.
+Second, the latter approach relies on a pretext task to generate features, i.e. the optimization of a reconstruction error as part of the autoencoder.
+We therefore propose a novel approach that combines both tasks efficiently, by directly training a \gls{cnn} to predict foreground probabilities.
+In particular, we leverage a non-biased risk estimator applicable to \gls{pu} learning that estimates the risk of negative samples using the positive and unlabeled samples.
+This risk estimator is used as a loss function to optimize a \gls{cnn} using a gradient-descent algorithm.
+Next, we emphasize that the latter loss is highly sensitive to the class-priors, a hyper-parameter that we do not know, and devise a self-supervised strategy to infer it from data using a recursive bayesian filtering approach.
+Our full segmentation pipeline therefore consists in the above \gls{cnn}-based foreground prediction model, which provides the costs that intervene in our network flow paradigm devised previously.
+We show through extensive experiments that our approach brings impressive improvements in segmentation accuracy, and that our class-prior estimation strategy is robust to initial conditions.
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../../main"
+%%% End:

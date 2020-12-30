@@ -99,7 +99,7 @@ that takes into account observed superpixels as well as the unobserved ones.
 To do this we propose the following Expected Exponential Loss (EEL) function:
 
 \begin{equation}
-  \mathcal{L}_{EEL} = \mathbb{E}^{Y} \left[ \sum_{S \in \{ \mathcal{P}, \mathcal{U}\}} e^{-f(S)Y}\right]
+  \mathcal{L}_{EE} = \mathbb{E}^{Y} \left[ \sum_{S \in \{ \mathcal{P}, \mathcal{U}\}} e^{-f(S)Y}\right]
 \end{equation}
 
 where the expectation is taken with respect to all $Y$s.
@@ -107,7 +107,7 @@ By linearity of expectation and the fact that labeled superpixels have no uncert
 
 \begin{equation}
   \label{eq:eel}
-  \mathcal{L}_{EEL} = \sum_{S \in \mathcal{P}} e^{-f(S)} + \left( \sum_{S \in \{ \mathcal{P}} \epsilon_{S} e^{-f(S)Y} + (1-\epsilon_{S}) e^{f(S)Y}\right)
+  \mathcal{L}_{EE} = \sum_{S \in \mathcal{P}} e^{-f(S)} + \sum_{S \in \mathcal{U}} \left(  \epsilon_{S} e^{-f(S)Y} + (1-\epsilon_{S}) e^{f(S)Y}\right)
 \end{equation}
 
 Note that Eq. \ref{eq:eel} is a generalization of the Exponential Loss (EL) \cite{hastie09}.
