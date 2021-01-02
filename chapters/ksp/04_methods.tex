@@ -11,16 +11,7 @@ The object segmentation is then inferred with a network flow optimization strate
 
 \begin{figure}[!ht]
   \centering
-\begin{tikzpicture}
-  \centering
-    \node[anchor=south west,inner sep=0] (image) at (0,0) {\includegraphics[width=0.7\textwidth]{pipeline}};
-    \begin{scope}[x={(image.south east)},y={(image.north west)}]
-        \node at (0.083,0.760)
-    {Sec.~\ref{sec:features}};
-        \node at (0.61,0.760)
-    {Sec.~\ref{sec:optimization}};
-    \end{scope}
-\end{tikzpicture}
+    \includegraphics[width=0.7\textwidth]{pipeline}
 \caption{Full pipeline of our method.
   (Top) The dataset consists of a video/volumetric sequence and a set of 2D locations. (Middle) Our approach is divided in two main blocks: (Green frame) A feature learning phase where each pixels are assigned a feature vector. After a superpixel segmentation step, we assign to each superpixel a feature vector. (Red frame) A foreground model gives objectness likelihood to each superpixel. A MAP optimization problem then associates tracklets. Several iterations are performed and allow to re-train foreground and transition models. (Bottom) At the output, we obtain for each frame a binary segmentation of our object of interest.}
 \label{fig:pipeline}

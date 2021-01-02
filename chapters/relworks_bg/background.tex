@@ -5,14 +5,6 @@
 This section describes the \gls{rf} method, which we will use in the evaluation phase of our deep feature study.
 Most of the following content is taken from \cite{hastie09}.
 
-\gls{rf} is an algorithm that builds up from the idea of bootstrap aggregation (bagging).
-Bagging consists in combining a committee of weak learners (high variance and low bias estimators).
-Combining such learners allows to decrease the variance one would get when using a single learner.
-The \gls{rf} algorithm generates a single decision tree per bootstrap sample.
-In the present experimental setup, our task is to predict the class of a given sample (foreground or background).
-Once the set of trees are fitted, we infer the class probability of a given sample by computing the average vote over all trees.
-The training algorithm is described in Alg. \ref{alg:rf}.
-
 \begin{algorithm}[H]
   \label{alg:rf}
  \caption{Training a Random Forest for classification}
@@ -30,6 +22,15 @@ The training algorithm is described in Alg. \ref{alg:rf}.
     \EndFor
   \end{algorithmic}
 \end{algorithm}
+
+\gls{rf} is an algorithm that builds up from the idea of bootstrap aggregation (bagging).
+Bagging consists in combining a committee of weak learners (high variance and low bias estimators).
+Combining such learners allows to decrease the variance one would get when using a single learner.
+The \gls{rf} algorithm generates a single decision tree per bootstrap sample.
+In the present experimental setup, our task is to predict the class of a given sample (foreground or background).
+Once the set of trees are fitted, we infer the class probability of a given sample by computing the average vote over all trees.
+The training algorithm is described in Alg. \ref{alg:rf}.
+
 
 
 \subsection{Deep Convolutional Neural Network}
