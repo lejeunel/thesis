@@ -1,19 +1,19 @@
 \begin{abstract}
 \addchaptertocentry{\abstractname} % Add the abstract to the table of contents
-State-of-the-art supervised Machine Learning methods, and in particular the ones grounded on Deep Learning, have already shown their superiority over traditional methods on a variety of tasks, namely classification and segmentation of images.
-However, this performance boost comes at a price: As the flexibility of the models increase, machine learning practitioner need an increasing amount of annotated training examples to fully exploit that potential.
+State-of-the-art supervised Machine Learning methods, and in particular those grounded on Deep Learning, have already shown their superiority over traditional methods on a variety of tasks, namely classification and segmentation of images.
+However, this performance boost comes at a price: As the flexibility and performance of the models increase, machine learning practitioner need an increasing amount of annotated training examples to fully exploit that potential.
 In particular, the present thesis considers the semantic segmentation of medical images, where a model must associate each pixel of an image to a meaningful category.
 This application has, to this day, been hindered by the fact that generating large amounts of annotated images is unpractical, due to the limited time-budget that medical experts can dedicate to the tedious task of producing pixel-wise annotations.
 
 \medskip
 
-The present thesis provides contributions to the latter bottleneck.
+The present thesis provides several contributions to the latter bottleneck.
 In particular, we devise a fast and intuitive annotation protocol, where a video or volume plays on a screen automatically.
 The annotator must provide, using a pointing device, 2D locations that indicate the position of an object of interest.
 
 \medskip
 Next, we propose a number of segmentation methods that allow to infer, from this very limited set of annotations, pixel-wise segmentation masks of the object on the whole sequence.
-By explicitly leveraging spatio-temporal relations between over-segmented regions, our first contribution formulates the segmentation problem as a maximum a posteriori problem.
+By explicitly leveraging spatio-temporal relations between over-segmented regions, our first major contribution formulates the segmentation problem as a maximum a posteriori problem.
 The latter is then cast into the network flow paradigm, where paths are produced that connect regions accross the whole sequence so as to minimize a global cost.
 The costs assigned to allowed trajectories are namely given by a foreground model which, grounded on a bagging of decision trees algorithm, is trained in a transductive manner using the provided positive regions, where positive regions are assigned features computed using a deep network configured as an autoencoder.
 

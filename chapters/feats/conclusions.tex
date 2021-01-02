@@ -1,0 +1,51 @@
+\chapter{Discussion and Conclusions}
+
+We now give overall observations on the results of our experiments, and finish with general advices
+as to which method is the best candidate for our next chapter.
+
+\subsubsection{Performance of baselines}
+Our baseline method \textit{BoVW} is clearly outperformed by all other methods.
+In particular, the fact that it considers less context than \textit{ScSP} and furthermore ignores spatial coherence largely explains its inferiority.
+
+\textit{VGG-16} features remain consistently below our U-Net based model and never reached the \textit{Top-Sig-Score}.
+However, despite the fact that this model is only trained to classify natural images, it still outperforms the supervised \textit{ScSP} model on almost all modalities.
+This can be explained by the fact that \textit{VGG-16} considers richer features, in contrast to \textit{ScSP} which considers only textures.
+\textit{ScSP}, however, achieves \textit{Top-Sig-Score} two times, both times on Slitlamp.
+This can be explained by the fact that this dataset shows an object of interest whose shape and appearance is relatively stable throughout the sequence.
+Furthermore, SIFT descriptors might efficiently characterize the optic disc, as the latter show veins that remain salient and visible throughout the sequence.
+
+\subsubsection{Relevance of 2D locations as objectness prior}
+\textit{U-Net AE} showed surprisingly high performances despite the fact that it does not leverage the provided 2D locations as priors.
+In particular, this method reaches \textit{Top-Sig-Score} on almost all datasets.
+In converse cases, \textit{U-Net Prior AE} and \textit{U-Net Motion Predict LSTM}, who both leverage the objectness prior, improve on \textit{U-Net AE}.
+To further investigate the benefit of the objectness prior, we compare the performances of \textit{U-Net AE} and \textit{U-Net Prior AE}.
+The \textit{max F1-Score} show a standard deviation over all datasets of $4.845e^{-3}$ for \textit{U-Net AE} and $4.322e^{-3}$ for \textit{U-Net Prior AE}.
+The addition of the prior in the loss function thus decreases the standard deviation by $10.8\%$.
+Also, comparing \textit{U-Net Pred Loc} and \textit{U-Net Pred Loc Frozen}, we observe that pre-training the network in an autoencoder setup provides more robust features.
+The idea of predicting the location of the object of interest, however, did not prove to be relevant.
+
+\subsubsection{On Temporal Consistency}
+\textit{U-Net Motion Predict} and \textit{U-Net Motion Predict LSTM} aim at encoding temporal coherence in the sequences.
+\textit{U-Net Motion Predict} reached four times the \textit{Top-Sig-Score}, while \textit{U-Net Motion Predict LSTM} reached it only two times.
+Both these models, however, produced performances that are largely inferior to the simpler \textit{U-Net AE} and \textit{U-Net Prior AE}.
+
+\subsubsection{Border Effects}
+Zero-padding, the most straightforward approach, produces important visual artifacts, as shown on the activation maps of Fig. \ref{fig:activatiom_maps}.
+Investigating the impact on performance using the more elaborate symmetric-padding approach (Fig. \ref{fig:activatiom_maps_sym}) showed that symmetric-padding does not significantly improve classification performances in most cases.
+
+\section{Conclusions}
+In seeking for discriminant features to represent over-segmented regions in medical sequences, we developed a variety of feature learning methods based on CNNs.
+The U-Net based methods were compared to three baselines: (1) a transfer learning approach using a pre-trained \textit{VGG-16} network, (2) a Bag of Visual Words approach (\textit{BoVW}), and (3) Sparse-coded Spatial Pyramid (\textit{ScSP}).
+We tested different variants of our core U-Net based autoencoder, some of which leveraging the user-provided 2D locations as objectness prior.
+We then assessed the performance of our features by classifying foreground and background using a binary Random Forest classifier.
+
+Our experiments showed that our U-Net based methods significantly outperform all baseline methods on a majority of datasets.
+Regarding the influence of the objectness prior, we showed that a gaussian prior distribution centered on the object of interest, when used to penalize the reconstruction error, brings substantially lower standard deviation in the  classification performance.
+Our quantitative studies on padding showed that the simple zero-padding approach, despite the artifacts that induces on the activation maps of the bottleneck, is not a decisive factor in the overall quality of features.
+
+From this study, we conclude that the \textit{U-Net Prior AE} is the best candidate among the tested approaches, and choose to use it as feature extraction method in the next chapter.
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../../main"
+%%% End:

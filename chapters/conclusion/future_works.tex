@@ -1,5 +1,38 @@
 \section{Future Works}
 
+The challenging problem addressed in the present thesis conserves a number of open problems, which we now emphasize.
+In particular, we first focus on the annotation protocol, and finish with considerations regarding the segmentation method itself.
+
+\subsection{Annotation Protocol}
+Our annotation protocol was devised with a very constraining budget: A maximum of $1$ 2D location on each frame.
+The latter constraint could be slightly relaxed with minimal impact on the time-budget of the annotator.
+In particular, a lower frame-rate, where each frame would be displayed on a screen for a longer time duration, could allow the annotator to provide more than $1$ location per frame, thereby shifting the segmentation problem closer to a traditional \gls{pn} learning setup.
+
+Next, the general annotation task could benefit from an instance that would determine which sequence of a given type deserves more attention.
+In particular, our experiments showed that the segmentation of tumors in MRI brain scans show an important variance.
+A possible direction for future works could be to devise an Active Learning strategy to select from a database of scans the sequences or parts of sequences that require special care using an uncertainty measure derived from the already computed segmentations.
+
+\subsection{Segmentation method}
+Our annotation protocol is strictly limited to positive samples.
+However, several components of our pipeline could benefit from the addition of negative samples.
+In particular, the \gls{pu} learning framework proposed in our last chapter can be extended to include negative samples using the positive, unlabeled, and biased negative objective of \cite{hsieh19}.
+
+In its current state, our pipeline exploits the temporal dependency of frames in two manners: (1) In the foreground prediction model, where a frame-wise smoothness on the class-priors is enforced, and (2) In the constrained spatio-temporal neighborhood that paths are allowed to take in our multi-object tracking step.
+A transversal line of research could be to devise a foreground prediction model where the \gls{cnn} architecture explicitly leverages temporal depencies, as is often done using \gls{lstm} modules.
+
+Another line of research could explore segmentation at pixel-level, in contrast with our solutions that all rely on a preliminary superpixel over-segmentation.
+As shown in our experiments, the latter pre-processing step brings an upper-bound on the segmentation performance of up to $10\%$.
+To the best of our knowledge, the proposed network-flow formulation, in its current implementation, is computationally untracktable at pixel-level, as the current dimension ($1200$ superpixels per frame) can sometimes take $\sim 30$ minutes to optimize.
+However, there exists several efforts made in this direction that implement the K-shortest paths algorithm on the \gls{gpu} that achieves $6$ times speed up compared to our \gls{cpu} implementation.
+Aside from this component, the proposed foreground prediction model can be trivially converted to work at pixel-level.
+
+Next, the proposed segmentation methods all pre-supposed that a single sequence with corresponding point annotation is known throughout the whole pipeline.
+This constraint could also be relaxed in such a way that both the images and provided 2D locations of a given sequence would benefit to other sequences of the same type.
+In particular, the vast field of \gls{tl} and \gls{da} could be explored.
+
+In the same vein, prior knowledge of the sequence type and modality could easily be integrated in the existing pipeline.
+For example, our self-supervised class-prior estimation strategy could benefit from this prior knowledge by setting appropriate initial conditions on the hidden variable: In the case of Brain and Cochlea, we would initialize our state with a bell-shape, whereas in the case of Slitlamp, we would enforce all frames to have the same prior.
+
 
 %%% Local Variables:
 %%% mode: latex

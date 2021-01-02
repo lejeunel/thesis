@@ -107,15 +107,8 @@ In particular, the max-pooling operator computes for each spatial location the m
 Figure \ref{fig:cnn} illustrates a CNN applied to an image processing task.
 
 \subsubsection{Optimization}
-Since the advent of deep learning, many optimization algorithms have been proposed and proved to be effective, each with their own pros and cons.
-To name a few: \gls{sgd}, Adam \cite{kingma14}, and RMSProp \cite{tieleman12}.
-As the two latter are essentially improvements of \gls{sgd}, we restrict this section to \gls{sgd} (see \ref{alg:sgd}).
-In practice, effectively training a deep learning model demands careful study of hyper-parameters.
-The most crucial is certainly the learning rate $\lambda$ which controls the fraction of gradient-estimate one wants to use to update $\bm{\theta}$.
-Also, one needs to initialize $\bm{\theta}$ to random values.
-The latter step has been an important object of study, e.g \cite{he15}, \cite{glorot10}.
 
-\begin{algorithm}[H]
+\begin{algorithm}
   \label{alg:sgd}
  \caption{Stochastic Gradient Descent (SGD)}
 
@@ -130,33 +123,41 @@ The latter step has been an important object of study, e.g \cite{he15}, \cite{gl
   \end{algorithmic}
 \end{algorithm}
 
+Since the advent of deep learning, many optimization algorithms have been proposed and proved to be effective, each with their own pros and cons.
+To name a few: \gls{sgd}, Adam \cite{kingma14}, and RMSProp \cite{tieleman12}.
+As the two latter are essentially improvements of \gls{sgd}, we restrict this section to \gls{sgd} (see Alg. \ref{alg:sgd}).
+In practice, effectively training a deep learning model demands careful study of hyper-parameters.
+The most crucial is certainly the learning rate $\lambda$ which controls the fraction of gradient-estimate one wants to use to update $\bm{\theta}$.
+Also, one needs to initialize $\bm{\theta}$ to random values.
+The latter step has been an important object of study, e.g \cite{he15}, \cite{glorot10}.
+
+
 
 \subsubsection{Batch normalization}
-As already mentioned, training a CNN demands a careful tuning of the learning rate in order to converge to a proper solution.
-Practical issues such as exploding/vanishing gradient arise when the latter is two high/low, respectively.
-In particular, as noted in \cite{ioffe15}, the input distribution of a given layer is dependent on the parameters of all preceding layers, a phenomenon called internal covariate shift.
-To circumvent the latter problem, a batch normalization can be added at the output of each layer to normalize the values of a given minibatch to a normal distribution.
-Additionally, such normalization often needs to combine with an activation function, and therefore will have its left tail zeroed-out in the case of a \gls{relu}.
-To circumvent that, authors add learnable scaling and shifting parameters, $\gamma$ and $\beta$, respectively.
-Also, batch normalization also has a regularization effect due to fluctuations in mini-batch statistics \cite{gastaldi17}.
-The algorithm is described in alg. \ref{alg:batchnorm}.
 
-\begin{algorithm}[H]
+\begin{algorithm}
   \label{alg:batchnorm}
  \caption{Batch Normalization}
  \begin{algorithmic}[1]
   \Require{Minibatch of size $M$: $\mathcal{B}=\{(\bm{x}_{i})\}_{i=1}^{M}$, learnable scaling and shifting parameters, $\gamma$ and $\beta$}
   \Ensure{$\bm{x}'_{i}=\text{BN}(\bm{x}_{i};\gamma,\beta)$}
     \State Compute mean: $\mu_{\mathcal{B}}\leftarrow \frac{1}{m}\sum_{i=1}^{M}\bm{x}_{i}$
-
     \State Compute variance: $\sigma^{2}_{\mathcal{B}}\leftarrow \frac{1}{m}\sum_{i=1}^{M}(\bm{x}_{i}-\mu_{\mathcal{B}})$
-
     \State Normalize: $\hat{\bm{x}}_{i}\leftarrow \frac{\bm{x}_{i}-\mu_{\mathcal{B}}}{\sqrt{\sigma^{2}_{\mathcal{B}} + \epsilon}}$
 
     \State Scale and shift: $x_{i}'\leftarrow \gamma \hat{\bm{x}}_{i} + \beta \equiv \text{BN}(\bm{x}_{i};\gamma,\beta)$
-
  \end{algorithmic}
 \end{algorithm}
+
+
+As already mentioned, training a CNN demands a careful tuning of the learning rate in order to converge to a proper solution.
+Practical issues such as exploding or vanishing gradient arise when the latter is two high or too low, respectively.
+In particular, as noted in \cite{ioffe15}, the input distribution of a given layer is dependent on the parameters of all preceding layers, a phenomenon called internal covariate shift.
+To circumvent the latter problem, a batch normalization can be added at the output of each layer to normalize the values of a given minibatch to a normal distribution.
+Additionally, such normalization often needs to combine with an activation function, and therefore will have its left tail zeroed-out in the case of a \gls{relu}.
+To circumvent that, authors add learnable scaling and shifting parameters, $\gamma$ and $\beta$, respectively.
+Also, batch normalization also has a regularization effect due to fluctuations in mini-batch statistics \cite{gastaldi17}.
+The algorithm is described in Alg. \ref{alg:batchnorm}.
 
 \begin{figure}[!htpb]
   \centering

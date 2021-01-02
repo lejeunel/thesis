@@ -38,10 +38,10 @@ Concretely, we set the following requirements on the annotation protocol:
 \begin{itemize}
   \item The annotator does not need to manually change the frame being annotated, e.g. by hitting a forward or backward key. The sequence automatically unfolds according to a pre-specified frame-rate.
   \item The annotator handles a single pointing device, which he/she uses to indicate the location of the object of interest.
-  \item The annotator must be to annotate the sequence in a single go, i.e. he/she does not need to review annotations and modify them manually afterwards.
+  \item The annotator must be able to annotate the sequence in a single go, i.e. he/she does not need to review annotations and modify them manually afterwards.
 \end{itemize}
 
-The segmentation method must be functional in a variety of situations, namely produce acceptable accuracy for:
+The late-stage segmentation methods must be functional in a variety of situations, namely produce acceptable accuracy for:
 \begin{itemize}
   \item Both videos and volumetric sequences.
   \item Both color and grayscale images.
@@ -90,7 +90,7 @@ In Fig. \ref{fig:dset_previews}, we show example frames for each type.
 \section{Annotation Software and Web Platform}
 In the frame of this thesis, a flexible and elegant annotation software was developed that supports as pointing device a traditional mouse, a pen compatible with touch-screens, as well as a backend interface that allows to connect a eye-gaze tracker through the USB port.
 Our second contribution is a web platform.
-Its goal is to allow a user to upload a sequence (video or volumetric), along with his/her annotations, as generated with the annotation software.
+Its goal is to allow a user to upload a sequence (video or volumetric), along with his/her annotations, as generated with our annotation software.
 A backend module then triggers an instance on a cluster (potentially equipped with a \gls{gpu}) that will produce the segmentation.
 Once the latter step is complete, the user is able to download the generated pixel-wise segmentation.
 We now describe both contributions.
@@ -98,10 +98,10 @@ We now describe both contributions.
 \subsection{Annotation Tool}
 \label{sec:anna}
 
-We design an annotation software that supports the following features.
+We design an annotation software so as to support the following features:
 
 \begin{itemize}
-    \item We want the software to be cross-platform, i.e. run on the most popular operating systems, i.e. Windows, MacOS, and Linux.
+    \item We want the software to be cross-platform, i.e. run on the most popular operating systems: Windows, MacOS, and Linux.
     \item We wish to have a polished and user-friendly \gls{gui}.
     \item The software must support the most standard types of files, i.e. popular video formats and DICOM.
     \item We further wished to experiment on using an eye-gaze tracker in place of standard pointing devices.
@@ -111,7 +111,7 @@ To guarantee cross-platform compatibility, we choose the Qt5 framework \cite{eng
 
 So as to decode and display both standard videos and DICOMs, we resort to two solutions.
 To support standard video compression formats, we resort to the OpenCV library \cite{opencv}.
-For DICOM, the de-facto standard in medical imaging hardware, our software leverages the ITK library \cite{johnson15}.
+To support DICOM, the de-facto standard in medical imaging, our software leverages the ITK library \cite{johnson15}.
 
 Regarding the acquisition of user's annotation, the mouse and tablet-pen inputs are naturally handled by the Qt framework.
 For acquisition using the eye-gaze tracker, we implement a module that is compatible with the proprietary backend given by the manufacturer of the tracker \cite{eyetribe}.
@@ -119,13 +119,13 @@ For acquisition using the eye-gaze tracker, we implement a module that is compat
 The typical annotation workflow is the following:
 
 \begin{itemize}
-  \item[-]{Provide as input a volume/video, either from file drop-down menu are by drag-and-drop.}
-  \item[-]{Optional: Set the framerate at which the sequence will play (right knob on Fig. \ref{fig:anna}).}
+  \item[-]{Provide as input a volume/video, either from the \textit{File} drop-down menu or by drag-and-drop.}
+  \item[-]{Optional: Set the framerate at which the sequence will play (vertical slider knob on the left side of Fig. \ref{fig:anna}).}
   \item[-]{Optional: Connect the software to the eye-gaze tracker server. The tracker will then act as a secondary mouse.}
   \item[-]{Hit the play button (or space-bar if available). The sequence unfolds.}
   \item[-]{Annotate:}
     \begin{itemize}
-      \item[-]{When using mouse: Simply click on the desired region.}
+      \item[-]{When using the mouse or tablet-pen: Simply click on the desired region.}
       \item[-]{When using gaze-tracker: Place gaze on region and use right button (Fig. \ref{fig:anna}) to activate the recording of locations.}
     \end{itemize}
   \item[-]{When annotation is done, save them in \gls{csv} format.}

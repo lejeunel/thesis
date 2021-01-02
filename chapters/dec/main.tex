@@ -1,6 +1,24 @@
 \resetfigpath{dec}
 
-\chapter{A Deep Clustering approach}
+\chapter{A Deep Embedded Clustering approach}
+This chapter presents an approach whose ambition is to improve on two components of the previous chapter, namely
+(1) The pairwise similarity model that intervenes in the frame-to-frame likelihood model, and
+(2) The feature extraction method that intervenes in the foreground prediction model.
+In particular, we aimed at generating pairwise similarity labels that would serve to train a pairwise similarity metric, as can be found, for example, in the deep siamese network for multiple object tracking of \cite{cuan18}, or the deep cosine metric learning of \cite{wojke18}.
+In our scenario, pairwise similarity labels are not available, which therefore justifies a preliminary self-supervised approach to generate them.
+This self-supervised task relies on the \gls{dec} approach, which devises a training scheme that
+alternates between a cluster assignment step and centroid update step, similar in spirit to the K-mean algorithm, while the features corresponding to these samples are obtained from the bottleneck of a \gls{cnn} and optimized jointly with the clustering objective.
+
+As will be shown in our experiments, this approach proved to be ineffective in practice, as the above task is very hard to achieve.
+In particular, we observed a high sensitivity to a number of hyper-parameters that made the learning process unstable.
+The learning rate, the update period of centroids, and the initial values of clusters were tightly dependent, often bringing the learning process to a degenerate solution.
+Next, assuming that the above went smoothly, our pairwise similarity module would often bring negligible improvements.
+Concretely, several strategies were implemented, namely a siamese network, a cosine similarity metric learning, and a \gls{gmm}.
+Neither provided significant improvements to our baseline models.
+We therefore chose to present results using the simpler \gls{gmm}.
+
+Despite these negative results, we chose to provide here our general approach for future reference.
+
 \input{chapters/dec/02_intro}
 \input{chapters/dec/03_methods}
 \input{chapters/dec/04_experiments}

@@ -1,4 +1,4 @@
-\section{Discussions}
+\section{Discussions and Conclusion}
 
 \textbf{Sparse point-wise annotation protocol}
 In our first chapter, we reminded the general burden brought by traditional annotation protocols in the frame of pixel-wise segmentation, which rely on labeling each frame of a sequence pixel by pixel.
@@ -51,12 +51,51 @@ Our last contribution continues on the same trajectory as the last ones.
 We first emphasize that the above foreground classifier based on a bagging of decision trees brings several limitations.
 First, the feature extraction step and the classification step are disjoint, i.e. the late-stage classifier does not explicitly leverage the spatial coherence of samples.
 Second, the latter approach relies on a pretext task to generate features, i.e. the optimization of a reconstruction error as part of the autoencoder.
+
 We therefore propose a novel approach that combines both tasks efficiently, by directly training a \gls{cnn} to predict foreground probabilities.
 In particular, we leverage a non-biased risk estimator applicable to \gls{pu} learning that estimates the risk of negative samples using the positive and unlabeled samples.
 This risk estimator is used as a loss function to optimize a \gls{cnn} using a gradient-descent algorithm.
 Next, we emphasize that the latter loss is highly sensitive to the class-priors, a hyper-parameter that we do not know, and devise a self-supervised strategy to infer it from data using a recursive bayesian filtering approach.
-Our full segmentation pipeline therefore consists in the above \gls{cnn}-based foreground prediction model, which provides the costs that intervene in our network flow paradigm devised previously.
+Concretely, we formulate a state-space model where the hidden variables to estimate are the class-priors, and the observations are computed through a gamma-corrected expectation on the predictions of the model itself.
+The initial condition of our states are given by a user-provided upper-bound constant value.
+We then perform a guided decrementation on the latter at frame-wise level, and devise a stopping condition.
+
+Our full segmentation pipeline therefore consists in the above \gls{cnn}-based foreground prediction model, which provides the costs that intervene in our network flow paradigm devised in the previous contribution.
 We show through extensive experiments that our approach brings impressive improvements in segmentation accuracy, and that our class-prior estimation strategy is robust to initial conditions.
+In particular, we show that our strategy allows for a misspecification range up to $60\%$ above the true upper-bound.
+Even though the latter pipeline requires an added information from the annotator, the latter, given this comfortable misspecification range, could in practice be provided without much added work, e.g. by visualizing a single frame.
+
+\textbf{Conclusion}
+
+The contributions presented in this thesis proved to be appropriate to our objectives.
+In particular, our full pipeline effectively allows to produce pixel-wise segmentations of medical sequences
+using minimal point-wise annotations.
+We have demonstrated through extensive experiments its effectiveness on a variety of image modalities.
+
+The chronological organization of the present thesis allows to emphasize the incremental added values of our contributions, namely:
+\begin{enumerate}
+    \item Leverage frame-to-frame motions to infer objectness of unlabeled regions, as part of our expected-exponential loss combined with a label propagation algorithm.
+    \item Devise an optimal deep feature learning method that accounts for the knowledge of the whole sequence and exploits the user-provided 2D locations as objectness prior.
+    \item Formulate and solve the segmentation problem by leveraging the spatio-temporal relations of regions throughout the whole sequence and the user-provided 2D locations so as to infer a set of paths that minimize a global cost, an approach that we called iterative multi-path tracking.
+    \item Improve on the foreground prediction model, which in its original form considered feature learning and foreground prediction as disjoint tasks, by devising a strategy to perform both jointly using a loss function applicable to \gls{pu} learning and deep convolutional neural networks.
+\end{enumerate}
+
+Furthermore, the above chronology shows that we have effectively explored and leveraged a vast amount of methodologies, from traditional \gls{ml} and \gls{cv} methods to more modern and elaborate \gls{dl}-based solutions.
+Each incremental step in complexity was justified on the basis of the limitations encountered at the previous step, while most of them were proven to be relevant through extensive experiments.
+
+We now wish to elaborate on the negative aspects of our contributions, namely our deep embedded clustering approach.
+The latter attempt intended to contribute to the pairwise likelihood models that intervene in our network-flow framework.
+Given that our scenario does not provide pairwise similarity labels, we resorted to a self-supervised approach to generate them from data.
+This preliminary step proved to be unpractical, as the deep embedded clustering strategy proved to be often unstable.
+Furthermore, assuming that the latter step was sucessful, our pairwise similarity learning strategies did not provide substantial improvements.
+From these negative outcomes, we pull-out the following take-home lessons:
+
+\begin{itemize}
+    \item The task of learning a pairwise similarity metric using labels generated through a self-supervised strategy is a difficult problem. Litterature shows that this problem in still in a very early stage and that its application to scenarios such as ours was too ambitious.
+    \item Despite the fact that pairwise similarity learning is an important object of research in multi-object tracking, its relevance in the frame of our scenario might has been over-estimated.
+    \item As corollary of the above, a more thorough review of the state-of-the-art could have driven us earlier to the conceptually simpler and more effective approach of the next chapter, where we rather focus on improving on the foreground prediction model.
+\end{itemize}
+
 
 %%% Local Variables:
 %%% mode: latex

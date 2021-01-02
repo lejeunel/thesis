@@ -25,10 +25,9 @@ As feature extraction method, we first consider \gls{bovw} and \gls{scsp}.
 The first generates local texture descriptors, which are then assigned a code using the K-means clustering algorithm.
 Each superpixel is then assigned a feature vector, taken as the histogram of codes.
 The second extends the latter by performing a multi-scale spatial pooling of codes.
-A third baseline considers a \gls{cnn} trained on natural images, where we forward-pass patches taken from images.
-Features are then taken at the pen-ultimate layer.
+A third baseline considers a \gls{cnn} trained on natural images, where we forward-pass patches centered on image regions.
 
-Next, we implement an unsupervised \gls{dl} approach by training a \gls{cnn} configured as an \gls{ae}, and pool features from the bottleneck layer.
+Next, we implement a \gls{dl} approach by training a \gls{cnn} configured as an \gls{ae}, and pool features from the bottleneck layer.
 Several other models are devised that incorporate prior knowledge on the object of interest using the user-provided 2D locations.
 More elaborate models leverage frame-to-frame motion using an \gls{lstm} module.
 

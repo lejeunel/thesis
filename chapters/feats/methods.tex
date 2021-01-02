@@ -4,7 +4,7 @@ This pre-processing step is justified by the fact that our late-stage segmentati
 framework, as presented in the next chapter, is computationally demanding, and would be untracktable at pixel-level.
 Hence, all presented feature learning methods shall provide a feature vector for each superpixel.
 
-Let $N$ be the number of images in a data sequence and $S$ the number of superpixels over all sequence.
+Let $N$ the number of images in a sequence and $S$ the number of superpixels over the whole sequence.
 We write the feature matrix $\boldsymbol{X} = [\boldsymbol{x}_1,...,\boldsymbol{x}_S]^T \in \mathbb{R}^{S \times D}$, where $S$ is the total number of superpixels contained within the sequence.
 Next, let $\boldsymbol{y} = [y_1,...y_S]^T \in \{0,1\}^S$ be the objectness labels, such that $y_i=1$ when superpixel $i$ is positive, and $y_i=0$ otherwise.
 Concretely, let $M_{j} \in \{0,1\}^{W \cdot H}$ the manual groundtruth mask of frame $j$ with dimension $(W,H)$, we set
@@ -18,7 +18,7 @@ y_{i} =
 \end{equation}
 
 We then train a \gls{rf} classifier using feature matrix $\boldsymbol{X}$ and labels $\boldsymbol{y}$.
-Some feature learning methods will use a user-provided 2D location, if available (see Fig. \ref{fig:Framework}).
+Some feature learning methods will use a user-provided 2D location, if available.
 Fig. \ref{fig:Framework} illustrates our feature learning and classification framework.
 The individual blocks, such as superpixel segmentation, feature learning methods, and evaluation method, are developed in subsequent sections.
 
@@ -30,22 +30,23 @@ The individual blocks, such as superpixel segmentation, feature learning methods
   \label{fig:Framework}
 \end{figure}
 
-% We use the superpixel segmentation algorithm SLIC proposed in \cite{achanta12}.
-% The original simple linear iterative clustering (SLIC) relies on k-means clustering performed in color the Lab color space and further uses spatial coordinates of pixels.
-% A trade-off between color similarity and spatial proximity is necessary.
-% In the SLIC approach, the problem is solved by using a compactness parameter.
-% For images with both, flat and very textured regions, using the same compactness parameter lead to smooth regular-sized superpixel in the flat regions and highly irregular sized superpixel in textured regions.
-% The ASLIC approach adaptively chooses the compactness parameter for each superpixel differently.
-% Fig. \ref{fig:ExSuperpixel} shows an example of using ASLIC on dataset \textit{Slit-Lamp Retina A}.
+We use the superpixel segmentation algorithm SLIC proposed in \cite{achanta12}, which relies on k-means clustering performed in the Lab color space.
+We set the approximate number of superpixels on each frame to $200$.
+Setting a larger value would capture the contours of objects more accurately, at the cost of having a higher quantity of samples to predict/classify.
+Fig. \ref{fig:sp_example} shows examples of the superpixel segmentation.
 
-% As parameter, the number of superpixels is crucial. In terms of trade-off, setting a large value will capture the contours of objects more accurately, at the cost of having a higher quantity of samples to predict/classify. We verified that taking $200$ superpixels per frame produces reasonably good segmentation on all our sequences.
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=11cm]{prev_sps}
+  \caption[Superpixel segmentation example]{Example of superpixel segmentation on each type of sequence. Each frame contains $\sim 200$ segments.
+  Superpixel contours are in white, ground truth annotation is in red, and user-provided 2D location is in green}
+  \label{fig:sp_example}
+\end{figure}
 
-% Having at disposal ground truth data at pixel-level, we set the values of the output variable $\boldsymbol{y}$ the following way.
-% If one superpixel is covered by the ground truth pixel-wise segmentation by more than $50\%$ of its area, this specific superpixel is assigned to the foreground. Otherwise, it is assigned to the background.
 
 \section{Feature Learning: Baselines} \label{ch:baselines}
 As baseline feature extraction method, we consider \gls{bovw} and \gls{scsp}, both being unsupervised methods relying on handcrafted texture-based features.
-A third baseline considers a \gls{cnn} trained to classify natural images, where we forward-pass patches taken from images.
+A third baseline considers a \gls{cnn} trained to classify natural images.
 We now describe them in details.
 
 \subsection{Bag of Visual Words} \label{bow}
@@ -105,10 +106,8 @@ Fig. \ref{fig:subfig:bow_coding} illustrates the generation of the codebook and 
 \end{wrapfigure}
 
 \gls{scsp} \cite{lazebnik09} builds up on the \gls{bovw} approach with two main modifications.
-First, instead of the standard k-means clustering, \gls{scsp} uses sparse codes of SIFT features.
-Second, a pyramid representation is used.
-The following describes the added value of \gls{scsp} with \gls{bovw}.
-
+First, instead of the standard k-means clustering, \gls{scsp} adds a sparsity regularization term to encode SIFT descriptor.
+Second, a pyramid representation is used that pools codes at several coarseness levels.
 Formally, the objective of sparse coding is
 
 \begin{equation}
@@ -162,7 +161,7 @@ Similar to the \textit{ScSP} approach, we extracted patches at superpixel centro
 We resize to ($244 \times 244 \times 3$), forward-pass into the network, and extract features from the penultimate convolutional layer, which gives a feature vector of dimension $D=4096$.
 
 
-\section{Feature Learning: U-Net Based} \label{ch:unet_based}
+\section{Feature Learning: U-Net Based models} \label{ch:unet_based}
 We now describe a serie of U-Net based feature extraction methods.
 We first explain the architecture of the "core" model, i.e. one that will be modified to account for different outputs and loss functions.
 We dedicate the second section to data augmentation.
@@ -205,26 +204,25 @@ The input values are scaled to the range $[0,1]$.
 \end{figure}
 
 \subsection{Data Augmentation} \label{ch:data_gen}
-As our sequences are limited in size, we resort to data augmentation to artificially increase the training set.
-However, since we have a setting where we train the neural network on the same data we later extract the features from, the model does not need to generalize to non-seen data.
-Hence, we only consider transformations that correspond to those observed within the original sequence.
-For example, it is very likely that during a slit-lamp recording the user rotates and shifts the camera, resulting in different angles and positions of the optical disc.
-This confirms to use horizontal and vertical shift, as well as rotation for image transforms.
-Contrarily, as the size of the object seldom changes, scaling and zooming are not relevant transformations.
+We resort to data augmentation to artificially increase the training set.
+In particular, we consider transformations that are likely to occur to those observed within the original sequence.
+For example, considering the Slitlamp dataset, one often observes similar images that differ by rotations, shifting, and shearing.
+In this case, we consider as ``reasonable'' transformations horizontal and vertical translations as well as rotations.
+Conversely, as the size of the object seldom changes, scaling and zooming are not relevant transformations.
 We resort to rotation, vertical/horizontal translation, and shearing.
 Additionally, we added Gaussian noise for regularization.
-Some examples and parameters used are described in chapter \ref{results_data_gen}.
+% The parameters of these transformations are given in chapter \ref{results_data_gen}.
 
 \clearpage
 \subsection{Feature Extraction} \label{feat_extract}
-Similarly to our baseline methods, U-Net based methods construct a feature matrix $\boldsymbol{X} = [\boldsymbol{x}_1,...,\boldsymbol{x}_S]^T \in \mathbb{R}^{S \times D}$ describing each superpixel.
-Fig. \ref{fig:feat_extract} illustrates this process on an example of a single image.
+Similarly to our baseline methods, we wish that our U-Net based methods construct a feature matrix $\boldsymbol{X} = [\boldsymbol{x}_1,...,\boldsymbol{x}_S]^T \in \mathbb{R}^{S \times D}$.
 After training, a forward pass is performed on all image and features are taken as the output (ReLU) of the deepest layer.
 Those features correspond to a downscaled version of the input image.
 Hence, it must be upscaled to the original image resolution.
 Each feature dimension is independently upscaled to the original image size using bicubic interpolation.
 Since one pixel becomes a region, extrapolation is also needed at border regions, shown by the red circle and square in Fig. \ref{fig:feat_extract}.
 As we now have a descriptor for each pixel upscaled to the same resolution as the original data, we can take the mean over all descriptors belonging to the individual superpixels with feature dimension $D=512$.
+Fig. \ref{fig:feat_extract} illustrates this step.
 \vspace{10pt}
 
 \begin{figure}[htbp]
@@ -244,14 +242,14 @@ As we now have a descriptor for each pixel upscaled to the same resolution as th
 \includegraphics[height=1.5cm]{icons/unet_rec.png}
 \end{wrapfigure}
 
-\textit{U-Net Autoencoder} (or \textit{U-Net AE}) is configured as an autoencoder, i.e.
-takes as input the image data and is trained to reconstruct the input.
+\textit{U-Net Autoencoder} (or \textit{U-Net AE}) considers the core model configured as an autoencoder \cite{vincent10}.
+The basic idea behind autoencoders is to produce a sparse representation of the input by means of a pretext task.
+In particular, it takes as input an image and must produce at the output its reconstructed version.
 Let $\mathcal{I}$ be the image set and $\boldsymbol{I}_k \in [0,1]^{H \times W \times C}$ an image with height $H$, width $W$ and number of channels $C$.
-% We assume that $\boldsymbol{I}_k$ is already downscaled to have $H$ and $W$ dividable by $16$ (see chapter \ref{model}).
 Pixels are described by $\boldsymbol{I}_k(i,j,c) \in [0,1]$ with $i$ and $j$ its indices.
 The reconstructed image, of same dimension as the input, is written $\boldsymbol{\hat{I}}_k$.
 The network's channel dimensions is taken as $C = c_i = c_o$.
-We chose to use a mean-squared error (MSE) loss function.
+As reconstruction objective, we chose the mean-squared error (MSE).
 For a minibatch of size $B$, the loss is given by:
 
 \begin{equation}
@@ -271,13 +269,14 @@ In later formulations, we will omit the summation on the mini-batch for clarity.
 \includegraphics[height=1.5cm]{icons/unet_gaze_rec.png}
 \end{wrapfigure}
 
-In contrast with \textit{U-Net Autoenc}, \textit{U-Net Prior AE}, we introduce a prior on the user-provided 2D location in the loss-function.
-Let $\boldsymbol{g} = [g_x, g_y]$ be the xy-coordinates of a 2D location, and  $\boldsymbol{Z} \in [0,1]^{H \times W}$ a probability map.
-Assuming that $\boldsymbol{g}$ is given for an image $\boldsymbol{I}$, we take $\boldsymbol{Z} \sim \mathcal{N}(\boldsymbol{g}, \sigma^2\mathbb{I})$, a 2D-Gaussian distribution with standard deviation $\sigma$ and mean $\boldsymbol{g}$.
-For images where no locations are available, we take a Uniform distribution:
-It is formulated in Eq. \ref{eq:gaussian}.
-
-\endgroup
+In contrast with \textit{U-Net Autoenc}, \textit{U-Net Prior Autoencoder} (or \textit{U-Net Prior AE}) introduces a prior on the user-provided 2D location in the loss function.
+Our intuition is that, in most image modalities, the object of interest covers only a small portion of the frame.
+Also, the background is often homogeneous or even fully black, e.g. for CT and MRI scans.
+Hence, we speculate that penalizing the loss around the 2D locations equalizes the weights given to background and object of interest in terms of the area occupied by the foreground/background, respectively.
+In particular, let $\boldsymbol{g} = [g_x, g_y]$ be the xy-coordinates of a user-provided 2D location, and  $\boldsymbol{Z} \in [0,1]^{H \times W}$ a probability map.
+Assuming that $\boldsymbol{g}$ is available for an image $\boldsymbol{I}$, we take $\boldsymbol{Z} \sim \mathcal{N}(\boldsymbol{g}, \sigma^2\mathbb{I})$, a 2D-Gaussian distribution with standard deviation $\sigma$ and mean $\boldsymbol{g}$.
+For images where no locations are available, we use as prior a Uniform distribution:
+Concretely:
 
 \begin{equation}
 \boldsymbol{Z} = 
@@ -289,7 +288,7 @@ It is formulated in Eq. \ref{eq:gaussian}.
 \end{equation}
 \hspace{6pt}
 
-$\boldsymbol{Z}_{i,j}$ therefore models the object prior at location $(i,j)$, with $i \in \{\mathbb{Z} \mid 1 \leq i \leq H\}$ and $j \in \{\mathbb{Z} \mid 1 \leq j \leq W\}$ to be the probability of that pixel corresponding to the object of interest. Each pixel's $L2$-norm is then multiplied by $\boldsymbol{Z}_{i,j}$. The loss function is therefore given by:
+The loss function is given by:
 
 \begin{equation}
 L_{MSE\_Gaze} = \frac{1}{W H} \sum_{i,j} \frac{\boldsymbol{Z}_{i,j}}{\max{\{\boldsymbol{Z}\}}} \|\boldsymbol{I}_{i,j} - \boldsymbol{\hat{I}}_{i,j}\|^2
@@ -297,11 +296,6 @@ L_{MSE\_Gaze} = \frac{1}{W H} \sum_{i,j} \frac{\boldsymbol{Z}_{i,j}}{\max{\{\bol
 \end{equation}
 \hspace{6pt}
 
-Where we normalize by $\max{\{\boldsymbol{Z}\}}$ for later comparison with the loss of \textit{U-Net AE}.
-This model, therefore, penalizes errors situated near the 2D locations.
-In most image modalities, the object of interest is only a small portion of the image and distinctive.
-Contrarily, the background is rather regular or even fully black, as it usually is for CT and MRI scans.
-Hence, we speculate that penalizing the loss around the 2D locations equalizes the weights given to background and object of interest in terms of area occupied by the foreground/background, respectively.
 
 \subsection{U-Net Predict Location} \label{sec:unet_pred_loc}
 
@@ -309,11 +303,9 @@ Hence, we speculate that penalizing the loss around the 2D locations equalizes t
 \includegraphics[height=1.5cm]{icons/unet_gaze_prob.png}
 \end{wrapfigure}
 
-\textit{U-Net Predict Location} (or \textit{U-Net Pred Loc}) predicts a probability map of the 2D location given the image.
+\textit{U-Net Predict Location} (or \textit{U-Net Pred Loc}) is grounded on the same idea as \textit{U-Net Prior AE}, except that we rather propose to predict a probability map of the 2D location given the image.
 We model the output probability map following eq. \ref{eq:gaussian}.
-% The work of \cite{kurmann17}, they used a similar setting and showed that a binary-cross-entropy loss (BCE-loss) performs well.
-% This gave rise to use BCE-loss, formulated in Eq. \ref{eq:mse_gaze_prob_loss} on an example of one image. The network's channel dimensions are $c\_i=C$ and $c\_o=1$.
-As loss function, we use the cross-entropy loss:
+As loss function, we use the \gls{bce}:
 
 \begin{equation}
 L_{BCE} = -\sum_{i,j} \boldsymbol{Z}_{i,j} \log{\boldsymbol{\hat{Z}}_{i,j}}
@@ -331,14 +323,14 @@ L_{BCE} = -\sum_{i,j} \boldsymbol{Z}_{i,j} \log{\boldsymbol{\hat{Z}}_{i,j}}
 
 \textit{U-Net Predict Location Frozen} (or \textit{U-Net Pred Loc Frozen}) combines the benefits of \textit{U-Net Autoenc} and \textit{U-Net Predict Location}.
 The model is first trained as an autoencoder similarly to \textit{U-Net AE}.
-Encoder weights are then frozen, and the model is re-trained in a similar fashion to \textit{U-Net Prior Autoenc}.
+Encoder weights are then frozen, the last layer is modified to output a single channel, and the model is re-trained in a similar fashion as \textit{U-Net Predict Location}.
+This method aims at leveraging the benefits of the autoencoder setting while using the location prior as in \textit{U-Net Predict Location}.
 Fig. \ref{fig:model_freeze} shows the network's portion where weights are frozen.
-This method aims at leveraging the benefits of an autoencoder setting while using the location prior as in \textit{U-Net AE}.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=5.0cm]{unet/model5_coarse}
-  \caption[Modified U-Net with freezed encoder part]{Illustration of frozen layers in \textit{U-Net Gaze Prob Freeze} method. All encoder part except the lowest level is frozen.}
+  \caption[Modified U-Net with freezed encoder part]{Illustration of frozen layers in \textit{U-Net Pred Loc Frozen} method. Frozen layers are in the highlighted in striped blue.}
   \label{fig:model_freeze}
 \end{figure}
 
@@ -349,18 +341,13 @@ This method aims at leveraging the benefits of an autoencoder setting while usin
 \includegraphics[height=1.5cm]{icons/unet_gaze_prob_concat.png}
 \end{wrapfigure}
 
-This model is based on the assumption that objects of interest in our context have relatively slow motion.
-In other words, the current user-provided 2D location is correlated to previous 2D locations.
-We therefore aim at predicting the object's current location.
-\textit{U-Net Motion Predict} (or \textit{U-Net Motion Pred}) incorporates the data's temporal correlation.
-
-Similar to \cite{lea16}, who investigated the problem of fine-grained action segmentation, we increased the model's number of input channel by a motion image.
-However, we followed a more straightforward approach by adding as motion information the previous probability map $\boldsymbol{Z}^{(t-1)}$.
-
-Fig. \ref{fig:unet_gaze_concat} illustrates the overall structure on one image $\boldsymbol{I}$.
-$\boldsymbol{Z}^{(t-1)}$, the probability map at time $t-1$, is concatenated to $\boldsymbol{I}^{(t)}$.
-These are then used to predict the gaze location at time $t$, i.e. $\boldsymbol{\hat{Z}}^{(t)}$.
-Similar to \textit{U-Net Predict Location}, we used the \gls{bce} loss function.
+Another approach, which we call \textit{U-Net Motion Predict} (or \textit{U-Net Motion Pred}) incorporates the temporal correlation of images.
+In particular, we leverage the assumption that both the object of interest and the provided 2D locations move in a smooth and coherent manner.
+Concretely, let $\boldsymbol{Z}^{(t-1)}$ and $\boldsymbol{\hat{Z}}^{(t)}$ the location cues at time $t-1$ and $t$, respectively.
+We assume that temporal coherence can be enforced by predicting $\boldsymbol{\hat{Z}}^{(t)}$ from $\boldsymbol{I}^{(t)}$ and $\boldsymbol{Z}^{(t-1)}$.
+We implement the latter by using as input a tensor that concatenates $\boldsymbol{I}^{(t)}$ and $\boldsymbol{Z}^{(t-1)}$, so as to predict $\boldsymbol{Z}^{t}$.
+Similar to \textit{U-Net Predict Location}, we use the \gls{bce} loss function.
+Fig. \ref{fig:unet_gaze_concat} illustrates our method.
 
 \begin{figure}[htbp]
   \centering
@@ -371,9 +358,6 @@ Similar to \textit{U-Net Predict Location}, we used the \gls{bce} loss function.
   \label{fig:unet_gaze_concat}
 \end{figure}
 
-% Since we augmented the inputs by an additional channel, the model's channel dimension become $c\_i=C+1$ and $c\_o=1$.
-% Note that in this configuration, the ordering of input frame is substantial. Thus, it made it difficult to apply data augmentation procedure. Due to time limitations, we did not use data augmentation.
-
 \subsection{U-Net Motion Predict LSTM} \label{ch:unet_gaze_prob_lstm}
 \begingroup
 \setlength\intextsep{0pt}
@@ -381,12 +365,11 @@ Similar to \textit{U-Net Predict Location}, we used the \gls{bce} loss function.
 \includegraphics[height=1.5cm]{icons/unet_gaze_prob_lstm}
 \end{wrapfigure}
 
-\textit{U-Net Motion Predict LSTM} (or \textit{U-Net Motion Pred LSTM}) also leverages the temporal correlation of the object.
-It uses three \textit{U-Net Predict Location} with shared weights to predict three consecutive probability maps.
-Those probability maps are fed to a recurrent unit.
-In particular, we use a \gls{lstm} \cite{shi15}, to predict the next probability map.
-Fig. \ref{fig:unet_gaze_lstm} illustrates this structure.
-The \gls{lstm} module uses filters of size $3 \times 3$ and no return sequence.
+\textit{U-Net Motion Predict LSTM} (or \textit{U-Net Motion Pred LSTM}) follows the same idea as \textit{U-Net Motion Pred}, but rather considers temporal coherence over a longer period.
+In particular, we instantiate $3$ models similar to \textit{U-Net Predict Location} with shared weights, and predict the three corresponding probability maps.
+In parallel, we concatenate these $3$ probability maps, feed them to a recurrent unit and predict the next probability map.
+As recurrent unit, we use a \gls{lstm} module \cite{shi15} with filters of size $3 \times 3$ and no return sequence.
+Fig. \ref{fig:unet_gaze_lstm} illustrates our architecture.
 
 \endgroup
 
@@ -399,16 +382,14 @@ The \gls{lstm} module uses filters of size $3 \times 3$ and no return sequence.
   \label{fig:unet_gaze_lstm}
 \end{figure}
 
-The overall loss $L_{BCE\_LSTM}$ for one image sequence of three images is shown in Eq. \ref{eq:bce_lstm}.
-$L_{BCE}(A,B)$ defines the binary cross entropy, formulated in Eq. \ref{eq:mse_gaze_prob_loss}, between $A$ and $B$.
-Parameter $\alpha$ is used to adjust the weight of the \gls{lstm} prediction.
-We used some jittering to represent the data, i.e. one sample is given by the sequence $[\boldsymbol{I}^{(t=0)}, \boldsymbol{I}^{(t=1)}, \boldsymbol{I}^{(t=2)}]$, and $[\boldsymbol{I}^{(t=1)}, \boldsymbol{I}^{(t=2)}, \boldsymbol{I}^{(t=3)}]$ represents another sample.
-% Likewise to the method \textit{U-Net Motion Predict}, we did not synthesize more data by using any sort of data augmentation.
-
+The overall loss $L_{BCE\_LSTM}$ for one image sequence of three images is written:
 \begin{equation}
 L_{BCE\_LSTM} = \alpha \Big[\sum_{d=1}^3 L_{BCE}(\boldsymbol{\hat{Z}}^{(t-d)}, \boldsymbol{Z}^{(t-d)})\Big] + (\alpha - 1) L_{BCE}(\boldsymbol{\hat{Z}}^{(t)}, \boldsymbol{Z}^{(t)})
 \label{eq:bce_lstm}
 \end{equation}
+
+Where $L_{BCE}$ is the binary cross entropy.
+Parameter $\alpha$ is used to adjust the weight of the \gls{lstm} predictions.
 
 \subsection{U-Net Based Methods Overview}
 Tab. \ref{tab:summary_unet_methods} summarizes the above U-Net based methods.
@@ -439,12 +420,11 @@ Tab. \ref{tab:summary_unet_methods} summarizes the above U-Net based methods.
 
 
 \section{Evaluation framework}
-We used a \gls{rf} classifier to compare the performance between the different feature learning methods.
-The next section describes further the evaluation phase.
+We now describe the evaluation framework used to compare our feature extraction methods.
 
-\subsection{Classification} \label{random_forest}
+\subsection{Classification setup} \label{random_forest}
 We compare our methods in a \gls{pn} classification setup using a \gls{rf} binary classifier.
-We evaluating using 5-fold cross-validation \cite[p. 241]{hastie09}.
+We evaluate using 5-fold cross-validation \cite[p. 241]{hastie09}.
 Prior to every construction of fold, the samples and their corresponding labels are shuffled.
 Each validation set is then evaluated using two metrics: \gls{pr} curve and F1-score.
 The final performance measure is then given by the average performance over all folds.
@@ -458,19 +438,14 @@ Our pipeline is shown on Fig. \ref{fig:random_forest}.
   \label{fig:random_forest}
 \end{figure}
 
-In our \gls{rf} classifier, all nodes are expanded until the leaves are pure, as advised in \cite[pg. 596]{hastie09}
-
+For each tree, all nodes are expanded until the leaves are pure, as advised in \cite[pg. 596]{hastie09}
 The forest has $150$ trees and pick $m=\sqrt{D}$ predictor variables, where $D$ is the feature dimension.
+In the evaluation phase, each tree takes as input the evaluation samples and provides a vote.
+The votes of individual trees are then averaged so as to provide a probability of being positive.
 
 \subsection{Performance metrics}
-\gls{pr} curves are a performance metric commonly used for binary decision problems in machine learning.
-We used PR-curves to evaluate the results of our Random Forest classifier, and thus, PR-curves present the performance of a feature learning method on a dataset.
-We also tried using Receiver Operation Characteristics (ROC) as a measure, but it turned out that PR-curves are a more useful measure for our data.
-This might be due to the nature of our data.
-Since we usually have much more negative than positive labels, our data becomes skewed.
-PR-Curves are more informative than ROC for skewed data, as pointed out by \cite{davis06}. They also stated that a curve dominates in ROC space if and only if it dominates in PR space.
-
-F1-Score is a measure that considers both, recall and precision. It's best value is reached at $1$ and worst at $0$. The formula is given by Eq. \ref{eq:f1_score}.
+F1-Score is a metric that computes the geometric mean between precision and recall.
+It writes:
 
 \begin{equation}
 \textrm{F1-Score} = 2 \cdot \frac{\textrm{Precision} \cdot \textrm{Recall}}{\textrm{Precision} + \textrm{Recall}}
@@ -478,46 +453,38 @@ F1-Score is a measure that considers both, recall and precision. It's best value
 \end{equation}
 \hspace{6pt}
 
-\textit{Max F1-Score} is defined as the relationship between precision and recall that reaches the maximum score. It can be seen as calculating for all points in a PR-curve, their according F1-Scores and taking the maximum. An example is given in Fig. \ref{fig:f1_score}, where the left diagram shows a PR-curve and the right diagram the F1-Score given the Recall values. The maximum value is shown in green.
+We define the \textit{Max F1-Score}, as the maximum F1-score achieved by thresholding the output probability of our \gls{rf} over $1000$ values linearly spread within the range $[0;1]$.
+An illustration is given in Fig. \ref{fig:f1_score}.
 
 \begin{figure}[ht]
   \centering
   \includegraphics[width=11cm]{f1_score/f1_score}
-  \caption[Illustration of max F1-Score]{Illustration of \textit{max F1-Score}. The left diagram shows an example of a \textit{Precision Recall curve}. The diagram on the right shows the F1-Score given the \textit{Recall} values. Maximum score is marked by a green point, the \textit{max F1-Score}.}
+  \caption[Illustration of max F1-Score]{Illustration of \textit{max F1-Score}. The left plot shows an example of a \textit{Precision Recall curve}. The diagram on the right shows the F1-Score with respect to \textit{Recall}. \textit{max F1-Score} is highlighted by a green marker.}
   \label{fig:f1_score}
 \end{figure}
 
 \subsection{Hyperparameters} \label{ch:eval_configs}
-In the frame of \gls{nn} training, one typically find two main factors that result in a variation of performances accross training runs.
-(1) The weight initialization of layers usually follow a random distribution (uniform or normal).
-(2) The data augmentation step relies on random sampling of parameters for its transformations.
-To circumvent the variability of performance, we choose to train a given model several time and average the results.
-% However, as we compare between different methods, seeding the random number generators would not allow a fair comparison.
-In particular, U-Net based methods are evaluated accross ten training runs, i.e. each model is trained ten times on each dataset, resulting in ten different feature sets per dataset and method.
-We evaluate each feature matrix individually using our Random Forest classifier (Sec. \ref{random_forest}).
-% Its settings are described in chapter \ref{random_forest}.
-% For evaluation, the Random Forest is not seeded.
+For the training of our U-Net based methods, we follow the general practice and apply random weight initialization.
+As the latter step might induce variations in performance, we evaluate each method through ten training runs, i.e. each model is trained and evaluated ten times, and their performance measures are averaged.
 
-As the baseline methods (including \textit{VGG-16}) are less affected by random initialization, we generate a single feature matrix per method and dataset.
-However, the Random Forest model is trained ten times on each feature matrix.
+As our baseline methods are less affected by random initialization, we compute a single feature set per method,
+but train our \gls{rf} ten times on each feature set.
 
 \subsubsection{Baseline Methods}
 Tab. \ref{tab:baseline_params} shows the different parameters used for all baseline methods.
-For comparison purpose, both \textit{ScSP} and \textit{BoVW}, have $512$ classes and a SIFT keypoint size of $16 \times 16$ pixels.
-The number of keypoints used for vector quantization is defined in terms of number per image for the \textit{BoVW} method, and number over the entire sequence for the \textit{ScSP} method.
-% We experimented with the patch size used for the \textit{ScSP} and \textit{VGG-16} methods.
-For \textit{ScSP}, we set empirically the width as three times the average width of superpixels ($MSPW$) leads to best results.
-For \textit{VGG-16}, the optimal patch size is set empirically two times the \gls{mspw}:
+For comparison purposes, both \textit{ScSP} and \textit{BoVW}, have $512$ classes and a SIFT keypoint size of $16 \times 16$ pixels.
+The number of keypoints used for vector quantization for both methods is chosen empirically.
+For methods that rely on path extraction, we first define the \gls{mspw} as
 
 \begin{equation}
    MSPW = \frac{1}{S} \sum_{i=1}^S \sqrt{A_i}
    \label{eq:mspw}
 \end{equation}
 \vspace{6pt}
-
 Where $S$ is the number of superpixels in the sequence and $A_{i}$ the amount of pixels contained in superpixel $i$.
+The patch size of method \textit{ScSP} is set empirically to $3 \cdot MSPW$.
+For \textit{VGG-16}, we set it to $2 \cdot MSPW$.
 
-\clearpage
 \begin{table}[!htbp]
    \centering
    \caption[Baseline parameters]{Hyper-parameters of baseline methods}
@@ -548,7 +515,9 @@ Where $S$ is the number of superpixels in the sequence and $A_{i}$ the amount of
 \vspace{20pt}
 
 \subsubsection{U-Net Based Methods}
-Tab. \ref{tab:unet_params} give the values of the parameters of our U-Net based models. For methods that predict a probability map $\boldsymbol{\hat{Z}}$, we set $\sigma$ to $6\%$ of the image width. For methods that involve the probability map $\bm{Z}$ in their loss-functions, we set $\sigma$ to $30\%$ of the image width. Fig. \ref{fig:prob_maps} shows ($\boldsymbol{Z}/\max{\{\boldsymbol{Z}\}}$) with the two $\sigma$ values mentioned above.
+For methods that predict a probability map, we set the standard deviation $\sigma$ to $6\%$ of the image width.
+For methods that use the probability map in the loss function, we set $\sigma$ to $30\%$ of the image width.
+Tab. \ref{tab:unet_params} gives the values of the parameters of our U-Net based models.
 \vspace{30pt}
 
 \begin{table}[!htbp]
@@ -558,7 +527,7 @@ Tab. \ref{tab:unet_params} give the values of the parameters of our U-Net based 
       \toprule
       \textbf{Method} & \textbf{\makecell{Symbol}} & \textbf{Parameters}\\
       \midrule
-      U-Net Gaze Rec & \makecell{\includegraphics[width=1cm]{icons/unet_gaze_rec}} &
+      U-Net AE Prior & \makecell{\includegraphics[width=1cm]{icons/unet_gaze_rec}} &
         \makecell[l]{$\sigma = 30\%$ of image width} \\
       \midrule
         \makecell[l]{U-Net AE Prior \\
@@ -575,28 +544,10 @@ Tab. \ref{tab:unet_params} give the values of the parameters of our U-Net based 
    \label{tab:unet_params}
 \end{table}
 
-\clearpage
-\begin{figure}[!htbp]
-  \centering
-  \subfloat[$\sigma = 6\%$ of image width]
-  {
-    \includegraphics[width=6cm]{probability_maps/prob_map_06}
-  }
-  \hfill
-  \subfloat[$\sigma = 30\%$ of image width]
-  {
-    \includegraphics[width=6cm]{probability_maps/prob_map_30}
-  }
-  \caption[Illustration of probability maps]{Prior probability maps of (a) U-Net AE Prior, U-Net Pred Loc Freeze, U-Net Motion Pred (b) \textit{U-Net Gaze Rec}.}
-  \label{fig:prob_maps}
-\end{figure}
-
-All of our U-Net based models are for $20$ epochs using the Adam optimizer \cite{kingma15} (learning rate $= 0.0001$, $\beta_1 = 0.9$, $\beta_2 = 0.999$, $\epsilon = 10^{-8}$, no decay).
+All of our U-Net based models are trained for $20$ epochs using the Adam optimizer \cite{kingma15}.
+We set the learning rate to $0.0001$.
 Weights are initialized with the Glorot method \cite{glorot10}.
-
-The batch size depends on the GPU memory, the model architecture, and the input size.
-% We trained our models on a \textit{GeForce GTX 1080 Ti}, with 11GB memory.
-In terms of number of parameters, our models are all roughly equal, except for the \textit{U-Net Motion Pred LSTM} which contains a recurrent part.
+The batch size is set according to the model architecture and the input size.
 \vspace{30pt}
 
 \clearpage
@@ -607,19 +558,22 @@ Example frames are shown in \ref{fig:data_gen}.
 
 \begin{table}[!htbp]
    \centering
-   \caption[Data generator parameters]{Parameters of data generator. Rotation, translation, and shearing are used as transformation. Gaussian noise is also added to augment data variance. It is defined by the standard deviation $\sigma$, which is relative to the range in bit depth $0-255$. $2'000$ images are randomly sampled for each epoch.}
+   \caption[Data augmentation parameters]{Parameters of data augmentation. Rotation, translation, shearing, and gaussian noise are used as transformation.}
    \begin{tabular}{l|c}
       \toprule
       \textbf{Parameter} & \textbf{Value} \\
       \midrule
       Rotation range & $\pm11.25$° \\
+      \midrule
       Horizontal translation range & $20\%$ of image width \\
+      \midrule
       Vertical translation range & $20\%$ of image height \\
+      \midrule
       Shearing range & $\pm22.5$° \\
       \midrule
-      Gaussian noise $\sigma$ & $13$ \\
-      \midrule
-      Number of samples per epoch & $2'000$ \\
+     Gaussian noise & $0.5\%$ of average variance on each channel\\
+      % \midrule
+      % Number of samples per epoch & $2'000$ \\
       \bottomrule
    \end{tabular}
    \label{tab:data_gen_param}
@@ -629,43 +583,9 @@ Example frames are shown in \ref{fig:data_gen}.
 \begin{figure}[!htbp]
   \centering
   \includegraphics[width=\textwidth]{unet/data_gen}
-  \caption[Examples of data generator]{Examples of data generator on an image of dataset \textit{Slit-Lamp Retina A}. We used rotation, translation, shearing and added Gaussian noise to each of the channels. The values are shown in Tab. \ref{tab:data_gen_param}.}
+  \caption[Examples of data generator]{Examples of data augmentation on \textit{Slitlamp}. We used rotation, translation, shearing and added Gaussian noise.}
   \label{fig:data_gen}
 \end{figure}
-
-% ch\clearpage
-% \subsubsection{Learning Curve} \label{ch:learning_curve}
-% In our setting, we train the CNN model on the dataset we later extract the features from.
-% Thus, there is no need to split the dataset into training and validation.
-% The performance would even become worse since the model would be trained on fewer data.
-% For our datasets, where all frames within the set are very similar to each other, we do not expect to find any signs of overfitting given the learning curve.
-
-% However, since we will later describe an experiment that shows the feature performance versus the training time of the model (chapter \ref{ch:perf_vs_training}), we still investigate the training curve.
-% To do so, we took the \textit{CT Inner Ear A} dataset and randomly split it into $80\%$ training set and $20\%$ validation set.
-% Subsequently, we trained two models, namely a \textit{U-Net Rec} with MSE-loss and a \textit{U-Net Gaze Prob} with BCE-loss, for $500$ epochs.
-% After each trained epoch, we calculated training and validation loss.
-% Fig. \ref{fig:learn_curve} shows the training and validation loss for the given models.
-% As we expected, there is no sign of overfitting.
-% We also performed this experiment on other datasets and they all showed similar behaviour.
-% \vspace{20pt}
-
-% \begin{figure}[!htbp]
-%   \centering
-%   \subfloat[Learning curve of model \textit{U-Net Rec} on dataset \textit{CT Inner Ear A}]
-%   {
-%     \includegraphics[width=11cm]{learning_curve/learning_curve_ds11_rec}
-%   }
-%   \\
-%   \subfloat[Learning curve of model \textit{U-Net Gaze Prob} on dataset \textit{CT Inner Ear A}]
-%   {
-%     \includegraphics[width=11cm]{learning_curve/learning_curve_ds11_prob}
-%   }
-%   \caption[Model learning curves]{Learning curves of training (a) \textit{U-Net Rec} and (b) \textit{U-Net Gaze Prob} model on dataset \textit{CT Inner Ear A}. We split the dataset into $80\%$ training and $20\%$ test and calculated the given loss after each trained epoch. As expected, there are no signs of overfitting.}
-%   \label{fig:learn_curve}
-% \end{figure}
-% \vspace{20pt}
-
-% The time per epoch largely depends on the input size of the model. If using the data generator with the above-mentioned settings and train the model on the stated hardware, it takes at most $4.5$ minutes per epoch (dataset \textit{Surgical Video Sequence}) and at least $35$ seconds per epoch (dataset \textit{CT Inner Ear A}).
 
 %%% Local Variables:
 %%% mode: latex
