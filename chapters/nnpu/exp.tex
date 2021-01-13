@@ -1,77 +1,79 @@
 \section{Experiments}
 \label{sec:exps}
+
+In the following section, we outline the experiments performed to characterize the behavior of our method. First, we compare our method with existing baselines for segmentation purposes. We then perform an ablation study to demonstrate which aspect of our method provides what quantitative benefits, as well as the impact of the class-prior upper-bound initialization. Last, we show how our stopping condition performs in establishing useful class priors.
+
 \subsection{Datasets}
-To validate our methods, we evaluate on the publicly available dataset used in \cite{lejeune18}.
-This consists in a variety of video and volumes of different modalities with 2D annotation points for different object types.
-It includes:
+To validate our method, we evaluate it on the publicly available dataset used in~\cite{lejeune18}. It consists of a variety of video and volumes of different modalities with 2D annotation points for different objects of interest, as well as the associated groundtruth segmentations. Specifically, it includes four different subsets of data:
 \begin{itemize}
-\item \textbf{Brain:} \(4\) 3D T2-weighted MRI scans chosen at random from the publicly available BRATS challenge dataset \cite{menze15}, where tumors are object of interest.
-\item \textbf{Tweezer:} \(4\) sequences from the training set of the publicly dataset MICCAI Endoscopic Vision challenge: Robotic Instruments segmentation \cite{endochal}. The piecewise-rigid surgical instrument must be segmented.
-\item \textbf{Slitlamp:} \(4\) slit-lamp video recordings of human retinas, where the optic disk is to be segmented.
-\item \textbf{Cochlea:} \(4\) volumes of 3D CT scans of the inner ear, where the cochlea must be annotated. This object is the most challenging object to segment due to its complicated geometry.
+\item \textbf{Brain:} Four 3D T2-weighted MRI scans chosen at random from the publicly available BRATS challenge dataset~\cite{menze15}, where tumors are the object of interest.
+\item \textbf{Tweezer:} Four sequences from the training set of the publicly dataset MICCAI Endoscopic Vision challenge: Robotic Instruments segmentation~\cite{endochal}. The surgical instrument is the object to segment in these sequences.
+\item \textbf{Slitlamp:} Four slit-lamp video recordings of human retinas, where the optic disk is to be segmented.
+\item \textbf{Cochlea:} Four volumes of 3D CT scans of the inner ear, where the cochlea must be annotated. This object is the most challenging object to segment due to its challenging geometry (\ie non-concave shape).
 \end{itemize}
 
-\subsection{Proposed methods and baselines}
-\label{sec:orge9e46ac}
-\subsubsection{Baselines}
-\label{sec:orgb4303b5}
-
-We now evaluate the segmentation performance of the proposed foreground models with the following baselines.
-\begin{itemize}
-\item \ksp: Multi-object tracking method described in \cite{lejeune18}.
-The foreground model is a bagging of decision trees similar to Random Forest.
-\item \textbf{EEL}: An expected exponential loss to learn robust classifiers in a PU learning setting \cite{lejeune17}.
-\item \textbf{Gaze2Segment}: A combination of saliency detection and graphcut \cite{khosravan16}.
-\item \textbf{DL-prior}: Point location supervision is used to train a CNN with strong object priors \cite{bearman16}.
-\end{itemize}
-
-\subsubsection{Proposed}
-\label{sec:org83c59ba}
-\begin{itemize}
-\item \puss: Non-negative positive-unlabeled (nnPU) with self-supervised class-prior estimation, as in Sec. \ref{sec:nnpu} and \ref{sec:pi_estim}.
-\item \kspss: Combines the \puss method and the multi-object tracking refinement step of Sec. \ref{sec:tracking}.
-\item \ksptrue: Same as above, except that the foreground model is the proposed CNN trained as in Alg. \ref{alg:sgdnnpu} using the groundtruth class-priors.
-\item \kspconst: Same as above except we train Alg. \ref{alg:sgdnnpu} taking as prior a sequence-wise constant value given by the mean groundtruth prior over all frames.
-\end{itemize}
-For both \ksptrue{} and \kspconst{}, we train the foreground prediction model for $150$ epochs as in Alg. \ref{alg:sgdnnpu}. The learning rate is set to $10^{-4}$ and reduced to $10^{-5}$ after $50$ epochs.
 
 \subsection{Segmentation performance}
+\label{sec:exp_performance}
+Using the datasets mentioned above, we evaluate the proposed methods (\SSnnPU~and \SSnnPUKSP) quantitatively and qualitatively. Additionally, we compare these to existing methods that perform the same tasks. These include:
+\begin{itemize}
+\item \KSPTrack: Multi-object tracking method described in \cite{lejeune18}. As in the original work, the object model consists of a decision tree bagger adapted to the PU setting, while features are taken from a CNN configured as an autoencoder.
+\item \textbf{EEL}: An expected exponential loss within a boosting framework for robust classication in a PU learning setting~\cite{lejeune17}.
+\item \textbf{Gaze2Segment}: A learned saliency-map based detection regularized with graphcut~\cite{khosravan16}.
+\item \textbf{DL-prior}: Point location supervision is used to train a CNN with strong object priors~\cite{bearman16}.
+\end{itemize}
 
-We evaluate quantitatively the proposed methods (\puss{} and \kspss{}) to the baselines.
-We set the initial upper-bound using the groundtruth annotations.
-In particular, we compute for all frames the frequencies of positives $\pi^{i}$ and set $\hat \pi_{0}=1.4 \cdot \max_{i}{\pi^{i}}$.
-As performance criteria, we use the F1 score, averaged on all $4$ sequences of a given type.
-Quantitative results are shown in Tab. \ref{tab:results}.
-Qualitative results are shown in Fig. \ref{fig:prevs}.
-
-The \kspss{} method brings substantial improvement on the best baseline (\ksp{}) on all image modalities.
-In particular, we report improvements in F1 scores of $18\%$ on Tweezer, $13\%$ on Cochlea, $9\%$ on Slitlamp, and $8\%$ on Brain.
-Also, comparing \puss{} with \kspss{}, we quantify the added value of the proposed tracking module.
-We report an improvement in average F1 score of $4\%$ on Tweezer, $41\%$ on Cochlea, $7\%$ on Slitlamp, and $6\%$ on Brain.
-
+For our method, we set the initial class prior upper-bound, $\pi_{max}$, by computing the frequencies of positives $\pi^{i}$ for all frames from the groundtruth and set $\hat \pi_{0}=1.4 \cdot \max_{i} \{ \pi^{i} \}$. While this may appear to be using the groundtruth to set the parameters of our method, it allows us to calibrate $\pi$ for comparison reasons. Indeed, a 40\% factor over the frame that has the largest object surface object can represent the entire image depending on the dataset. To show that our method is not inherently sensitive to this value, we perform an analysis of sensitivity in Sec.~\ref{sec:ablation}.
 \input{chapters/nnpu/tables/results.tex}
 
 \begin{figure*}[t]
-\caption{Qualitative results for each type. From left to right: Original image with groundtruth highlighted in red and 2D location in green, output of foreground prediction model (nnPUss), thresholded output of the latter, and segmentation using the full pipeline (KSPTrack/nnPUss).}
+\caption{Qualitative results for each type. From left to right: Original image with groundtruth highlighted in red and 2D location in green, output of foreground prediction model (SSnnPU), SSnnPU combined with our spatio-temporal regularization scheme (SSnnPU+KSPTrack), best baseline (KSPTrack), and second best baseline (EEL).}
 \centering
-    \includegraphics[width=.6\textwidth]{pics/prevs.png}
+    \includegraphics[width=.8\textwidth]{pics/prevs.png}
 \label{fig:prevs}
 \end{figure*}
+
+In Table.~\ref{tab:results}, we show the F1 scores of each method, averaged over each sequence for each data type. Given that some methods require superpixels, we also show the maximum performance a segmentation method would have if every single superpixel was correctly labeled. In practice we denote positive superpixels as those with more than half of the pixels are in the groundtruth. We then compare the latter segmentation with the pixel-wise manual ground truth annotation and denote the result \MaxSP.
+
+From these results, we note that both \SSnnPU~and \SSnnPUKSP~ perform well on average. Most notably, \SSnnPUKSP~outperformes all other approaches including \SSnnPU. This is coherent as the spatio-temporal regularization provides an efficient method to remove false positives generated by \SSnnPU. On the Tweezer sequences, the gain in performances are striking, with an increase in 14\% on average over the previous state-of-the-art, and closely approaches a perfect labeling according to \MaxSP.
+
+When comparing \SSnnPU~and \SSnnPUKSP, we note that the spatio-temporal regularization provided by the KSP is particularly effective in the Cochlea cases (\ie plus 18\%). This is coherent as the geometry of the cochlea is largely made of a rings and where visual appearance plays a somewhat lesser role in identifying the complete structure. This latter point also explains the fairly poor performance of \SSnnPU~but much improved one by \SSnnPUKSP~when compared to \KSPTrack. 
+
+In Fig.~\ref{fig:prevs}, we show qualitative results of different methods and provide complete video results of \SSnnPUKSP~ as supplementary material.
+
+\subsection{Ablation study}
+\label{sec:ablation}
+To provide a better understanding as to what aspects of our method provide improvements, we perform an ablation study. Specifically, we evaluate the following variants of our methods:
+\begin{itemize}
+\item \SSnnPU: Non-negative positive-unlabeled with self-supervised class-prior estimation, as in Sec.~\ref{sec:nnpu} and~\ref{sec:pi_estim}.
+\item \SSnnPUKSP: Combines the \SSnnPU~method and the \KSPTrack~methods described in Sec.~\ref{sec:tracking}.
+\item \SSnnPUTrue: Same as \SSnnPUKSP, except that the foreground model is directly trained using the true class-priors (\ie. taken from the groundtruth) following Alg.~\ref{alg:sgdnnpu}.
+\item \SSnnPUConst: Same as \SSnnPUTrue, except that we use a sequence-wise constant class prior given by the mean groundtruth prior over all frames (as in~\cite{kiryo17}).
+\end{itemize}
+For both \SSnnPUTrue~and \SSnnPUConst, we train the models $f$ for $150$ epochs. The learning rate in both cases are set to $10^{-4}$ and reduced to $10^{-5}$ after $50$ epochs.
+
+\input{chapters/nnpu/tables/table_eta.tex}
+
+In addition, to assess how \SSnnPUKSP~performs as a function of the selected $\pi_{max}$, we evaluate the method using $\hat \pi_{0}=\eta \max_{i}\pi^{i}$, with $\eta \in \{1.2, 1.4, 1.6, 1.8\}$. Similarly, to assess the relevance of the self-supervised estimation of priors, we perform segmentation using method \SSnnPUConst~with $\eta \in \{0.8, 1.0, 1.2, 1.4\}$.
+
+We report F1, precision and recall scores for each aforementioned method in Table.~\ref{tab:results_eta}. First, we observe that our self-supervised estimation is relatively robust to variations in $\hat \pi_{0}$.
+In particular, Tweezer shows variations in F1 scores of at most $1\%$ while $\eta$ ranges between $1.2$ and $1.6$. Similarly, the performances fluctuate only marginally for Cochlea, Slitlamp and Brain sequences with at most 5\% changes. These fluctuations still lead to improved performances over state-of-the-art methods.
+
+In contrast, sensitivity to initial class priors is much stronger for \SSnnPUConst, which yields variations between 1\% and 15\% depending on the sequence type. The relevance of the frame-wise prior estimation can also be assessed by comparing, for each sequence type, the maximum F1 scores reached by \SSnnPUKSP~and \SSnnPUConst~for all tested values of $\eta$. \SSnnPUKSP~brings an improvement over \SSnnPUConst~of $2\%, 1\%, 6\%$ and $0\%$ for the Tweezer, Brain, Cochlea and Slitlamp sequence, respectively.
+
+Last, comparing \SSnnPUKSP~to \SSnnPUTrue, we note that the proposed self-supervised prior estimation framework brings comparable performances on all types. That is the \SSnnPU~ component of our methods appears to provide class priors on par with the true class-priors. Surprisingly, in the Tweezer case, some values of $\eta$ yield even better performances than if the true class prior values were to be used.
+
 
 \subsection{Analysis of Convergence}
 \label{sec:convergence}
 
-Fig. \ref{fig:converge} shows for each type of sequence the convergence of our class-prior estimation procedure (Sec. \ref{sec:pi_estim}).
-All sequences are trained using $\hat\pi_{0}= 1.4 \cdot \max_i{\pi^i}$.
+Last, we analyze the behavior of our proposed stopping conditions in Alg.~\ref{alg:prior_estim}. In particular, Fig.~\ref{fig:converge} illustrates the convergence of the class prior estimation for each type of sequence. In these cases, all sequences are trained using $\hat\pi_{0}= 1.4 \cdot \max_i \{\pi^i\}$.
 
-As we aim at estimating the true class-prior, we plot on the top panels the Mean Absolute Error (MAE) between the estimated priors and the true priors.
-The proposed stopping condition, which leverages the variance of pseudo-negatives, is plotted in the bottom panel.
-
-We observe that the proposed stopping condition triggers reasonably close to the optima in most cases.
-
+As we aim to estimate the true class-prior, we plot the Mean Absolute Error between the estimated priors and the true priors (top panels).
+The proposed stopping condition, which leverages the variance of pseudo-negatives, is plotted in the bottom panel. We observe that the proposed stopping condition triggers reasonably close to the optima in most cases. In cases where the stopping condition is triggered earlier or later, we note that the difference in mean absolute error is fairly small, whereby implying that the impact in the early/late trigger is rather small. 
 
 \begin{figure*}[t]
-\caption{For each type, we show: (top) Mean Absolute Error (MAE) between the predicted positive frequency of the classifier and the true prior (bottom) Variance of the pseudo-negatives, with threshold in dashed-red, and the minimum number of epochs in dashed-green.}
+\caption{Visualization of stopping conditions for \SSnnPU~method. For each tested image type, we show: (top) Mean Absolute Error (MAE) between the estimated and the true prior, (bottom) Variance of the pseudo-negatives. We also show here threshold (in dashed-red), and the minimum number of epochs (dashed-green). Both the optimal (circle) and the stopping conditions-based class-priors (cross) are shown on each of the sequences of each type (one line per sequence). }
 \centering
 \begin{tabular}{@{}cc@{}}
     \includegraphics[width=.5\textwidth]{pics/tweezer_priors.png} &
@@ -82,38 +84,7 @@ We observe that the proposed stopping condition triggers reasonably close to the
 \label{fig:converge}
 \end{figure*}
 
-\subsection{Robustness w.r.t. upper-bound and relevance of frame-wise estimation}
-\label{sec:org1ddd2fc}
-We wish to assess how our self-supervised prior estimation method performs in a real-world scenario, where the provided upper-bound $\hat \pi_{0}$ is misspecified.
-We therefore apply the proposed method \kspss{} using $\hat \pi_{0}=\eta \cdot \max_{i}\pi^{i}$, with $\eta \in \{1.2, 1.4, 1.6, 1.8\}$.
-Also, in order to assess the relevance of the self-supervised estimation of priors, we perform segmentation using method \kspconst{} with $\eta \in \{0.8, 1.0, 1.2, 1.4\}$.
-As reference, we further segment using the frame-wise true priors, as in method \ksptrue{}.
-We report the F1 score, precision and recall in Tab. \ref{tab:results_eta}.
-
-First, we observe that our self-supervised estimation of priors is relatively robust to variations of $\hat \pi_{0}$.
-In particular, Tweezer shows variations in F1 scores of max. $1\%$ while $\eta$ varies over range $[1.2, 1.6]$.
-Cochlea, varies by $4\%$ over range $[1.2; 1.6]$.
-Slitlamp varies by $5\%$ over range $[1.4, 1.8]$.
-Last, Brain varies by $4\%$ over range $[1.2, 1.6]$.
-
-These variations are in general more important when using the simpler \kspconst.
-In particular, Tweezer varies by $1\%$ over range $[0.8, 1.2]$,
-Cochlea varies by $5\%$ over range $[1., 1.4]$,
-Slitlamp varies by $15\%$ over range $[0.8, 1.2]$,
-and Brain varies by $8\%$ over range $[0.8, 1.2]$.
-
-The relevance of the frame-wise prior estimation is assessed by comparing, for each type, the maximum F1 scores reached by \kspss{} and \kspconst{} for all tested values of $\eta$.
-On Tweezer, \kspss{} brings an improvement of $2\%$ over \kspconst{}.
-On Cochlea, the improvement is of $6\%$.
-On Brain, the improvement is of $1\%$.
-Slitlamp, however, shows equal performances for both methods.
-
-Last, comparing \kspss{} to \ksptrue{}, we note that the proposed self-supervised prior estimation framework brings comparable performances on all types.
-
-
-\input{chapters/nnpu/tables/table_eta.tex}
-
 %%% Local Variables:
 %%% mode: latex
-%%% TeX-master: "../../main"
+%%% TeX-master: "main"
 %%% End:

@@ -2,20 +2,25 @@
 \centering
 \caption{
     Quantitative results on all datasets. We report the F1 scores and standard deviations.
+    In column ``All'', we show the average F1 score on all sequences.
+    In column $\Delta$, we show the absolute difference with respect to the maximum achievable score given the superpixel over-segmentation (Max. SP).
     }
 \label{tab:results}
 \begin{tabular}{llp{1.8cm}p{1.8cm}p{1.8cm}p{1.8cm}p{1.8cm}}
 \toprule
-Types &               Tweezer &               Cochlea &              Slitlamp &                Brain \\
-Methods         &                       &                       &                       &                      \\
+Types &              Tweezer &              Cochlea &             Slitlamp &                Brain &          All &      $\Delta$ \\
+Methods         &                      &                      &                      &                      &              &               \\
 \midrule
-KSPTrack/nnPUss &  $\bm{0.91} \pm 0.03$ &  $\bm{0.75} \pm 0.05$ &  $\bm{0.84} \pm 0.05$ &  $\bm{0.8} \pm 0.09$ \\
-nnPUss          &       $0.87 \pm 0.02$ &        $0.53 \pm 0.1$ &        $0.78 \pm 0.1$ &      $0.75 \pm 0.13$ \\
+Max. SP         &       $0.92\pm 0.02$ &       $0.92\pm 0.01$ &       $0.92\pm 0.02$ &       $0.95\pm 0.01$ &       $0.93$ &             - \\
+\hline
+
+SSnnPU/KSPTrack &  $\bm{0.91}\pm 0.03$ &  $\bm{0.75}\pm 0.05$ &  $\bm{0.84}\pm 0.05$ &  $\bm{0.80}\pm 0.09$ &  $\bm{0.82}$ &  $\bm{-0.10}$ \\
+SSnnPU          &       $0.87\pm 0.02$ &       $0.53\pm 0.10$ &       $0.78\pm 0.10$ &       $0.75\pm 0.13$ &       $0.73$ &       $-0.19$ \\
 \hdashline
-KSPTrack        &       $0.77 \pm 0.08$ &       $0.66 \pm 0.02$ &       $0.77 \pm 0.08$ &      $0.74 \pm 0.08$ \\
-EEL             &        $0.6 \pm 0.16$ &       $0.12 \pm 0.05$ &       $0.59 \pm 0.08$ &      $0.52 \pm 0.14$ \\
-Gaze2Segment    &        $0.18 \pm 0.0$ &       $0.07 \pm 0.02$ &        $0.02 \pm 0.0$ &      $0.07 \pm 0.02$ \\
-DL-prior        &       $0.72 \pm 0.06$ &        $0.3 \pm 0.04$ &       $0.51 \pm 0.11$ &      $0.56 \pm 0.08$ \\
+KSPTrack        &       $0.77\pm 0.08$ &       $0.66\pm 0.02$ &       $0.77\pm 0.08$ &       $0.74\pm 0.08$ &       $0.74$ &       $-0.19$ \\
+EEL             &       $0.60\pm 0.16$ &       $0.12\pm 0.05$ &       $0.59\pm 0.08$ &       $0.52\pm 0.14$ &       $0.46$ &       $-0.47$ \\
+Gaze2Segment    &       $0.18\pm 0.00$ &       $0.07\pm 0.02$ &       $0.02\pm 0.00$ &       $0.07\pm 0.02$ &       $0.08$ &       $-0.84$ \\
+DL-prior        &       $0.72\pm 0.06$ &       $0.30\pm 0.04$ &       $0.51\pm 0.11$ &       $0.56\pm 0.08$ &       $0.52$ &       $-0.40$ \\
 \bottomrule
 \end{tabular}
 \end{table*}

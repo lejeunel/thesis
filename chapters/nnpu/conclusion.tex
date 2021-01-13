@@ -1,16 +1,11 @@
 \section{Conclusions}
 \label{sec:conclusion}
 
-The present work contributes to the challenging problem of segmenting medical sequences of various modalities using
-point-wise annotations.
-From the annotator's point of view, the burden is marginally increased in that we require, aside from a maximum of one 2D location per frame, an upper-bound on the class-prior.
+The present work contributes to the challenging problem of segmenting medical sequences of various modalities using point-wise annotations and without knowing in advance what is to be segmented. As such, it has important implications in the ability to quickly produce groundtruth annotations or learn from a single example.
 
-By formulating our problem as a positive/unlabeled prediction task, we demonstrated the relevance of the non-negative unbiased risk estimator in the latter scenario by applying it as the loss function of a Deep Convolutional Neural Network.
-We further contributed by devising a self-supervised framework based on recursive bayesian filtering, to estimate the class priors, a hyper-parameter that plays an important role in the segmentation accuracy.
-We also combined the latter foreground prediction method with a tracking framework that explicitly leverages the temporal relations of over-segmented regions.
+By formulating our problem as a positive/unlabeled prediction task, we demonstrated the relevance of the non-negative unbiased risk estimator as a loss function of a Deep Convolutional Neural Network. Our novel contribution of a self-supervised framework based on recursive bayesian filtering, to estimate the class priors, a hyper-parameter that plays an important role in the segmentation accuracy, was demonstrated to bring important performance gains over state-of-the-art methods, particularly when also used in combination with a spatio-temporal regularlization scheme. From the annotator's point of view, the burden is marginally increased in what the method requires, asides from 2D locations and an upper-bound on the class-prior. While our approach does not perform flawlessly in challenging cases, we show that the performance is stable and resilient to miss-specified class prior upper-bounds. Last, we show that our stopping conditions are adept at yielding favorable estimates as well.
 
-We demonstrated through extensive experiments substantial improvements over the state-of-the-art.
-The proposed self-supervised estimation method is proven to be resilient to misspecification of the prior's upper-bound.
+As future works, we aim at investigating the addition of negative samples into our foreground model, by leveraging the positive, unlabeled, and biased negative risk estimator of~\cite{hsieh19}. Similarly, given that our regularization is outside of the learning framework, we wish to also explore how this could be integrated to increase performance. 
 
 %%% Local Variables:
 %%% mode: latex

@@ -1,10 +1,13 @@
 \section{Methods}
 \label{sec:methods}
-As a preliminary, we formulate our foreground prediction problem in a Positive/Negative setup as a mean to introduce notations.
-We then show how to extend the latter for the Positive/Unlabeled scenario using the non-negative estimator of \cite{kiryo17}.
-Next, we describe our main contribution, which consists in estimating the positive class priors in a self-supervised manner via recursive Bayesian estimation.
-Last, we briefly describe our multi-path tracking framework.
 
+The goal of our method is to generate a segmentation mask for an object of interest in each frame of a single image volume or video sequence using only point-wise annotations and without knowing the image type or object of interest beforehand.
+
+To do so, we propose a novel approach within the Positive-Unlabeled learning setting, that learns the segmentation of the object identified by the point-wise annotations. Our method makes use of a non-negative risk estimator~\cite{kiryo17}, which heavily relies on knowing the proportion of positive samples in the data. While unavailable in our setting, we introduce a novel self-supervised method to estimate this key value via an iterative learning procedure within a Bayesian estimation framework. We then devise a stopping condition to halt training at an appropriate point. Last, a spatio-temporal tracking framework is applied to regularize the output of our approach over the complete volume information.
+
+We describe our approach now in more detail. In the following subsection, we introduce the Positive-Unlabeled learning framework and its non-negative risk estimator. We then describe in 
+Sec.~\ref{sec:pi_estim} our self-supervised approach to learn effective class priors. Last, we detail how we leverage the spatio-temporal regularizer, and provide our implementation details
+in Sec.~\ref{sec:tracking} and Sec.~\ref{sec:implementation}, respectively.
 \input{chapters/nnpu/method_nnpu.tex}
 \input{chapters/nnpu/method_bayesian.tex}
 \input{chapters/nnpu/method_tracking.tex}
@@ -13,5 +16,5 @@ Last, we briefly describe our multi-path tracking framework.
 
 %%% Local Variables:
 %%% mode: latex
-%%% TeX-master: "../../main"
+%%% TeX-master: "main"
 %%% End:

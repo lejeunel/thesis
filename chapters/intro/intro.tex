@@ -5,7 +5,7 @@
 \label{intro}
 
 The medical imaging field has recently witnessed the revolution of \gls{ai}, a broad discipline that is part of computer science, whose aim is to conceptualize human ``intellectual'' tasks, and produce computer programs that can replicate them, thereby allowing to relieve human beings from tedious and repetitive tasks.
-From classification to segmentation tasks, \gls{ai} already provides flexible and efficient tools that greatly facilitate the daily practice of clinicians.
+From classification, where images must be assigned to pre-defined categories (sane, pathological), to segmentation tasks, where regions of interest must be delineated, \gls{ai} already provides flexible and efficient tools that greatly facilitate the daily practice of clinicians.
 In particular, large quantities of \gls{mri} brain scans are now efficiently and accurately processed by \gls{ai} systems that help clinicians in the diagnosis of pathologies \cite{sun19}.
 Similarly, surgical instruments can be segmented automatically and accurately in real-time to allow laparoscopic interventions of the abdominal cavity by means of robotic technology, thereby decreasing the invasiveness of traditional methods \cite{davinci}.
 
@@ -47,7 +47,7 @@ The \textit{goodness} of this move will be assessed using a reference ``good'' m
 In order to exploit this knowledge, the programmer must therefore define in advance a quantitative measure of goodness, usually called \textit{error}.
 Next, an update scheme allows to update the numerous parameters of the model so as to minimize the error.
 Simply put, if the error is large, we would like to encourage the model to produce a drastically different move when facing a similar checker-board configuration.
-Conversely, when the move is adequate to the expected move, the model must give a high priority to the latter decision.
+Conversely, when the move is similar to the expected move, the model must give a high priority to the latter decision.
 Intuitively, one sees that a single experience of this kind does not allow to fully explore the strategic depth of the game.
 One therefore needs to generate a large number of such experiences so as to make the model capable of competing against creative and competent human opponents.
 The above paradigm, which stands at the root of \gls{ml} is called ``learning by example'', and conveys the idea that machines are able to learn to perform complex tasks \textit{without being explictly programmed to do so}, through repeated experiences.
@@ -55,9 +55,9 @@ The above paradigm, which stands at the root of \gls{ml} is called ``learning by
 In practice, however, conventional and \gls{ml} paradigms are often used complementarily.
 For example, in the present scenario, an early-stage instance could allow to select among different game strategies selected by a pre-defined algorithm, e.g. ``aggressively give-away pieces'', ``play conservative'', and let the trained module select which move to perform within it.
 
-We now wish to emphasize the fact that \gls{ml} approaches, which in principle allows to solve more and more complex tasks, comes with its own limitations, namely that the considered model must be able to explore an increasingly large amount of situations, while its decisions must be compared to reference outputs.
+We now wish to emphasize the fact that \gls{ml} approaches, which in principle allow to solve more and more complex tasks, comes with its own share of limitations, namely that the considered model must be able to explore an increasingly large amount of situations, while its decisions must be compared to reference outputs.
 In the \gls{ml} terminology, we call such input data coupled with its reference output a \textit{training sample}.
-In practice, producing these reference outputs (called \textit{annotations} or \textit{labels}) often requires human interventions, in which human experts
+In practice, producing these reference outputs (called \textit{annotations} or \textit{labels}) often requires human intervention, in which experts
 are shown a serie of inputs, and must provide the ``optimal'' output.
 
 From these considerations, we pull out the following rule-of-thumb.
@@ -83,12 +83,12 @@ The power, flexibility, and hence impressive performance boost of \gls{dl} model
 As showcase application, let us mention the ImageNet Large Scale Visual Recognition Challenge \cite{ILSVRC15}, which consists in classifying natural images into semantic categories such as ``balloon'', ``dog'', etc..
 The inputs are taken as the images themselves, i.e. a square-grid where each cell represent a pixel that encodes $3$ numerical values: one for each color channel.
 The training dataset contains $150'000$ images, classified into $1000$ categories.
-As of today, state-of-the-art solution leverage \gls{dl}-based models.
-In particular, Deep Convolutional Neural Network can classify unseen images with an accuracy of $88.6\%$ \cite{tan19}, a performance on par, if not superior, with human skills.
+As of today, state-of-the-art solutions leverage \gls{dl}-based models.
+In particular, Deep Convolutional Neural Networks can classify unseen images with an accuracy of $88.6\%$ \cite{tan19}, a performance on par, if not superior, with human skills.
 The full model contains a feature extraction module, which extracts salient characteristics of the image such as texture, colors, and shapes.
 At its output lies a classification module, which is responsible to combine these features through cascaded mathematical operations.
 In order to get and idea of the complexity of the task, think about recognizing a dog in an image taken at random from the internet, and try to evaluate the huge variety of situations in which such object can appear, e.g. field of view of the photographer, position of the dog, lightning condition, breed of the dog, clutter in the background.
-Next, multiply this already daunting task to a thousand kind of objects, and you will easily understand why the latter state-of-the-art model accounts for over $70$ million parameters.
+Next, multiply this already daunting task to a thousand kind of objects, and you will easily understand why these models account for over $70$ million parameters.
 Let us emphasize that, in this scenario where natural images must be classified, the tedious task of annotating training images has been performed by many individuals in parallel, an approach called \textit{crowd-sourcing}.
 
 Another example, closer in nature to the present thesis, is the Brain Tumor Segmentation (BraTS) Challenge \cite{menze15}, which consists in segmenting brain tumors from \gls{mri} scans, where the model needs to output for each pixel of a given slice a prediction that will help a clinician in his/her diagnosis.
@@ -128,7 +128,7 @@ The annotation time is estimated to $1$ minute per image per instrument.
 
 \section{Problem definition and thesis statement}
 
-Comparing the above scenarios, we emphasize that applying state-of-the-art \gls{dl} methods to the segmentation of medical images poses additional practical difficulties with respect.
+Comparing the above scenarios, we emphasize that applying state-of-the-art \gls{dl} methods to the segmentation of medical images poses additional practical difficulties with respect to non-medical settings.
 In particular, the annotation task requires a medical expertise.
 Second, assuming such experts are available and willing to participate to this task, their daily obligations usually imposes a limited time budget.
 Third, the task itself is considered tedious and repetitive.

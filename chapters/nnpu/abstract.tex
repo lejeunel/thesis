@@ -1,11 +1,14 @@
 \begin{abstract}
-  We propose a method to segment medical sequences of various modalities
-  with minimal annotations: a single click per frame that indicate where the object is located, and an upper-bound on the object's size.
-  Our approach relies on a Positive/Unlabeled objective applicable to Deep Convolutional Neural Networks.
-  As the latter requires accurate class-priors to be effective, we further propose a self-supervised method to infer the latter from data using a recursive Bayesian filtering approach.
-  Next, we use the foreground predictions in a multi-path optimization problem where spatio-temporal relations of over-segmented regions are explicitly leveraged.
-  We demonstrate that our approach is resilient to inaccuracies in the upper-bound of priors and show substantial improvements to state-of-the-art.
+
+The ability to quickly annotate medical imaging data plays a critical role in training deep learning frameworks for segmentation. Doing so for image volumes or video sequences is even more pressing as annotating these is particularly burdensome. To alleviate this problem, this work proposes a new method to efficiently segment medical imaging volumes or videos using point-wise annotations only. This allows annotations to be collected extremely quickly and remains applicable to numerous segmentation tasks.
+Our approach trains a deep learning model using an appropriate Positive/Unlabeled objective function using sparse point-wise annotations. While most methods of this kind assume that the proportion of positive samples in the data is known a-priori, we introduce a novel self-supervised method to estimate this prior efficiently by combining a Bayesian estimation framework and new stopping criteria. Our method iteratively estimates appropriate class priors and yields high segmentation quality for a variety of object types and imaging modalities. In addition, by leveraging a spatio-temporal tracking framework, we regularize our predictions by leveraging the complete data volume. We show experimentally that our approach outperforms state-of-the-art methods tailored to the same problem.
+
 \end{abstract}
+
+\begin{IEEEkeywords}
+Positive-Unlabeled learning, Semantic segmentation, Point-wise supervision
+\end{IEEEkeywords}
+
 
 %%% Local Variables:
 %%% mode: latex

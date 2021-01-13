@@ -1,43 +1,19 @@
-\subsection{Tracking Framework}
+\subsection{Spatio-Temporal Regularization}
 \label{sec:tracking}
-In practice, the foreground predictions, as given by the output of our model, are noisy.
-As a refinement step, we resort to a similar strategy as \cite{lejeune18}, where the spatio-temporal relations of superpixels are leveraged in a multi-object tracking framework.
-We now briefly describe the latter approach, and show where the proposed foreground prediction method fits.
 
+While our \SSnnPU~method leverages all images and point-wise annotations to train and segment the data volume in question, the output of our method does not explicitly leverage the spatio-temporal relations within the data cube. That is, every sample is treated and predicted independently, and only implicitly related through $f_\theta$. In order to coherently regularize over the different frames and locations, we use an existing graph based framework as a post-processing step.
 
-\subsubsection{Tracking as a Linear Program}
-\label{sec:orgcf5c794}
-Let \(\mathcal{P}=\{x_i\}_{i=1}^{|\mathcal{P}|}\) as a path formed by temporally-ordered superpixels \(x_{i}\), where we omit the time index for conciseness.
-The segmentation task reduces to finding an optimal set of paths \(\bm{\mathcal{P}}^*=\{ \mathcal{P}_k\}_{k=1}^K\) so as to minimize a cost.
-As further developped in \cite{lejeune18}, the latter problem is first formulated as a maximum a posteriori problem and converted to the integer program:
+To this end, we make use of the multi-object tracking framework (\KSPTrack) introduced in~\cite{lejeune18} to refine the output of the \SSnnPU~method. In short, \KSPTrack~represents the data volume with superpixels and builds a network graph over these to optimize a set of spatio-temporal paths that jointly correspond to the object segmentation throughout the data volume. This is solved by casting the problem as network-flow optimization, whereby costs are assigned to input/output nodes, visiting and transition edges within and across frames, and where 2D annotations are used to define source nodes that allow to push flow within the network.
 
-\begin{equation}
-\label{eq:lin_prog}
-\bm{\mathcal{P}}^* = \operatorname*{argmin}_{\bm{\mathcal{P}}} \sum_i C_{fg}(i) f_{visit}(i) + \sum_{i,j} C_{trans}(i,j)f_{trans}(i,j) + \sum_{i} C_{in} f_{in}(i)
-\end{equation}
-
-Considered as a network flow problem, the latter integer program is further restricted to edge capacity constraints and flow conservation at the nodes inputs and outputs.
-
-The term $C_{fg}(i)$ defines the cost of selecting superpixel $x_i$ as foreground.
-We derive it from the foreground probability of the corresponding superpixel as
-
+In practice, we use the same orginal \KSPTrack~setup as in~\cite{lejeune18} with the exception of using the output of \SSnnPU, $f_{\theta}(x_i)$ to compute the cost of selecting superpixel $x_i$ as part of the object by,
 \begin{equation}
   \label{eq:cost_fg}
-  C_{fg}(i) = -\log \frac{f_\theta(x_i)}{1-f_\theta(x_i)}
+  C_{fg}(i) = -\log \frac{f_\theta(x_i)}{1-f_\theta(x_i)},
 \end{equation}
+\noindent
+where $C_{fg}(i)$ is the cost of including superpixed $x_i$ as part of the object. By construction, this relation therefore imposes a negative cost when $f_{\theta}(x) > 0.5$, and a non-negative cost otherwise. 
 
-By construction, this relation therefore imposes a negative cost when $f_{\theta}(x) > 0.5$, and a non-negative cost otherwise.
-The costs $C_{in}(i)$, express the cost of pushing flow into the network starting from superpixel $x_{i}$.
-In particular, for each user-provided 2D location (assumed to be located on the object), we define a circle centered on it of radius $R$.
-$C_{in}(i)$ is set to $0$ when the centroid of superpixel $x_i$ is contained within that circle, and $\infty$ otherwise.
-The transitions costs $C_{trans}(i,j)$, which define the cost of transiting from $x_i$ to $x_j$, are set to $0$ when $x_i$ and $x_j$ overlap, i.e. have at least $1$ pixel of same location, and $\infty$ otherwise.
-
-To optimize the problem of Eq. \ref{eq:lin_prog}, we resort to the K-Shortest Paths (KSP) algorithm as described in \cite{lejeune18}.
-
-Note that in contrast with \cite{lejeune18}, we simplify the modeling of costs $C_{in}$ and $C_{trans}$.
-Also, the latter work performs several iterations of the tracking algorithm by augmenting the set of positives and re-training their foreground model after each iteration.
-This augmentation strategy did not prove beneficial in the proposed foreground prediction model.
-
+The final output of the \KSPTrack~method yields a binary image for each of the frames in the data volume. For the remainder of this paper, we will refer to the combined use of \SSnnPU~and \KSPTrack~as \SSnnPUKSP.
 
 %%% Local Variables:
 %%% mode: latex

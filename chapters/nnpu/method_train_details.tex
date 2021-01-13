@@ -1,56 +1,30 @@
 \subsection{Training details, hyper-parameters, and implementation}
-We now describe for each component of our pipeline the hyper-parameters and training details.
-The code of our foreground prediction model is written in Python using the PyTorch library \cite{paszke19}.
-The tracking module is written in C++.
-The code of all components is made publicly available \footnote{\url{https://github.com/lejeunel/ksptrack}}.
+\label{sec:implementation}
+We now specify technical details of our implementation and training procedure. \SSnnPU~is implemented\footnote{Code will be made publicly available.} in Python using the PyTorch library, while we use the publicly available implementation of \KSPTrack\footnote{\url{https://github.com/lejeunel/ksptrack}}.
 
-\subsubsection{Foreground prediction model}
-For all our experiments we use a Convolutional Neural Network based on the U-Net architecture \cite{ronneberger15}, as proposed in \cite{ibtehaz20}.
-First, in place of simple convolutional layers, we use ``Inception-like'' blocks \cite{szegedy16} to improve robustness to scale variations.
-Second, the shortcut connections are replaced by a serie of $3\times3$ convolutional layers with residual connections.
-Last, batch normalization layers \cite{ioffe15} are added after each convolutional layer.
+\subsubsection{SSnnPU}
+$f_\theta$ is implemented as a Convolutional Neural Network based on the U-Net architecture proposed in~\cite{ibtehaz20} for all experiments. It uses ``Inception-like'' blocks in place of simple convolutional layers to improve robustness to scale variations. Skip connections are replaced by a serie of $3\times3$ convolutional layers with residual connections. Batch normalization layers are added after each convolutional layer.
 
-For the proposed self-supervised class-prior estimation (Sec. \ref{sec:nnpu} and \ref{sec:pi_estim}), we divide the training into three phases:
-
+To train \SSnnPU, we proceed with a three phase process:
 \begin{enumerate}
-  \item We perform a pre-training phase so as to make our observations more robust.
-    In particular, we initialize the weights of our CNN so as to
-    make the training focus more on the foreground, as suggested in \cite{lin17}.
-    Concretely, we note that the last layer of our decoder is a sigmoid function $\sigma(x)=\frac{1}{1+e^{-x}}$.
-    We set the bias of the preceding convolutional layer to $-\log{\frac{1-\pi_{init}}{\pi_{init}}}$, with $\pi_{init}=0.01$.
-    All others parameters are initialized using He's method \cite{he15init}.
-    The CNN is then trained for $50$ epochs using constant initial prior $\hat \pi_{0}$ following Alg. \ref{alg:sgdnnpu} with a learning rate set to $10^{-4}$.
-    \item We optimize the model and class-prior estimates for maximum $100$ epochs as in Alg. \ref{alg:prior_estim} with a learning rate set to $10^{-5}$.
-  \item We train using frame-wise priors given by the previous phase for an additional $100$ epochs with a learning rate of $10^{-5}$.
+  \item To increase the robustness of early observations, we train $f$ for 50 epochs with Alg.~\ref{alg:sgdnnpu} and a learning rate set to $10^{-4}$. With the last layer of our decoder being a sigmoid function, we set the bias of the preceding convolutional layer to $-\log{\frac{1-\pi_{init}}{\pi_{init}}}$, with $\pi_{init}=0.01$, as advised in~\cite{lin17}. All others parameters are initialized using He's method~\cite{he15init}.
+    \item We then optimize the model and class-prior estimates for a maximum $100$ epochs as described in Alg.~ \ref{alg:prior_estim} with a learning rate set to $10^{-5}$.
+  \item We then train using frame-wise priors given by the previous phase for an additional $100$ epochs with a learning rate of $10^{-5}$.
 \end{enumerate}
-
-In all phases, we use the Adam optimizer \cite{kingma14} with weight decay $0.01$.
-As data augmentation, we use a random combination of additive gaussian noise, bilateral blur, and gamma constrast.
+We use the Adam optimizer with weight decay $0.01$ for all training phases. Data augmentation is performed using a random combination of additive gaussian noise, bilateral blur and gamma contrasting. 
 
 \subsubsection{Recursive Bayesian Estimation}
-For the process, transition, and initial covariance matrices, we use diagonal matrices, i.e.
+For the process, transition, and initial covariance matrices, we use diagonal matrices 
 $Q=\sigma_{Q}\mathbb{I}$, $R=\sigma_{R}\mathbb{I}$, and $S=\sigma_{S}\mathbb{I}$, where $\mathbb{I}$ is the identity matrix.
-As the observations are often very noisy, we set an observation variance much larger than the process variance, i.e. $\sigma_{Q}=10$ and $\sigma_{R}=0.05$.
-$\sigma_{S}$ is set to $0.03$.
-The parameters of the control input are set proportional to $\hat \pi_{0}$, i.e. $u_{0}=0.02 \cdot \hat \pi_{0}$, and $u_{T}=0.4 \cdot \hat \pi_{0}$.
-For the observation model (Eq. \ref{eq:observ}), we set $\gamma=2$.
-The window length of the frame-wise smoothing filter is set proportional to the number of frames: $L=0.05\cdot N$.
-The time-period of our stopping condition is set to $T_{s}=10$, and the threshold on the variance is $\tau=0.007$.
+As the observations $\rho_{k}^{i}$ are often very noisy, we set $\gamma=2$ and the observation variance much larger than the process variance $\sigma_{Q}=10$, $\sigma_{R}=0.05$ and $\sigma_{S}=0.03$.
+The parameters of the control input are set proportionally to $\hat \pi_{0}$ with $u_{0}=0.02 \hat \pi_{0}$, and $u_{T}=0.4 \hat \pi_{0}$. The window length of the frame-wise smoothing filter is set proportionally to the number of frames: $L=0.05N$. The time-period of our stopping condition is set to $T_{s}=10$ and the threshold on the variance is $\tau=0.007$.
 
-\subsubsection{Tracking and superpixelization}
+\subsubsection{KSPTrack parameters}
 \label{sec:org4560526}
-We define for each user-provided 2D location a circle of radius \(R=0.05 \cdot \max\{W,H\}\) centered on the 2D location, where \(W\) and \(H\) are the width and height of frames, respectively.
-In order to reduce the number of edges and alleviate the computational requirement, we also prune ``visiting'' edges when their corresponding foreground probability falls below $0.4$.
-
-So as to make the tracking step tracktable, all sequences are pre-segmented into $\sim 1200$ superpixels using SLIC \cite{achanta12}.
-Given that our segmentations will be evaluated at pixel-level, the latter pre-processing step induces an upper-bound in accuracy, which we wish to evalute.
-To do so, we use the manual ground truth annotation as follows:
-Taking as positive the superpixels that overlap the manual ground truth annotations by more than $0.5$ of their area, and the others as negatives, we obtain the optimal superpixel segmentation of our sequence.
-We then compare the latter segmentation with the pixel-wise manual ground truth annotation and report the F1-score in Tab. \ref{tab:sp_errors}.
-
-\input{chapters/nnpu/tables/sp_errors.tex}
+All sequences are pre-segmented into $\sim 1200$ superpixels and the output of $f$ is averaged over all pixels in a superpixel. Each point-wise annotation defines a circle of radius \(R=0.05 \cdot \max\{W,H\}\) centered on the 2D location, where \(W\) and \(H\) are the width and height of frames, respectively. The input cost at given superpixel is set to $0$ when its centroid is contained within that circle, and $\infty$ otherwise. The transitions costs are set to $0$ when superpixels overlap and $\infty$ otherwise.
+In order to reduce the number of edges and alleviate the computational requirements, we also prune {visiting} edges when their corresponding object probability falls below $0.4$. We perform a single round of \KSPTrack~as augmenting the set of positives and re-training the object model after each round (as in~\cite{lejeune18}) did not prove beneficial.
 
 %%% Local Variables:
 %%% mode: latex
-%%% TeX-master: "../../main"
+%%% TeX-master: "main"
 %%% End:

@@ -240,8 +240,6 @@ booktitle = {Advances in Neural Information Processing Systems 27},
 editor = {Z. Ghahramani and M. Welling and C. Cortes and N. D. Lawrence and K. Q. Weinberger},
 pages = {703--711},
 year = {2014},
-publisher = {Curran Associates, Inc.},
-url = {http://papers.nips.cc/paper/5509-analysis-of-learning-from-positive-and-unlabeled-data.pdf}
 }
 
 @INPROCEEDINGS{sznitman2013,
@@ -657,6 +655,15 @@ doi="10.1007/3-540-45878-6_5",
 url="http://dx.doi.org/10.1007/3-540-45878-6_5"
 }
 
+@inproceedings{duplessis15,
+   title="Convex Formulation for Learning from Positive and Unlabeled Data",
+   Author={Plessis, Marthinus Du and Niu, Gang and Sugiyama, Masashi},
+   year="2015",
+   Booktitle="International Conference on Machine Learning",
+   pages="1386 -- 1394",
+ } 
+
+
 @INPROCEEDINGS{prokaj11,
 author={J. Prokaj and M. Duchaineau and G. Medioni},
 booktitle={CVPR 2011 WORKSHOPS},
@@ -972,11 +979,7 @@ volume = "50",
 pages = "65 - 81",
 year = "2018",
 issn = "1361-8415",
-doi = "https://doi.org/10.1016/j.media.2018.08.007",
-url = "http://www.sciencedirect.com/science/article/pii/S1361841518306637",
 author = "Laurent Lejeune and Jan Grossrieder and Raphael Sznitman",
-keywords = "Semi-supervised learning, Semantic segmentation, Multi-path tracking, Point-wise supervision",
-abstract = "Recent machine learning strategies for segmentation tasks have shown great ability when trained on large pixel-wise annotated image datasets. It remains a major challenge however to aggregate such datasets, as the time and monetary cost associated with collecting extensive annotations is extremely high. This is particularly the case for generating precise pixel-wise annotations in video and volumetric image data. To this end, this work presents a novel framework to produce pixel-wise segmentations using minimal supervision. Our method relies on 2D point supervision, whereby a single 2D location within an object of interest is provided on each image of the data. Our method then estimates the object appearance in a semi-supervised fashion by learning object-image-specific features and by using these in a semi-supervised learning framework. Our object model is then used in a graph-based optimization problem that takes into account all provided locations and the image data in order to infer the complete pixel-wise segmentation. In practice, we solve this optimally as a tracking problem using a K-shortest path approach. Both the object model and segmentation are then refined iteratively to further improve the final segmentation. We show that by collecting 2D locations using a gaze tracker, our approach can provide state-of-the-art segmentations on a range of objects and image modalities (video and 3D volumes), and that these can then be used to train supervised machine learning classifiers."
 }
 
 @article{mnih15,
@@ -1226,12 +1229,7 @@ month={June},}
   journal   = {CoRR},
   volume    = {abs/1708.02002},
   year      = {2017},
-  url       = {http://arxiv.org/abs/1708.02002},
   archivePrefix = {arXiv},
-  eprint    = {1708.02002},
-  timestamp = {Mon, 13 Aug 2018 16:46:12 +0200},
-  biburl    = {https://dblp.org/rec/journals/corr/abs-1708-02002.bib},
-  bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
 @article{derr18,
@@ -1349,7 +1347,6 @@ publisher={NOPUBLISHER}
   booktitle={Proceedings of the 32th AAAI conference on artificial intelligence},
   pages={2712--2719},
   year={2018},
-  organization={AAAI Press}
 }
 
 @article{bekker20,
@@ -1397,35 +1394,22 @@ publisher={NOPUBLISHER}
   journal   = {CoRR},
   volume    = {abs/1809.05710},
   year      = {2018},
-  url       = {http://arxiv.org/abs/1809.05710},
   archivePrefix = {arXiv},
-  eprint    = {1809.05710},
-  timestamp = {Tue, 01 Sep 2020 17:53:14 +0200},
-  biburl    = {https://dblp.org/rec/journals/corr/abs-1809-05710.bib},
-  bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
- @InProceedings{duplessis15,
+
  title = {Convex Formulation for Learning from Positive and Unlabeled Data},
  author = {Marthinus Du Plessis and Gang Niu and Masashi Sugiyama},
  pages = {1386--1394},
  year = {2015},
- editor = {Francis Bach and David Blei},
  volume = {37},
- series = {Proceedings of Machine Learning Research},
- address = {Lille,
- France},
- month = {07--09 Jul},
- publisher = {PMLR},
- pdf = {http://proceedings.mlr.press/v37/plessis15.pdf},
- url = {http://proceedings.mlr.press/v37/plessis15.html},
- abstract = {We discuss binary classification from only from positive and unlabeled data (PU classification),
- which is conceivable in various real-world machine learning problems. Since unlabeled data consists of both positive and negative data,
- simply separating positive and unlabeled data yields a biased solution. Recently, it was shown that the bias can be canceled by using a particular non-convex loss such as the ramp loss. However, classifier training with a non-convex loss is not straightforward in practice. In this paper, we discuss a convex formulation for PU classification that can still cancel the bias. The key idea is to use different loss functions for positive and unlabeled samples. However, in this setup, the hinge loss is not permissible. As an alternative, we propose the double hinge loss. Theoretically, we prove that the estimators converge to the optimal solutions at the optimal parametric rate. Experimentally, we demonstrate that PU classification with the double hinge loss performs as accurate as the non-convex method, with a much lower computational cost.} }
+ booktitle = {International Conference on Machine Learning},
+ }
 
 @article{kalman1960,
   title={A new approach to linear filtering and prediction problems},
   author={Kalman, Rudolph Emil},
+  journal = {Journal of Basic Engineering},
   year={1960}
 }
 
@@ -1520,7 +1504,6 @@ publisher={NOPUBLISHER}
   author={Li, Xiaoli and Liu, Bing},
   booktitle={IJCAI},
   volume={3},
-  number={2003},
   pages={587--592},
   year={2003}
 }
@@ -1596,12 +1579,7 @@ publisher={NOPUBLISHER}
   journal   = {CoRR},
   volume    = {abs/1502.01852},
   year      = {2015},
-  url       = {http://arxiv.org/abs/1502.01852},
   archivePrefix = {arXiv},
-  eprint    = {1502.01852},
-  timestamp = {Wed, 17 Apr 2019 17:23:45 +0200},
-  biburl    = {https://dblp.org/rec/journals/corr/HeZR015.bib},
-  bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
 @misc{welch95,
@@ -1636,4 +1614,64 @@ publisher={NOPUBLISHER}
   booktitle={Proceedings of the IEEE conference on computer vision and pattern recognition},
   pages={2818--2826},
   year={2016}
+}
+@inproceedings{hsieh19,
+  title={Classification from positive, unlabeled and biased negative data},
+  author={Hsieh, Yu-Guan and Niu, Gang and Sugiyama, Masashi},
+  booktitle={International Conference on Machine Learning},
+  pages={2820--2829},
+  year={2019},
+  organization={PMLR}
+}
+@inproceedings{ferreira12,
+  title={An annotation tool for dermoscopic image segmentation},
+  author={Ferreira, Pedro M and Mendon{\c{c}}a, Teresa and Rozeira, Jorge and Rocha, Paula},
+  booktitle={Proceedings of the 1st International Workshop on Visual Interfaces for Ground Truth Collection in Computer Vision Applications},
+  pages={1--6},
+  year={2012}
+}
+
+@misc{sener18,
+      title={Active Learning for Convolutional Neural Networks: A Core-Set Approach},
+      author={Ozan Sener and Silvio Savarese},
+      year={2018},
+      eprint={1708.00489},
+      archivePrefix={arXiv},
+      primaryClass={stat.ML}
+}
+@article{chen19,
+  title={Self-supervised learning for medical image analysis using image context restoration},
+  author={Chen, Liang and Bentley, Paul and Mori, Kensaku and Misawa, Kazunari and Fujiwara, Michitaka and Rueckert, Daniel},
+  journal={Medical image analysis},
+  volume={58},
+  pages={101539},
+  year={2019},
+  publisher={Elsevier}
+}
+
+@inproceedings{salvador13,
+  title={Crowdsourced object segmentation with a game},
+  author={Salvador, Amaia and Carlier, Axel and Giro-i-Nieto, Xavier and Marques, Oge and Charvillat, Vincent},
+  booktitle={Proceedings of the 2nd ACM international workshop on Crowdsourcing for multimedia},
+  pages={15--20},
+  year={2013}
+}
+
+@incollection{jamaludin17,
+  title={Self-supervised learning for spinal MRIs},
+  author={Jamaludin, Amir and Kadir, Timor and Zisserman, Andrew},
+  booktitle={Deep Learning in Medical Image Analysis and Multimodal Learning for Clinical Decision Support},
+  pages={294--302},
+  year={2017},
+  publisher={Springer}
+}
+@article{heim18,
+  title={Large-scale medical image annotation with crowd-powered algorithms},
+  author={Heim, Eric and Ro{\ss}, Tobias and Seitel, Alexander and M{\"a}rz, Keno and Stieltjes, Bram and Eisenmann, Matthias and Lebert, Johannes and Metzger, Jasmin and Sommer, Gregor and Sauter, Alexander W and others},
+  journal={Journal of Medical Imaging},
+  volume={5},
+  number={3},
+  pages={034002},
+  year={2018},
+  publisher={International Society for Optics and Photonics}
 }
