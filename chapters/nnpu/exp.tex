@@ -12,6 +12,17 @@ To validate our method, we evaluate it on the publicly available dataset used in
 \item \textbf{Cochlea:} Four volumes of 3D CT scans of the inner ear, where the cochlea must be annotated. This object is the most challenging object to segment due to its challenging geometry (\ie non-concave shape).
 \end{itemize}
 
+\begin{figure*}[t]
+\caption{Visualization of stopping conditions for \SSnnPU~method. For each tested image type, we show: (top) Mean Absolute Error (MAE) between the estimated and the true prior, (bottom) Variance of the pseudo-negatives. We also show here threshold (in dashed-red), and the minimum number of epochs (dashed-green). Both the optimal (circle) and the stopping conditions-based class-priors (cross) are shown on each of the sequences of each type (one line per sequence). }
+\centering
+\begin{tabular}{@{}cc@{}}
+    \includegraphics[width=.5\textwidth]{tweezer_priors.png} &
+    \includegraphics[width=.5\textwidth]{brain_priors.png} \\
+    \includegraphics[width=.5\textwidth]{slitlamp_priors.png} &
+    \includegraphics[width=.5\textwidth]{cochlea_priors.png} \\
+\end{tabular}
+\label{fig:converge}
+\end{figure*}
 
 \subsection{Segmentation performance}
 \label{sec:exp_performance}
@@ -29,7 +40,7 @@ For our method, we set the initial class prior upper-bound, $\pi_{max}$, by comp
 \begin{figure*}[t]
 \caption{Qualitative results for each type. From left to right: Original image with groundtruth highlighted in red and 2D location in green, output of foreground prediction model (SSnnPU), SSnnPU combined with our spatio-temporal regularization scheme (SSnnPU+KSPTrack), best baseline (KSPTrack), and second best baseline (EEL).}
 \centering
-    \includegraphics[width=.8\textwidth]{pics/prevs.png}
+    \includegraphics[width=.65\textwidth]{prevs.png}
 \label{fig:prevs}
 \end{figure*}
 
@@ -72,17 +83,6 @@ Last, we analyze the behavior of our proposed stopping conditions in Alg.~\ref{a
 As we aim to estimate the true class-prior, we plot the Mean Absolute Error between the estimated priors and the true priors (top panels).
 The proposed stopping condition, which leverages the variance of pseudo-negatives, is plotted in the bottom panel. We observe that the proposed stopping condition triggers reasonably close to the optima in most cases. In cases where the stopping condition is triggered earlier or later, we note that the difference in mean absolute error is fairly small, whereby implying that the impact in the early/late trigger is rather small. 
 
-\begin{figure*}[t]
-\caption{Visualization of stopping conditions for \SSnnPU~method. For each tested image type, we show: (top) Mean Absolute Error (MAE) between the estimated and the true prior, (bottom) Variance of the pseudo-negatives. We also show here threshold (in dashed-red), and the minimum number of epochs (dashed-green). Both the optimal (circle) and the stopping conditions-based class-priors (cross) are shown on each of the sequences of each type (one line per sequence). }
-\centering
-\begin{tabular}{@{}cc@{}}
-    \includegraphics[width=.5\textwidth]{pics/tweezer_priors.png} &
-    \includegraphics[width=.5\textwidth]{pics/brain_priors.png} \\
-    \includegraphics[width=.5\textwidth]{pics/slitlamp_priors.png} &
-    \includegraphics[width=.5\textwidth]{pics/cochlea_priors.png} \\
-\end{tabular}
-\label{fig:converge}
-\end{figure*}
 
 %%% Local Variables:
 %%% mode: latex

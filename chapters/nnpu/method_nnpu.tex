@@ -36,8 +36,9 @@ R_{i}^{-}=\sum_{i=1}^N\Biggl(
 \frac{\pi^{i}}{|\mathcal{X}^{i}_{p}|}\sum_{x \in \mathcal{X}^{i}_p}\ell^-(f_{\theta}(x)) \Biggr).
 \end{equation}
 
-Thus the complete training procedure for the PU setting with deep neural networks is described in Alg.~\ref{alg:sgdnnpu}. Specifically, when \(R_{i}^{-} < 0\), gradient ascent is performed by setting the gradient to \(-\nabla_\theta R_{i}^{-}\).
-
+Thus the complete training procedure for the PU setting with deep neural networks is described in Alg.~\ref{alg:sgdnnpu}. Specifically, when \(R_{i}^{-} < 0\), gradient ascent is performed by setting the gradient to \(-\nabla_\theta R_{i}^{-}\). 
+%\algnewcommand\algorithmicforeach{\textbf{for each}}
+%\algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
 \begin{algorithm}[H]
 \caption{Non-negative PU learning}
 \label{alg:sgdnnpu}

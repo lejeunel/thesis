@@ -14,6 +14,8 @@ first wish to give the reader some insights on the genesis of \gls{ai}.
 In particular, we describe the two main paradigms that underlie common automated systems, namely the conventional programming and machine learning paradigms.
 In a second section, we explain why one needs large amounts of annotated data to make modern \gls{ai} solutions practical, and how the medical imaging field, in particular, is hindered by this requirement.
 Next, we emphasize how the present thesis aims at solving this issue.
+We then give a brief discussion on the annotation protocol itself, and describe different approaches
+from the traditional mouse-driven approach to the most recent eye-gaze tracking.
 Last, we give an overview of the organization of the present thesis.
 
 \section{Conventional Programming VS. Machine Learning}
@@ -126,6 +128,65 @@ The annotation time is estimated to $1$ minute per image per instrument.
     \label{fig:intro_endovis}
 \end{figure}
 
+\section{Human-Computer interaction}
+
+The task of annotating data is usually performed by means of a computer program
+specifically designed for the considered task.
+An important field of study closely related to the presented study, \gls{hci}, aims at optimizing the interaction
+between a human user that provides inputs and a machine that records them.
+The two instances, human and computer, communicate with one another through an interface channel, where
+the output data provided by the computer is the input data received by the human user, and vice versa \cite{dix00}.
+
+The core idea is that the human-computer interface must be designed in such
+a way as to be as painless as possible
+for the user (physically and psychologically), while ensuring that the user-provided inputs are
+robust and adequate to the late-stage task.
+
+\Gls{hci} therefore combines two broad categories of disciplines.
+
+The first lies on the computer's side and leverages a broad range of techniques such as computer vision,
+signal processing, and hardware design.
+The second lies on the human side and covers several fields such as psychology, linguistics, and ergonomics.
+
+While \gls{hci} is too broad to be entirely covered in this introduction, we rather choose to
+mention studies and applications that are most related to the present thesis, namely the task of annotating images.
+
+In \cite{russell08}, authors propose a web platform that allows participants to annotate
+natural images drawn from a database.
+Concretely, the user defines on each image a closed polygonal contour on each object contained on the image,
+and selects a pre-defined semantic label from a list.
+Defining the contour of an object by means of polygons
+provides a sensible quality vs. annotation-time compromise.
+Furthermore, as the quantity of user-provided anchor points can be arbitrarily large,
+the error of the polygonal contour with respect to a reference manual annotation
+is theoretically null.
+Another important feature of the latter framework is to allow a user to perform corrections on the contour by
+displacing keypoints, and/or adding new keypoints to further refine the annotation.
+
+In \cite{labelme16}, authors extend the above protocol by allowing users to draw
+contours using rectangles (a.k.a. bounding-boxes), free-form
+lines, circles and polygons (see Fig. \ref{fig:labelme}).
+
+\begin{figure}[!htpb]
+  \includegraphics[width=0.99\textwidth]{labelme.jpg}
+  \caption{Graphical annotation tool inspired by LabelMe \cite{russell08}. User can draw contours
+  using rectangles, free-form lines, circles, and polygons. Taken from \cite{labelme16}.}
+  \label{fig:labelme}
+\end{figure}
+
+Another approach, based on eye-gaze tracking aims at relieving the physical effort brought by
+the handling of traditional pointing devices such as computer mouse.
+An eye-gaze tracking system comprises an acquisition device that records the
+position of a user's eye-gaze over time with a
+software that infers where the user is looking at on a monitor.
+This approach, while being less demanding for the user, this approach poses several important technical limitations.
+First, the movement of the eyes are inherently noisy and must be carefully filtered
+so as to circumvent ocular tremor and drift \cite{niehorster21}.
+Second, the tracker must be calibrated in a preliminary phase.
+Third, depending on the considered gaze-tracker device, the calibration parameters can be sensitive to
+the user's head position and must therefore be repeated regularly throughout the data acquisition.
+
+
 \section{Problem definition and thesis statement}
 
 Comparing the above scenarios, we emphasize that applying state-of-the-art \gls{dl} methods to the segmentation of medical images poses additional practical difficulties with respect to non-medical settings.
@@ -139,6 +200,7 @@ The present thesis addresses the bottleneck of scarcity of annotated medical ima
 
 \textbf{Thesis statement}
 Generating pixel-wise annotations of medical sequences over a wide range of modalities is greatly facilitated by means of a novel fast and intuitive protocol that relies on sparse point-wise cues, aided by a segmentation framework that relies on \gls{dl} and multi-object tracking.
+
 
 \section{Organization and Contribution of this Thesis}
 The organization of this thesis is now summarized per chapter:
@@ -155,27 +217,20 @@ We then describe the medical datasets that were used for the evaluation of the p
 
 \textbf{Chapter 4} contains our first segmentation method that relies on the Expected Exponential loss, optimized using a gradient boosting classifier. The probabilities of unlabeled samples are estimated using label propagation.
 
-\textbf{Chapter 5} gives a thorough study of feature extraction methods, which form an important component of the method presented in the next chapter.
-In particular, we first develop an evaluation framework based on a \gls{rf} classifier that operates on superpixels.
-As baselines, we implement traditional feature extraction methods, such as \gls{bovw}.
-Another baseline considers unsupervised deep feature extraction, where we use a \gls{cnn} trained to classify natural images.
-We then implement various methods based on \gls{dl} that integrate motion priors, as well as priors derived from the user-provided point annotations.
-Through extensive experiments, we demonstrate the superiority of the \gls{ae} configuration aided by spatial priors.
-
-\textbf{Chapter 6} presents an innovative framework based on multi-object tracking.
+\textbf{Chapter 5} presents an innovative framework based on multi-object tracking.
 Concretely, we formulate our segmentation problem as a maximum a-posteriori problem, where the random variable to optimize is the objectness of superpixels.
-Using deep features extracted with the best method of the previous chapter, we train an ensemble of decision trees using a sampling method applicable to the \gls{pu} setup.
+Using deep features, we train an ensemble of decision trees using a sampling method applicable to the \gls{pu} setup.
 Next, simple gaussian kernels provide pairwise similarity measures.
 These two models allow to define likelihoods of selecting a superpixel given the user's annotations, and transiting from one frame to the next.
 Using the network flow paradigm, we then build a graph that connects superpixels according to spatio-temporal relations.
 This chapter covers the content of our first journal article \cite{lejeune18}.
 
-\textbf{Chapter 7} investigates on using a self-supervised clustering method to improve on the foreground prediction and pairwise similarity models defined in the previous chapter.
+\textbf{Chapter 6} investigates on using a self-supervised clustering method to improve on the foreground prediction and pairwise similarity models defined in the previous chapter.
 In particular, our original ambition was to use the self-supervised embedded clustering paradigm to generate pairwise similarity labels.
 Our next step would then consist in training a pairwise similarity module, using the above labels.
 Even though this approach did not show substantial improvements in performance, we choose to mention it here as a negative result.
 
-\textbf{Chapter 8} continues on the same line as the previous chapter by improving on the foreground prediction model.
+\textbf{Chapter 7} continues on the same line as the previous chapter by improving on the foreground prediction model.
 Instead of using two components, where the first generates deep features, while the second estimates foreground probabilities, we aim at combining the two in an end-to-end fashion.
 We leverage a loss function applicable to the \gls{pu} scenario, where the foreground probabilities are inferred by a deep network configured as a predictor.
 As the latter loss function requires accurate class priors to render its full potential, we further devise a strategy to estimate the latter in a self-supervised manner.
@@ -183,7 +238,14 @@ In particular, our approach consists in setting an initial upper-bound constant 
 Our algorithm relies on the recursive bayesian estimation paradigm.
 This chapter covers the content of our second journal article, currently in preparation.
 
-\textbf{Chapter 9} gives a summary of our contributions, provides general discussions on the improvements and limitations of our solutions, and concludes by giving an outline on future works.
+\textbf{Chapter 8} gives a summary of our contributions, provides general discussions on the improvements and limitations of our solutions, and concludes by giving an outline on future works.
+
+\textbf{Appendix A} gives a thorough study of feature extraction methods, which form an important component of the method presented in our multi-path tracking method, as presented in chapter 5.
+In particular, we first develop an evaluation framework based on a \gls{rf} classifier that operates on superpixels.
+As baselines, we implement traditional feature extraction methods, such as \gls{bovw}.
+Another baseline considers unsupervised deep feature extraction, where we use a \gls{cnn} trained to classify natural images.
+We then implement various methods based on \gls{dl} that integrate motion priors, as well as priors derived from the user-provided point annotations.
+Through extensive experiments, we demonstrate the superiority of the \gls{ae} configuration aided by spatial priors.
 
 %%% Local Variables:
 %%% mode: latex
