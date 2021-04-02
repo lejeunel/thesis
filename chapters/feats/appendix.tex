@@ -51,10 +51,10 @@ Most of the content of the present chapter is taken from \cite{goodfellow16}.
 \subsubsection{Neural Network}
 Deep learning essentially refers to a family of machine learning methods that historically derive from the \gls{mlp}, also known as Neural Network.
 An \gls{mlp} aims at approximating an unknown function $f^{*}$ with a function $f(x;\theta)$ parameterized by $\theta$.
-More concretely, an \gls{mlp} converts an input $x$ to an output $y$ using a chain of function $f^{(1)} \circ f^{2} \circ \cdots \circ f^{n}(x)$, which justifies its name ``network''.
+More concretely, an \gls{mlp} converts an input $x$ to an output $y$ using a chain of functions $f^{(1)} \circ f^{2} \circ \cdots \circ f^{n}(x)$, which justifies its name ``network''.
 Each function is usually referred to as ``layer'', while the term ``neural'' comes from the fact that it is originally inspired by neuroscience \cite{mcculloch43}.
 
-As in all machine learning setup, one wants to find the set of parameters $\bm{\theta}$ so as to optimize a cost (or loss) function, for example the \gls{mse}:
+As in every \gls{ml} setup, one wants to find the set of parameters $\bm{\theta}$ so as to optimize a cost (or loss) function, for example the \gls{mse}:
 
 \begin{equation}
 \mathcal{L}(\bm{\theta}) = \sum_{x\in \mathcal{X}}(f^{*}(x)-f(x;\bm{\theta}))
@@ -96,8 +96,8 @@ Fig. \ref{fig:cnn_con} illustrates the idea of sparse connectivity brought by co
 
 \begin{figure}[!htpb]
   \centering
-  \includegraphics[width=10cm]{fc_vs_conv}
-  \caption{(Left) A fully-connected (linear) layer with 1D input at the bottom. (Right) Convolutional layer with a kernel of size 3.}
+  \includegraphics[width=10cm]{fc_vs_conv2}
+  \caption{(Top) Convolutional layer with a kernel of size 3. (Bottom) A fully-connected (linear) layer with 1D input at the bottom. Taken from \cite{goodfellow16}}
   \label{fig:cnn_con}
 \end{figure}
 
@@ -110,7 +110,7 @@ In particular, the max-pooling operator computes for each spatial location the m
 \begin{figure}[!htpb]
   \centering
   \includegraphics[width=10cm]{max_pooling}
-  \caption{(Left) Input. (Right) Output of max-pooling layer. Each color represents a set of values included in the sliding window.}
+  \caption{(Left) Input. (Right) Output of max-pooling layer. Each color represents a set of values included in the sliding window. Taken from Wikipedia.}
   \label{fig:max_pool}
 \end{figure}
 Figure \ref{fig:cnn} illustrates a CNN applied to an image processing task.
@@ -200,3 +200,8 @@ For example, using the \gls{mse} criterion, one writes:
     In yellow is the bottleneck.}
   \label{fig:ae}
 \end{figure}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../../main"
+%%% End:

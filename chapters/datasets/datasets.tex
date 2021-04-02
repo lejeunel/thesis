@@ -107,13 +107,15 @@ We design an annotation software so as to support the following features:
     \item We further wished to experiment on using an eye-gaze tracker in place of standard pointing devices.
 \end{itemize}
 
-To guarantee cross-platform compatibility, we choose the Qt5 framework \cite{eng16}, which relies on C++ and provides convenient widgets out of the box, such as drop-down menus, a file dialog, and sliders.
+To guarantee cross-platform compatibility, we choose the Qt5 framework \cite{eng16}, which relies
+on C++ and provides convenient widgets out of the box, such as drop-down menus, a file dialog, and sliders.
 
 So as to decode and display both standard videos and DICOMs, we resort to two solutions.
 To support standard video compression formats, we resort to the OpenCV library \cite{opencv}.
 To support DICOM, the de-facto standard in medical imaging, our software leverages the ITK library \cite{johnson15}.
 
-Regarding the acquisition of user's annotation, the mouse and tablet-pen inputs are naturally handled by the Qt framework.
+Regarding the acquisition of user's annotation, the mouse and tablet-pen inputs are naturally
+handled by the Qt framework.
 For acquisition using the eye-gaze tracker, we implement a module that is compatible with the proprietary backend given by the manufacturer of the tracker \cite{eyetribe}.
 
 The typical annotation workflow is the following:
@@ -138,13 +140,16 @@ The typical annotation workflow is the following:
   \label{fig:anna}
 \end{figure}
 
-We make our source code publicly available at \url{https://github.com/aimi-lab/Anna}.
+We make our source code publicly available at \url{https://github.com/lejeunel/Anna}.
 In Fig. \ref{fig:anna}, we show an example screenshot.
 
 
 \subsection{Web platform}
-The segmentation methods presented in the next chapters sometimes require important computational resources, namely a \gls{gpu} for the training of deep networks.
-We therefore provide a way for users to upload their data along with the corresponding 2D locations to a server that will perform the necessary computations remotely and send back segmentation results when they are available.
+The segmentation methods presented in the next chapters sometimes require important computational
+resources, namely a \gls{gpu} for the training of deep networks.
+We therefore provide a way for users to upload their data along with the corresponding 2D locations
+to a server that will perform the necessary computations remotely and send back segmentation
+results when they are available.
 Concretely, we develop a web interface that provides:
 
 \begin{itemize}
