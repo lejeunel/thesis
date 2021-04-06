@@ -165,7 +165,8 @@ Note that the above label propagation strategy, while it implicitly accounts for
 across two temporally adjacent frames
 via $\theta$, only propagates probabilities on a frame-by-frame basis.
 
-Last, propagation can the be computed iteratively by solving
+Last, we propagate probabilities at step $m+1$ iteratively using probabilities of previous step $m$
+along with initial values by solving
 
 \begin{equation}
 P_{m+1} = \alpha \Omega P_{m} + (1 - \alpha)P_{0}
