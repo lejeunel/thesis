@@ -11,9 +11,9 @@ In practice, we use the same orginal \KSPTrack~setup as in~\cite{lejeune18} with
   C_{fg}(i) = -\log \frac{f_\theta(x_i)}{1-f_\theta(x_i)},
 \end{equation}
 \noindent
-where $C_{fg}(i)$ is the cost of including superpixed $x_i$ as part of the object. By construction, this relation therefore imposes a negative cost when $f_{\theta}(x) > 0.5$, and a non-negative cost otherwise. 
+where $C_{fg}(i)$ is the cost of including superpixel $x_i$ as part of the object. By construction, this relation therefore imposes a negative cost when $f_{\theta}(x) > 0.5$, and a non-negative cost otherwise.
 
-The final output of the \KSPTrack~method yields a binary image for each of the frames in the data volume. For the remainder of this paper, we will refer to the combined use of \SSnnPU~and \KSPTrack~as \SSnnPUKSP.
+The final output of the \KSPTrack~method yields a binary image for each of the frames in the data volume. For the remainder of this chapter, we will refer to the combined use of \SSnnPU~and \KSPTrack~as \SSnnPUKSP.
 
 %%% Local Variables:
 %%% mode: latex

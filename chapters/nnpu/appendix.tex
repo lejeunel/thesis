@@ -45,7 +45,7 @@ In recursive bayesian filtering, we are interested in estimating the \gls{pdf} o
 Using Baye's rule, we rewrite:
 \begin{equation}
   \label{eq:bg_aposteriori}
-  p(\bm{x}_{k}|\bm{z}_{0:k}) = \frac{p(\bm{x}_{k}|\bm{z}_{0:k-1})\cdot p(\bm{x}_{k}|\bm{z}_{k})}{p(\bm{x}_{k}|\bm{z}_{0:k-1})}
+  p(\bm{x}_{k}|\bm{z}_{0:k}) = \frac{p(\bm{x}_{k}|\bm{z}_{0:k-1})\cdot p(\bm{x}_{k}|\bm{z}_{k})}{p(\bm{z}_{k}|\bm{z}_{0:k-1})}
 \end{equation}
 
 The left term of the denominator of Eq. \ref{eq:bg_aposteriori} is called the a-priori probability distribution of the current state.
@@ -74,12 +74,13 @@ the \gls{kf} only needs to propagate the
 Under these assumptions, the state-space model is rewritten :
 
 \begin{align}
-  \bm{x}_{k+1}&=F_{k}\bm{x}_{k} B_{k}u_{k} + \bm{v}_{k} \label{eq:bg_state_trans_kf}\\
+  \bm{x}_{k+1}&=F_{k}\bm{x}_{k} + B_{k}u_{k} + \bm{v}_{k} \label{eq:bg_state_trans_kf}\\
   \bm{z}_{k}&= H_{k}\bm{x}_{k} + \bm{n}_{k} \label{eq:bg_proc_kf} \\
   \bm{x}_{0}&= \bm{\bar{x}}_{0} + \mathcal{N}(0,S) \label{eq:bg_init_kf}
 \end{align}
 
 Where $\bm{v}_{k}=\mathcal{N}(0,Q)$, $\bm{n}_{k}=\mathcal{N}(0,R)$ are the process and observation noise signals, respectively, while $Q$, $R$, and $S$ are the process, observation and initial covariance matrices, respectively.
+Matrices $F_{k}$ and $H_{k}$ are linear representations of the transition and process models (Eq. \ref{eq:bg_state_trans} and \ref{eq:bg_proc}), while $B_{k}$ is an additional control-input linear model with input vector $u_{k}$.
 
 \subsubsection{Kalman Filter inference}
 We now provide an overview of the main steps of the \gls{kf} algorithm.

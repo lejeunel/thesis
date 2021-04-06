@@ -62,7 +62,7 @@ For a given image sequence, our approach is organized as follows and is illustra
 probability by using the image data and the gaze information; (3) we then train a gradient
 boosted classifier with our proposed loss on a subset of the image data; (4) using the trained
 classifier, we predict the remainder of the image data. We will detail these steps in the following
-sections but first define some notation used throughout this paper.
+sections but first define some notation used throughout this chapter.
 
 \begin{figure}[h]
 \includegraphics[width=0.99\textwidth]{pipeline}
@@ -118,7 +118,7 @@ Conversely values of $\epsilon_{S}$ close to 1 (or 0) will strongly impact the l
 
 \section{Implementation}
 We implemented the above EEL within a traditional Gradient Boosting classifier \cite{hastie09},
-by regressing to the residual given by the derivate of Eq. \ref{eq:eel}.
+by regressing to the residual given by the derivative of Eq. \ref{eq:eel}.
 For all experiments, we used stumps as weak learners, a shrinkage factor of 1 and the line search was replaced by a constant weight of 1.
 The weak learner stumps operate on features extracted from the center of the superpixel.
 In particular, we used generic Overfeat features \cite{sermanet13} which provide a rich
@@ -144,18 +144,28 @@ That is, we compute
 
   where $\mathcal{N}$ is a Gaussian distribution such that $\mu_{S}$ and $\Sigma_{S}$ are the color mean and covariance of pixels in a positive superpixel $S$.
   Also, we fix $p_{n}=1$ for positive superpixels.
-  To propagate probabilities, we also define a $N \times N$ affinity matrix, denoted W
-with values
+  To propagate probabilities, we first define $\theta_{i}$, the average motion gradient of superpixel $S_{i}$ computed
+  using its average optical flow maps along the $x$ and $y$ axes, respectively $f_{i}^{x}$ and $f_{i}^{y}$,  as
+
+\begin{equation}
+\theta_{i} = \frac{\arctan{f_{i}^{y}} / f_{i}^{x}}{\pi}
+\end{equation}
+
+Next, we define a $N \times N$ affinity matrix, denoted W with values
 
 \begin{equation}
 w_{ij} = exp(-||\theta_{i} - \theta_{j}||^2 / 2\sigma_{a}^{2}) exp(-||C(S_i) - C(S_j)||^2 / 2\sigma_{d}^{2})
 \end{equation}
 
-where for superpixel $S_{i}$, $C(S_{i})$ is its center and $\theta_{i}$ is its average gradient orientation.
+where for superpixel $S_{i}$, $C(S_{i})$ is its center and $\theta_{i}$ is the average gradient orientation of
+the corresponding optical flow map.
 In cases where $S_{i}$ and $S_{j}$ are separated by more than $\tau$ pixels, $w_{ij}=0$.
 $\sigma_{a}$ and $\sigma_{d}$ are model parameters reflecting the variance in angle difference and the impact of neighboring superpixels, respectively.
+Note that the above label propagation strategy, while it implicitly accounts for motion
+across two temporally adjacent frames
+via $\theta$, only propagates probabilities on a frame-by-frame basis.
 
-Propagation can the be computed iteratively by solving
+Last, propagation can the be computed iteratively by solving
 
 \begin{equation}
 P_{m+1} = \alpha \Omega P_{m} + (1 - \alpha)P_{0}
