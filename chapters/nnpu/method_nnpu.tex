@@ -6,7 +6,6 @@ We first briefly introduce and formulate Non-negative Positive-Unlabeled learnin
 
 Traditional supervised learning, which we denote Positive/Negative learning (PN), looks to build a model \(f_{\theta}: I \mapsto [0;1]^{W \times H}\), where \(\theta\) is a set of model parameters, \(I\) is the input image with width $W$ and height $H$. Letting \(\bm{\mathcal{I}} = \{\mathcal{I}^i\}_{i=1}^{N}\) be the set of $N$ input images corresponding to an image volume or video sequence, 
 each image $\mathcal{I}^i$ is composed of pixels, $\mathcal{X}^i=\mathcal{X}_p^i \cup \mathcal{X}_n^i$, where $\mathcal{X}_p^i$ and $\mathcal{X}_n^i$ denote the positive and negative pixels, respectively. We denote $\pi^i \in (0,1)$ as the proportion of positive pixels in image $i$, and $\bm{\pi} = \{\pi^i\}_{i=1}^{N}$ as the set of such proportions over all frames. 
-%To simplify the notation, we write $f_{\theta}(x) = f_{\theta}(\mathcal{I})\big|_x$ as theresponse of $f_{\theta}$ on image $\mathcal{I}$ averaged on the region defined by superpixel $x$.
 
 Training $f$ to optimize $\theta$ can then be computed by minimizing the empirical risk of the form,
 \begin{equation}
@@ -25,6 +24,7 @@ R_{pu}=\sum_{i=1}^{N}\Biggl[ \frac{\pi^{i}}{|\mathcal{X}^{i}_{p}|}\sum_{x \in \m
 \Biggl( \frac{1}{|\mathcal{X}^{i}_{u}|}\sum_{x \in \mathcal{X}^{i}_u}\ell^-(f_{\theta}(x)) -
 \frac{\pi^{i}}{|\mathcal{X}^{i}_{p}|}\sum_{x \in \mathcal{X}^{i}_p}\ell^-(f_{\theta}(x)) \Biggr) \Biggr].
 \end{equation}
+
 This is achieved by observing that $p(x) = \pi p(x|Y=1) + (1-\pi) p(x|Y=-1)$ and that the negative risk can be expressed as $ (1-\pi) \mathbb{E}_{X \sim p(x|Y=-1)}\left[\ell^-(f_\theta(X)) \right] =
 \mathbb{E}_{X \sim p(x)}\left[\ell^-(f_\theta(X)) \right] - \pi \mathbb{E}_{X \sim p(x|Y=+1)}\left[\ell^-(f_\theta(X)) \right]$. In the case of expressive models such as Neural Networks, minimizing the objective of Eq.~\eqref{eq:nnpu} using stochastic gradient descent on mini-batches of samples tends to overfit to the training data, by driving the negative risk, (\ie the bottom term of Eq.~\eqref{eq:nnpu}) to be negative.
 
